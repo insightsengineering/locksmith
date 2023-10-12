@@ -62,4 +62,4 @@ Run `make help` to list all related targets that will aid local development.
 
 ## License
 
-`locksmith` is licensed under the Apache 2.0 license. See [LICENSE.md](LICENSE.md) for details.
+`locksmith` is licensed under the Apache 2.0 license. See [LICENSE](LICENSE) for details.
