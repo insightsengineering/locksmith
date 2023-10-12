@@ -62,7 +62,7 @@ func newRootCommand() {
 	rootCmd = &cobra.Command{
 		Use:   "locksmith",
 		Short: "renv.lock generator",
-		Long:  `locksmith is a utility to generate renv.lock file containing all dependencies of given set of R packages.
+		Long: `locksmith is a utility to generate renv.lock file containing all dependencies of given set of R packages.
 Given the input list of R packages or git repositories containing the R packages, as well as a list of R package
 repositories (e.g. in a package manager, CRAN, BioConductor etc.), locksmith will try to determine the list of
 all dependencies and their versions required to make the input list of packages work.
