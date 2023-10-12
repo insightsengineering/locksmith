@@ -39,13 +39,13 @@ jobs:
           go-version: ${{ matrix.go-version }}
           cache: true
           cache-dependency-path: go.sum
-      
+
       - name: Run Tests 🧨
         run: make test
 
       - name: Check whether JUnit XML report exists 🚦
         id: check-junit-xml
-        uses: andstor/file-existence-action@v1
+        uses: andstor/file-existence-action@v2
         with:
           files: junit-report.xml
 
@@ -59,7 +59,7 @@ jobs:
 
       - name: Check whether coverage reports exists 💭
         id: check-coverage-reports
-        uses: andstor/file-existence-action@v1
+        uses: andstor/file-existence-action@v2
         with:
           files: >-
             coverage.xml,

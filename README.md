@@ -44,7 +44,7 @@ exampleParameter: exampleValue
 For example, setting the following variables will override the respective values from configuration file:
 `LOCKSMITH_LOGLEVEL`, `LOCKSMITH_EXAMPLEPARAMETER` etc.
 
-The precedence is like this (→ means "takes precedence over" or "overrides"):
+The order of precedence is:
 
 CLI flag → environment variable → configuration file → default value.
 
