@@ -1,6 +1,6 @@
 # locksmith
 
-[![build](https://github.com/insightsengineering/locksmith/actions/workflows/build.yml/badge.svg)](https://github.com/insightsengineering/locksmith/actions/workflows/build.yml)
+[![build](https://github.com/insightsengineering/locksmith/actions/workflows/test.yml/badge.svg)](https://github.com/insightsengineering/locksmith/actions/workflows/test.yml)
 
 `locksmith` is a utility to generate `renv.lock` file containing all dependencies of given set of R packages.
 
