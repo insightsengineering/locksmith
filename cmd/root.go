@@ -28,7 +28,10 @@ import (
 
 var cfgFile string
 var logLevel string
-var exampleParameter string
+var inputPackageList string
+var inputRepositoryList string
+var gitHubToken string
+var gitLabToken string
 
 var log = logrus.New()
 
@@ -37,7 +40,7 @@ func setLogLevel() {
 	customFormatter.TimestampFormat = "2006-01-02 15:04:05"
 	customFormatter.ForceColors = true
 	log.SetFormatter(customFormatter)
-	log.SetReportCaller(true)
+	log.SetReportCaller(false)
 	customFormatter.FullTimestamp = true
 	fmt.Println("logLevel =", logLevel)
 	switch logLevel {
@@ -74,15 +77,28 @@ It will then save the result in an renv.lock-compatible file.`,
 			setLogLevel()
 
 			fmt.Println("config =", cfgFile)
-			fmt.Println("exampleParameter =", exampleParameter)
+			fmt.Println("inputPackageList =", inputPackageList)
+			fmt.Println("inputRepositoryList =", inputRepositoryList)
+
+			packageList, repositoryList := parseInput()
+			log.Info("inputPackageList = ", packageList)
+			log.Info("inputRepositoryList = ", repositoryList)
+
+			downloadDescriptionFiles(packageList)
 		},
 	}
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "",
 		"config file (default is $HOME/.locksmith.yaml)")
 	rootCmd.PersistentFlags().StringVar(&logLevel, "logLevel", "info",
 		"Logging level (trace, debug, info, warn, error). ")
-	rootCmd.PersistentFlags().StringVar(&exampleParameter, "exampleParameter", "",
-		"Example parameter that does nothing.")
+	rootCmd.PersistentFlags().StringVar(&inputPackageList, "inputPackageList", "",
+		"Comma-separated list of git repository URLs for input packages.")
+	rootCmd.PersistentFlags().StringVar(&inputRepositoryList, "inputRepositoryList", "",
+		"Comma-separated list of package repositories, sorted according to their priorities (descending).")
+	rootCmd.PersistentFlags().StringVar(&gitHubToken, "gitHubToken", "",
+		"Token to download non-public files from GitHub.")
+	rootCmd.PersistentFlags().StringVar(&gitLabToken, "gitLabToken", "",
+		"Token to download non-public files from GitLab.")
 
 	// Add version command.
 	rootCmd.AddCommand(extension.NewVersionCobraCmd())
@@ -132,7 +148,10 @@ func Execute() {
 func initializeConfig() {
 	for _, v := range []string{
 		"logLevel",
-		"exampleParameter",
+		"inputPackageList",
+		"inputRepositoryList",
+		"gitHubToken",
+		"gitLabToken",
 	} {
 		// If the flag has not been set in newRootCommand() and it has been set in initConfig().
 		// In other words: if it's not been provided in command line, but has been
