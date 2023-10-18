@@ -86,6 +86,9 @@ It will then save the result in an renv.lock-compatible file.`,
 
 			inputDescriptionFiles := downloadDescriptionFiles(packageList)
 			parseDescriptionFileList(inputDescriptionFiles)
+			repositoryPackagesFiles := downloadPackagesFiles(repositoryList)
+			packagesFiles := parsePackagesFiles(repositoryPackagesFiles)
+			prettyPrint(packagesFiles)
 		},
 	}
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "",
@@ -93,7 +96,7 @@ It will then save the result in an renv.lock-compatible file.`,
 	rootCmd.PersistentFlags().StringVar(&logLevel, "logLevel", "info",
 		"Logging level (trace, debug, info, warn, error). ")
 	rootCmd.PersistentFlags().StringVar(&inputPackageList, "inputPackageList", "",
-		"Comma-separated list of git repository URLs for input packages.")
+		"Comma-separated list of URLs for raw DESCRIPTION files in git repositories for input packages.")
 	rootCmd.PersistentFlags().StringVar(&inputRepositoryList, "inputRepositoryList", "",
 		"Comma-separated list of package repositories, sorted according to their priorities (descending).")
 	rootCmd.PersistentFlags().StringVar(&gitHubToken, "gitHubToken", "",

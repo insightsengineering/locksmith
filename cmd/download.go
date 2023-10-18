@@ -17,8 +17,8 @@ package cmd
 
 import (
 	"crypto/tls"
-	"net/http"
 	"io"
+	"net/http"
 )
 
 // Returns HTTP status code for downloaded file, number of bytes in downloaded content,
@@ -59,4 +59,17 @@ func downloadDescriptionFiles(packageList []string) []string {
 		}
 	}
 	return inputDescriptionFiles
+}
+
+func downloadPackagesFiles(repositoryList []string) map[string]string {
+	inputPackagesFiles := make(map[string]string)
+	for _, repository := range repositoryList {
+		statusCode, _, packagesFileContent := downloadTextFile(repository+"/src/contrib/PACKAGES", map[string]string{})
+		if statusCode == 200 {
+			inputPackagesFiles[repository] = packagesFileContent
+		} else {
+			log.Warn("An error occurred while downloading ", repository+"/src/contrib/PACKAGES")
+		}
+	}
+	return inputPackagesFiles
 }

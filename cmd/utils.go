@@ -15,8 +15,17 @@ limitations under the License.
 */
 package cmd
 
+import (
+	"encoding/json"
+)
+
 func checkError(err error) {
 	if err != nil {
 		log.Error(err)
 	}
+}
+
+func prettyPrint(i interface{}) {
+	s, _ := json.MarshalIndent(i, "", "  ")
+	log.Debug(string(s))
 }

@@ -16,11 +16,14 @@ limitations under the License.
 package cmd
 
 import (
-	"strings"
-	"regexp"
-	"encoding/json"
 	yaml "gopkg.in/yaml.v3"
+	"regexp"
+	"strings"
 )
+
+type PackagesFile struct {
+	Packages []PackageDescription `json:"packages"`
+}
 
 type PackageDescription struct {
 	Package      string       `json:"package"`
@@ -35,31 +38,61 @@ type Dependency struct {
 	VersionValue    string `json:"value"`
 }
 
-func parseDescriptionFileList(inputDescriptionFiles []string) {
+func parseDescriptionFileList(inputDescriptionFiles []string) []PackageDescription {
 	var allPackages []PackageDescription
 	for _, descriptionFile := range inputDescriptionFiles {
 		parseDescription(descriptionFile, &allPackages)
 	}
-	result, err := json.MarshalIndent(allPackages, "", "  ")
-	checkError(err)
-	log.Info(string(result))
+	return allPackages
+}
+
+func parsePackagesFiles(repositoryPackageFiles map[string]string) map[string]PackagesFile {
+	packagesFilesMap := make(map[string]PackagesFile)
+	for repository, packagesFile := range repositoryPackageFiles {
+		packagesFilesMap[repository] = processPackagesFile(packagesFile)
+	}
+	return packagesFilesMap
+}
+
+// Reads a string containing PACKAGES file, and returns structure with
+// selected contents of the file.
+func processPackagesFile(content string) PackagesFile {
+	var allPackages PackagesFile
+	for _, lineGroup := range strings.Split(content, "\n\n") {
+		// Each lineGroup contains information about one package and is separated by an empty line.
+		firstLine := strings.Split(lineGroup, "\n")[0]
+		packageName := strings.ReplaceAll(firstLine, "Package: ", "")
+		cleaned := cleanDescriptionOrPackagesEntry(lineGroup)
+		packageMap := make(map[string]string)
+		err := yaml.Unmarshal([]byte(cleaned), &packageMap)
+		if err != nil {
+			log.Error("Error reading ", packageName, " package data from PACKAGES: ", err)
+		}
+		var packageDependencies []Dependency
+		processDependencyFields(packageMap, &packageDependencies)
+		allPackages.Packages = append(
+			allPackages.Packages,
+			PackageDescription{packageName, packageMap["Version"], packageDependencies},
+		)
+	}
+	return allPackages
 }
 
 func parseDescription(description string, allPackages *[]PackageDescription) {
-	cleaned := cleanDescription(description)
+	cleaned := cleanDescriptionOrPackagesEntry(description)
 	packageMap := make(map[string]string)
 	err := yaml.Unmarshal([]byte(cleaned), &packageMap)
 	checkError(err)
-	packageName := packageMap["Package"]
+
 	var packageDependencies []Dependency
 	processDependencyFields(packageMap, &packageDependencies)
 	*allPackages = append(
 		*allPackages,
-		PackageDescription{packageName, packageMap["Version"], packageDependencies},
+		PackageDescription{packageMap["Package"], packageMap["Version"], packageDependencies},
 	)
 }
 
-func cleanDescription(description string) string {
+func cleanDescriptionOrPackagesEntry(description string) string {
 	lines := strings.Split(description, "\n")
 	filterFields := []string{"Package:", "Version:", "Depends:", "Imports:", "Suggests:", "LinkingTo:"}
 	outputContent := ""
