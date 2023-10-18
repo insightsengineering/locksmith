@@ -26,6 +26,7 @@ func checkError(err error) {
 }
 
 func prettyPrint(i interface{}) {
-	s, _ := json.MarshalIndent(i, "", "  ")
+	s, err := json.MarshalIndent(i, "", "  ")
+	checkError(err)
 	log.Debug(string(s))
 }

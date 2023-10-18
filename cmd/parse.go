@@ -16,9 +16,10 @@ limitations under the License.
 package cmd
 
 import (
-	yaml "gopkg.in/yaml.v3"
 	"regexp"
 	"strings"
+
+	yaml "gopkg.in/yaml.v3"
 )
 
 type PackagesFile struct {
