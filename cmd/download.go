@@ -19,12 +19,11 @@ import (
 	"crypto/tls"
 	"net/http"
 	"io"
-	"strings"
 )
 
 // Returns HTTP status code for downloaded file, number of bytes in downloaded content,
 // and the downloaded content itself.
-func downloadFile(url string, parameters map[string]string) (int, int64, string) {
+func downloadTextFile(url string, parameters map[string]string) (int, int64, string) {
 	tr := &http.Transport{ // #nosec
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // #nosec
 	} // #nosec
@@ -35,8 +34,6 @@ func downloadFile(url string, parameters map[string]string) (int, int64, string)
 		req.Header.Add(k, v)
 	}
 
-	log.Debug("HTTP request = ", req)
-
 	resp, err := client.Do(req)
 	checkError(err)
 
@@ -45,20 +42,21 @@ func downloadFile(url string, parameters map[string]string) (int, int64, string)
 		if resp.StatusCode == http.StatusOK {
 			body, err2 := io.ReadAll(resp.Body)
 			checkError(err2)
-			log.Debug("HTTP response = ", string(body))
 			return resp.StatusCode, resp.ContentLength, string(body)
 		}
 	}
 	return -1, 0, ""
 }
 
-func downloadDescriptionFiles(repositoryList []string) {
-	for _, repository := range repositoryList {
-		if strings.HasPrefix(repository, "https://github.com") {
-			repository = strings.ReplaceAll(repository, "https://github.com", "https://raw.githubusercontent.com")
-			downloadFile(repository + "/main/DESCRIPTION", map[string]string{"Authorization": "token " + gitHubToken})
+func downloadDescriptionFiles(packageList []string) []string {
+	var inputDescriptionFiles []string
+	for _, packageName := range packageList {
+		statusCode, _, descriptionContent := downloadTextFile(packageName, map[string]string{"Authorization": "token " + gitHubToken})
+		if statusCode == 200 {
+			inputDescriptionFiles = append(inputDescriptionFiles, descriptionContent)
+		} else {
+			log.Warn("An error occurred while downloading ", packageName)
 		}
-		// TODO else if gitlab
 	}
-
+	return inputDescriptionFiles
 }

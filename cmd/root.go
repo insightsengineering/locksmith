@@ -84,7 +84,8 @@ It will then save the result in an renv.lock-compatible file.`,
 			log.Info("inputPackageList = ", packageList)
 			log.Info("inputRepositoryList = ", repositoryList)
 
-			downloadDescriptionFiles(packageList)
+			inputDescriptionFiles := downloadDescriptionFiles(packageList)
+			parseDescriptionFileList(inputDescriptionFiles)
 		},
 	}
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "",
