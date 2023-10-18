@@ -42,7 +42,7 @@ type Dependency struct {
 func parseDescriptionFileList(inputDescriptionFiles []string) []PackageDescription {
 	var allPackages []PackageDescription
 	for _, descriptionFile := range inputDescriptionFiles {
-		parseDescription(descriptionFile, &allPackages)
+		processDescription(descriptionFile, &allPackages)
 	}
 	return allPackages
 }
@@ -56,7 +56,7 @@ func parsePackagesFiles(repositoryPackageFiles map[string]string) map[string]Pac
 }
 
 // Reads a string containing PACKAGES file, and returns structure with
-// selected contents of the file.
+// fields/properties required for further processing.
 func processPackagesFile(content string) PackagesFile {
 	var allPackages PackagesFile
 	for _, lineGroup := range strings.Split(content, "\n\n") {
@@ -79,7 +79,9 @@ func processPackagesFile(content string) PackagesFile {
 	return allPackages
 }
 
-func parseDescription(description string, allPackages *[]PackageDescription) {
+// Reads a string containing DESCRIPTION file and returns a structure with fields/properties
+// required for further processing.
+func processDescription(description string, allPackages *[]PackageDescription) {
 	cleaned := cleanDescriptionOrPackagesEntry(description)
 	packageMap := make(map[string]string)
 	err := yaml.Unmarshal([]byte(cleaned), &packageMap)
@@ -93,6 +95,9 @@ func parseDescription(description string, allPackages *[]PackageDescription) {
 	)
 }
 
+// Processes a multiline string representing information about one package from PACKAGES file, or the whole
+// contents of DESCRIPTION file. Removes newlines occurring within filtered fields (which are predominantly
+// fields containing lists of package dependencies). Also removes fields which are not required for further processing.
 func cleanDescriptionOrPackagesEntry(description string) string {
 	lines := strings.Split(description, "\n")
 	filterFields := []string{"Package:", "Version:", "Depends:", "Imports:", "Suggests:", "LinkingTo:"}
@@ -121,6 +126,8 @@ func cleanDescriptionOrPackagesEntry(description string) string {
 	return outputContent
 }
 
+// Processes a map containing a YAML-like object representing dependencies of a package.
+// Returns a list of Dependency structures corresponding to dependency name, and version constraints.
 func processDependencyFields(packageMap map[string]string,
 	packageDependencies *[]Dependency) {
 	dependencyFields := []string{"Depends", "Imports", "Suggests", "Enhances", "LinkingTo"}
