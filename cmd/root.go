@@ -99,7 +99,7 @@ It will then save the result in an renv.lock-compatible file.`,
 	rootCmd.PersistentFlags().StringVar(&inputPackageList, "inputPackageList", "",
 		"Comma-separated list of URLs for raw DESCRIPTION files in git repositories for input packages.")
 	rootCmd.PersistentFlags().StringVar(&inputRepositoryList, "inputRepositoryList", "",
-		"Comma-separated list of package repositories, sorted according to their priorities (descending).")
+		"Comma-separated list of package repositories URLs, sorted according to their priorities (descending).")
 	rootCmd.PersistentFlags().StringVar(&gitHubToken, "gitHubToken", "",
 		"Token to download non-public files from GitHub.")
 	rootCmd.PersistentFlags().StringVar(&gitLabToken, "gitLabToken", "",

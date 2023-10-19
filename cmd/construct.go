@@ -146,22 +146,28 @@ func checkIfSkipDependency(indentation string, packageName string, dependencyNam
 		log.Debug(indentation, "Skipping package ", dependencyName, " as it is a base R package.")
 		return true
 	}
+	// Go through the list of dependencies added to the output list previously, to check
+	// if it contains a dependency required by the currently processed package but in a version
+	// that is too low.
 	for i := 0; i < len(*outputList); i++ {
 		if dependencyName == (*outputList)[i].Package {
 			if checkIfVersionSufficient((*outputList)[i].Version, versionOperator, versionValue) {
 				return true
-			} else {
-				log.Warn(
-					indentation,
-					"Output list already contains dependency ", dependencyName, " version ", (*outputList)[i].Version,
-					" but it is insufficient as ", packageName, " requires ", dependencyName, " ", versionOperator, " ",
-					versionValue,
-				)
-				(*outputList)[i].Package = ""
-				(*outputList)[i].Version = ""
-				(*outputList)[i].Repository = ""
-				return false
 			}
+			log.Warn(
+				indentation,
+				"Output list already contains dependency ", dependencyName, " version ", (*outputList)[i].Version,
+				" but it is insufficient as ", packageName, " requires ", dependencyName, " ", versionOperator, " ",
+				versionValue,
+			)
+			// Overwrite the information about the previous version of the dependency on the output list.
+			// The new version of the dependency will be subsequently added by deeper recursion levels,
+			// according to the higher requirements by currently processed package.
+			// When generating the output renv.lock, these empty entries will be filtered out.
+			(*outputList)[i].Package = ""
+			(*outputList)[i].Version = ""
+			(*outputList)[i].Repository = ""
+			return false
 		}
 	}
 	return false

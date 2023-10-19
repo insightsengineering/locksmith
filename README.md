@@ -23,6 +23,11 @@ Example usage with multiple flags:
 locksmith --logLevel debug --exampleParameter 'exampleValue'
 ```
 
+Real-life example with multiple input packages and repositories.
+```bash
+locksmith --inputPackageList https://raw.githubusercontent.com/insightsengineering/formatters/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/rtables/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/scda/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/scda.2022/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/nestcolor/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/tern/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/rlistings/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/citril/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/scda.test/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/citril.metadata/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/chevron/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/dunlin/main/DESCRIPTION --inputRepositoryList https://packages.roche.com/Validated-4.2/latest,https://packages.roche.com/CRAN/latest
+```
+
 ## Configuration file
 
 If you'd like to set the above options in a configuration file, by default `locksmith` checks `~/.locksmith`, `~/.locksmith.yaml` and `~/.locksmith.yml` files.

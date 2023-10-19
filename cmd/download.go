@@ -62,7 +62,7 @@ func downloadDescriptionFiles(packageList []string) []DescriptionFile {
 			inputDescriptionFiles = append(inputDescriptionFiles, DescriptionFile{descriptionContent, "GitHub"})
 		} else {
 			log.Warn("An error occurred while downloading ", packageName)
-			log.Warn("Please make sure you provided an access token.")
+			log.Warn("Please make sure you provided an access token (e.g. in LOCKSMITH_GITHUBTOKEN environment variable).")
 		}
 	}
 	return inputDescriptionFiles
