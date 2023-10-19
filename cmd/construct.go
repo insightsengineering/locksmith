@@ -80,7 +80,7 @@ func resolveDependenciesRecursively(outputList *[]OutputPackage, name string, ve
 		for _, p := range packagesFiles[r].Packages {
 			if p.Package == name {
 				if r != repositoryList[0] {
-					log.Warn(indentation, " ", name, " not found in top repository.")
+					log.Warn(indentation, name, " not found in top repository.")
 				}
 				// Check if package in the repository is available in sufficient version.
 				if !checkIfVersionSufficient(p.Version, versionOperator, versionValue) {
@@ -99,19 +99,9 @@ func resolveDependenciesRecursively(outputList *[]OutputPackage, name string, ve
 					p.Package, p.Version, r,
 				})
 				for _, d := range p.Dependencies {
-					skipDependency := false
 					if d.DependencyType == "Depends" || d.DependencyType == "Imports" {
-						if checkIfBasePackage(d.DependencyName) {
-							log.Debug(indentation, "Skipping package ", d.DependencyName, " as it is a base R package.")
-							skipDependency = true
-						}
-						if checkIfPackageOnOutputList(d.DependencyName, *outputList) {
-							log.Debug(indentation, "Package ", d.DependencyName, " is already present on the output list.")
-							skipDependency = true
-						}
-						// TODO check if package on output list is in sufficient version.
-						// If not, overwrite the package entry on the output list with empty values.
-						if !skipDependency {
+						if !checkIfSkipDependency(indentation, p.Package, d.DependencyName,
+							d.VersionOperator, d.VersionValue, outputList) {
 							log.Info(indentation, p.Package, " → ", d.DependencyName)
 							resolveDependenciesRecursively(
 								outputList, d.DependencyName, d.VersionOperator,
@@ -145,6 +135,33 @@ func checkIfPackageOnOutputList(name string, outputList []OutputPackage) bool {
 	for _, o := range outputList {
 		if name == o.Package {
 			return true
+		}
+	}
+	return false
+}
+
+func checkIfSkipDependency(indentation string, packageName string, dependencyName string, versionOperator string,
+	versionValue string, outputList *[]OutputPackage) bool {
+	if checkIfBasePackage(dependencyName) {
+		log.Debug(indentation, "Skipping package ", dependencyName, " as it is a base R package.")
+		return true
+	}
+	for i := 0; i < len(*outputList); i++ {
+		if dependencyName == (*outputList)[i].Package {
+			if checkIfVersionSufficient((*outputList)[i].Version, versionOperator, versionValue) {
+				return true
+			} else {
+				log.Warn(
+					indentation,
+					"Output list already contains dependency ", dependencyName, " version ", (*outputList)[i].Version,
+					" but it is insufficient as ", packageName, " requires ", dependencyName, " ", versionOperator, " ",
+					versionValue,
+				)
+				(*outputList)[i].Package = ""
+				(*outputList)[i].Version = ""
+				(*outputList)[i].Repository = ""
+				return false
+			}
 		}
 	}
 	return false
