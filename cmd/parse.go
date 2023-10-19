@@ -29,6 +29,7 @@ type PackagesFile struct {
 type PackageDescription struct {
 	Package      string       `json:"package"`
 	Version      string       `json:"version"`
+	Repository   string       `json:"repository"`
 	Dependencies []Dependency `json:"dependencies"`
 }
 
@@ -39,7 +40,7 @@ type Dependency struct {
 	VersionValue    string `json:"value"`
 }
 
-func parseDescriptionFileList(inputDescriptionFiles []string) []PackageDescription {
+func parseDescriptionFileList(inputDescriptionFiles []DescriptionFile) []PackageDescription {
 	var allPackages []PackageDescription
 	for _, descriptionFile := range inputDescriptionFiles {
 		processDescription(descriptionFile, &allPackages)
@@ -60,6 +61,9 @@ func parsePackagesFiles(repositoryPackageFiles map[string]string) map[string]Pac
 func processPackagesFile(content string) PackagesFile {
 	var allPackages PackagesFile
 	for _, lineGroup := range strings.Split(content, "\n\n") {
+		if lineGroup == "" {
+			continue
+		}
 		// Each lineGroup contains information about one package and is separated by an empty line.
 		firstLine := strings.Split(lineGroup, "\n")[0]
 		packageName := strings.ReplaceAll(firstLine, "Package: ", "")
@@ -73,7 +77,7 @@ func processPackagesFile(content string) PackagesFile {
 		processDependencyFields(packageMap, &packageDependencies)
 		allPackages.Packages = append(
 			allPackages.Packages,
-			PackageDescription{packageName, packageMap["Version"], packageDependencies},
+			PackageDescription{packageName, packageMap["Version"], "", packageDependencies},
 		)
 	}
 	return allPackages
@@ -81,8 +85,8 @@ func processPackagesFile(content string) PackagesFile {
 
 // Reads a string containing DESCRIPTION file and returns a structure with fields/properties
 // required for further processing.
-func processDescription(description string, allPackages *[]PackageDescription) {
-	cleaned := cleanDescriptionOrPackagesEntry(description)
+func processDescription(description DescriptionFile, allPackages *[]PackageDescription) {
+	cleaned := cleanDescriptionOrPackagesEntry(description.Contents)
 	packageMap := make(map[string]string)
 	err := yaml.Unmarshal([]byte(cleaned), &packageMap)
 	checkError(err)
@@ -91,7 +95,7 @@ func processDescription(description string, allPackages *[]PackageDescription) {
 	processDependencyFields(packageMap, &packageDependencies)
 	*allPackages = append(
 		*allPackages,
-		PackageDescription{packageMap["Package"], packageMap["Version"], packageDependencies},
+		PackageDescription{packageMap["Package"], packageMap["Version"], description.Repository, packageDependencies},
 	)
 }
 

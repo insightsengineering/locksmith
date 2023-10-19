@@ -21,6 +21,11 @@ import (
 	"net/http"
 )
 
+type DescriptionFile struct {
+	Contents   string `json:"contents"`
+	Repository string `json:"repository"`
+}
+
 // Returns HTTP status code for downloaded file, number of bytes in downloaded content,
 // and the downloaded content itself.
 func downloadTextFile(url string, parameters map[string]string) (int, int64, string) {
@@ -48,14 +53,16 @@ func downloadTextFile(url string, parameters map[string]string) (int, int64, str
 	return -1, 0, ""
 }
 
-func downloadDescriptionFiles(packageList []string) []string {
-	var inputDescriptionFiles []string
+func downloadDescriptionFiles(packageList []string) []DescriptionFile {
+	var inputDescriptionFiles []DescriptionFile
 	for _, packageName := range packageList {
+		// TODO GitLab packages
 		statusCode, _, descriptionContent := downloadTextFile(packageName, map[string]string{"Authorization": "token " + gitHubToken})
 		if statusCode == 200 {
-			inputDescriptionFiles = append(inputDescriptionFiles, descriptionContent)
+			inputDescriptionFiles = append(inputDescriptionFiles, DescriptionFile{descriptionContent, "GitHub"})
 		} else {
 			log.Warn("An error occurred while downloading ", packageName)
+			log.Warn("Please make sure you provided an access token.")
 		}
 	}
 	return inputDescriptionFiles
