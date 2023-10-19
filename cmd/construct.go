@@ -110,7 +110,7 @@ func resolveDependenciesRecursively(outputList *[]OutputPackage, name string, ve
 							skipDependency = true
 						}
 						// TODO check if package on output list is in sufficient version.
-						// If not, overwrite the pacakge entry on the output list with empty values.
+						// If not, overwrite the package entry on the output list with empty values.
 						if !skipDependency {
 							log.Info(indentation, p.Package, " → ", d.DependencyName)
 							resolveDependenciesRecursively(
@@ -138,10 +138,7 @@ func checkIfBasePackage(name string) bool {
 		"methods", "parallel", "splines", "stats", "stats4", "tcltk", "tools",
 		"translations", "utils", "R",
 	}
-	if stringInSlice(name, basePackages) {
-		return true
-	}
-	return false
+	return stringInSlice(name, basePackages)
 }
 
 func checkIfPackageOnOutputList(name string, outputList []OutputPackage) bool {
@@ -194,38 +191,20 @@ func checkIfVersionSufficient(availableVersionValue string, versionOperator stri
 	availableVersion := stringsToInts(availableVersionStrings)
 	requiredVersion := stringsToInts(requiredVersionStrings)
 
-	available := "<"
-	if availableVersion[0] > requiredVersion[0] {
-		available = ">"
-	} else if availableVersion[0] == requiredVersion[0] && len(requiredVersion) > 1 {
-		if availableVersion[1] > requiredVersion[1] {
+	available := "="
+	for i := 0; i < 4; i++ {
+		if availableVersion[i] > requiredVersion[i] {
 			available = ">"
-		} else if availableVersion[1] == requiredVersion[1] && len(requiredVersion) > 2 {
-			if availableVersion[2] > requiredVersion[2] {
-				available = ">"
-			} else if availableVersion[2] == requiredVersion[2] && len(requiredVersion) > 3 {
-				if availableVersion[3] > requiredVersion[3] {
-					available = ">"
-				} else if availableVersion[3] == requiredVersion[3] {
-					available = "="
-				} else {
-					available = "<"
-				}
-			} else if availableVersion[2] == requiredVersion[2] && len(requiredVersion) <= 3 {
-				available = "="
-			} else {
-				available = "<"
-			}
-		} else if availableVersion[1] == requiredVersion[1] && len(requiredVersion) <= 2 {
-			available = "="
-		} else {
+			break
+		} else if availableVersion[i] < requiredVersion[i] {
 			available = "<"
+			break
+		} else if availableVersion[i] == requiredVersion[i] && len(requiredVersion) <= i+1 {
+			available = "="
+			break
 		}
-	} else if availableVersion[0] == requiredVersion[0] && len(requiredVersion) <= 1 {
-		available = "="
-	} else {
-		available = "<"
 	}
+
 	if available == ">" && (versionOperator == ">=" || versionOperator == ">") {
 		return true
 	}
