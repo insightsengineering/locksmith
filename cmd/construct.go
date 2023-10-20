@@ -94,7 +94,8 @@ func resolveDependenciesRecursively(outputList *[]OutputPackage, name string, ve
 					continue
 				}
 				// Add package to the output list.
-				// TODO maybe the repository should be saved as an alias.
+				// Repository is saved as an URL, and will be changed into an alias
+				// during the processing of output package list into renv.lock file.
 				*outputList = append(*outputList, OutputPackage{
 					p.Package, p.Version, r,
 				})
@@ -140,8 +141,8 @@ func checkIfPackageOnOutputList(name string, outputList []OutputPackage) bool {
 	return false
 }
 
-func checkIfSkipDependency(indentation string, packageName string, dependencyName string, versionOperator string,
-	versionValue string, outputList *[]OutputPackage) bool {
+func checkIfSkipDependency(indentation string, packageName string, dependencyName string,
+	versionOperator string, versionValue string, outputList *[]OutputPackage) bool {
 	if checkIfBasePackage(dependencyName) {
 		log.Debug(indentation, "Skipping package ", dependencyName, " as it is a base R package.")
 		return true
@@ -151,14 +152,15 @@ func checkIfSkipDependency(indentation string, packageName string, dependencyNam
 	// that is too low.
 	for i := 0; i < len(*outputList); i++ {
 		if dependencyName == (*outputList)[i].Package {
+			// Dependency found on the output list.
 			if checkIfVersionSufficient((*outputList)[i].Version, versionOperator, versionValue) {
 				return true
 			}
 			log.Warn(
 				indentation,
-				"Output list already contains dependency ", dependencyName, " version ", (*outputList)[i].Version,
-				" but it is insufficient as ", packageName, " requires ", dependencyName, " ", versionOperator, " ",
-				versionValue,
+				"Output list already contains dependency ", dependencyName, " version ",
+				(*outputList)[i].Version, " but it is insufficient as ", packageName,
+				" requires ", dependencyName, " ", versionOperator, " ", versionValue,
 			)
 			// Overwrite the information about the previous version of the dependency on the output list.
 			// The new version of the dependency will be subsequently added by deeper recursion levels,
@@ -170,6 +172,7 @@ func checkIfSkipDependency(indentation string, packageName string, dependencyNam
 			return false
 		}
 	}
+	// Dependency not yet added to the output list.
 	return false
 }
 
@@ -199,7 +202,7 @@ func checkIfVersionSufficient(availableVersionValue string, versionOperator stri
 	requiredVersionStrings := strings.FieldsFunc(requiredVersionValue, splitVersion)
 
 	// Make sure the length of available and required versions is the same.
-	// In case a trailing version component(s) are missing, add -1 in their place.
+	// In case trailing version component(s) are missing, add -1 in their place.
 	if len(availableVersionStrings) > len(requiredVersionStrings) {
 		for i := 0; i < len(availableVersionStrings)-len(requiredVersionStrings); i++ {
 			requiredVersionStrings = append(requiredVersionStrings, "-1")
@@ -215,6 +218,7 @@ func checkIfVersionSufficient(availableVersionValue string, versionOperator stri
 	requiredVersion := stringsToInts(requiredVersionStrings)
 
 	available := "="
+	// Compare up to 4 dot- or dash-separated version components.
 	for i := 0; i < 4; i++ {
 		if availableVersion[i] > requiredVersion[i] {
 			available = ">"
@@ -228,21 +232,8 @@ func checkIfVersionSufficient(availableVersionValue string, versionOperator stri
 		}
 	}
 
-	if available == ">" && (versionOperator == ">=" || versionOperator == ">") {
-		return true
-	}
-	if available == "=" {
-		if versionOperator == ">=" {
-			return true
-		} else if versionOperator == ">" {
-			return false
-		}
-	}
-	if available == "<" {
-		return false
-	}
 	if versionOperator != ">" && versionOperator != ">=" {
 		log.Error("Unknown version constraint operator: ", versionOperator)
 	}
-	return false
+	return strings.Contains(versionOperator, available)
 }
