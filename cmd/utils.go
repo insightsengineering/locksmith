@@ -17,8 +17,8 @@ package cmd
 
 import (
 	"encoding/json"
-	"strings"
 	"strconv"
+	"strings"
 )
 
 func checkError(err error) {
