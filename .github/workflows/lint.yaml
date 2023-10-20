@@ -28,18 +28,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Override SuperLinter configs 💾
-        run: |
-          # Override markdownlint default config
-          [ ! -e .markdownlint.yaml ] && cat > .markdownlint.yaml <<EOF
-          ###############
-          # Rules by id #
-          ###############
-          MD013:
-            line_length: 1200 # Line length
-          EOF
-        shell: bash
-
       - name: Lint Code Base 🕵🏻‍♀️
         uses: github/super-linter/slim@v4
         env:
