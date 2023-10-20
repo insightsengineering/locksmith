@@ -17,6 +17,8 @@ package cmd
 
 import (
 	"encoding/json"
+	"strings"
+	"strconv"
 )
 
 func checkError(err error) {
@@ -38,4 +40,20 @@ func stringInSlice(a string, list []string) bool {
 		}
 	}
 	return false
+}
+
+func parseInput() ([]string, []string) {
+	packageList := strings.Split(inputPackageList, ",")
+	repositoryList := strings.Split(inputRepositoryList, ",")
+	return packageList, repositoryList
+}
+
+func stringsToInts(input []string) []int {
+	var output []int
+	for _, i := range input {
+		j, err := strconv.Atoi(i)
+		checkError(err)
+		output = append(output, j)
+	}
+	return output
 }

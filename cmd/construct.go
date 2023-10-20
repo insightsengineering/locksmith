@@ -17,15 +17,8 @@ limitations under the License.
 package cmd
 
 import (
-	"strconv"
 	"strings"
 )
-
-type OutputPackage struct {
-	Package    string `json:"package"`
-	Version    string `json:"version"`
-	Repository string `json:"repository"`
-}
 
 func constructOutputPackageList(packages []PackageDescription, packagesFiles map[string]PackagesFile,
 	repositoryList []string) []OutputPackage {
@@ -175,16 +168,6 @@ func checkIfSkipDependency(indentation string, packageName string, dependencyNam
 
 func splitVersion(r rune) bool {
 	return r == '.' || r == '-'
-}
-
-func stringsToInts(input []string) []int {
-	var output []int
-	for _, i := range input {
-		j, err := strconv.Atoi(i)
-		checkError(err)
-		output = append(output, j)
-	}
-	return output
 }
 
 func checkIfVersionSufficient(availableVersionValue string, versionOperator string,

@@ -22,11 +22,6 @@ import (
 	"strings"
 )
 
-type DescriptionFile struct {
-	Contents   string `json:"contents"`
-	Repository string `json:"repository"`
-}
-
 // Returns HTTP status code for downloaded file, number of bytes in downloaded content,
 // and the downloaded content itself.
 func downloadTextFile(url string, parameters map[string]string) (int, int64, string) {

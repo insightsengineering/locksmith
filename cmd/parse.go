@@ -22,24 +22,6 @@ import (
 	yaml "gopkg.in/yaml.v3"
 )
 
-type PackagesFile struct {
-	Packages []PackageDescription `json:"packages"`
-}
-
-type PackageDescription struct {
-	Package      string       `json:"package"`
-	Version      string       `json:"version"`
-	Repository   string       `json:"repository"`
-	Dependencies []Dependency `json:"dependencies"`
-}
-
-type Dependency struct {
-	DependencyType  string `json:"type"`
-	DependencyName  string `json:"name"`
-	VersionOperator string `json:"operator"`
-	VersionValue    string `json:"value"`
-}
-
 func parseDescriptionFileList(inputDescriptionFiles []DescriptionFile) []PackageDescription {
 	var allPackages []PackageDescription
 	for _, descriptionFile := range inputDescriptionFiles {
