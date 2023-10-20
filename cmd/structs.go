@@ -19,6 +19,7 @@ package cmd
 type DescriptionFile struct {
 	Contents   string `json:"contents"`
 	Repository string `json:"repository"`
+	GitRef     string `json:"gitref"`
 }
 
 type PackagesFile struct {
