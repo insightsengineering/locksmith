@@ -95,7 +95,9 @@ func processDescription(description DescriptionFile, allPackages *[]PackageDescr
 	processDependencyFields(packageMap, &packageDependencies)
 	*allPackages = append(
 		*allPackages,
-		PackageDescription{packageMap["Package"], packageMap["Version"], description.Repository, packageDependencies},
+		PackageDescription{
+			packageMap["Package"], packageMap["Version"], description.Repository, packageDependencies,
+		},
 	)
 }
 
@@ -160,7 +162,9 @@ func processDependencyFields(packageMap map[string]string,
 				}
 				*packageDependencies = append(
 					*packageDependencies,
-					Dependency{field, dependencyName, versionConstraintOperator, versionConstraintValue},
+					Dependency{
+						field, dependencyName, versionConstraintOperator, versionConstraintValue,
+					},
 				)
 			}
 		}

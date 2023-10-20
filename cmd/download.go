@@ -19,6 +19,7 @@ import (
 	"crypto/tls"
 	"io"
 	"net/http"
+	"strings"
 )
 
 type DescriptionFile struct {
@@ -53,16 +54,25 @@ func downloadTextFile(url string, parameters map[string]string) (int, int64, str
 	return -1, 0, ""
 }
 
-func downloadDescriptionFiles(packageList []string) []DescriptionFile {
+func downloadDescriptionFiles(packageDescriptionList []string) []DescriptionFile {
 	var inputDescriptionFiles []DescriptionFile
-	for _, packageName := range packageList {
-		// TODO GitLab packages
-		statusCode, _, descriptionContent := downloadTextFile(packageName, map[string]string{"Authorization": "token " + gitHubToken})
+	for _, packageDescriptionURL := range packageDescriptionList {
+		token := make(map[string]string)
+		if strings.HasPrefix(packageDescriptionURL, "https://raw.githubusercontent.com") {
+			token["Authorization"] = "token " + gitHubToken
+		} else {
+			token["Private-Token"] = gitLabToken
+		}
+		log.Info("Downloading ", packageDescriptionURL)
+		statusCode, _, descriptionContent := downloadTextFile(packageDescriptionURL, token)
 		if statusCode == 200 {
 			inputDescriptionFiles = append(inputDescriptionFiles, DescriptionFile{descriptionContent, "GitHub"})
 		} else {
-			log.Warn("An error occurred while downloading ", packageName)
-			log.Warn("Please make sure you provided an access token (e.g. in LOCKSMITH_GITHUBTOKEN environment variable).")
+			log.Warn(
+				"An error occurred while downloading ", packageDescriptionURL,
+				" Please make sure you provided an access token (in LOCKSMITH_GITHUBTOKEN ",
+				"or LOCKSMITH_GITLABTOKEN environment variable).",
+			)
 		}
 	}
 	return inputDescriptionFiles

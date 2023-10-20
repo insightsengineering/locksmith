@@ -39,7 +39,8 @@ func constructOutputPackageList(packages []PackageDescription, packagesFiles map
 	for _, p := range packages {
 		for _, d := range p.Dependencies {
 			skipDependency := false
-			if d.DependencyType == "Depends" || d.DependencyType == "Imports" || d.DependencyType == "Suggests" {
+			if d.DependencyType == "Depends" || d.DependencyType == "Imports" ||
+				d.DependencyType == "Suggests" {
 				if checkIfBasePackage(d.DependencyName) {
 					log.Debug("Skipping package ", d.DependencyName, " as it is a base R package.")
 					skipDependency = true
@@ -113,7 +114,10 @@ func resolveDependenciesRecursively(outputList *[]OutputPackage, name string, ve
 	if versionOperator != "" && versionValue != "" {
 		versionConstraint = " in version " + versionOperator + " " + versionValue
 	}
-	log.Warn(indentation, "Could not find package ", name, versionConstraint, " in any of the repositories.")
+	log.Warn(
+		indentation, "Could not find package ", name, versionConstraint,
+		" in any of the repositories.",
+	)
 }
 
 func checkIfBasePackage(name string) bool {

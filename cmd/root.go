@@ -65,11 +65,12 @@ func newRootCommand() {
 	rootCmd = &cobra.Command{
 		Use:   "locksmith",
 		Short: "renv.lock generator",
-		Long: `locksmith is a utility to generate renv.lock file containing all dependencies of given set of R packages.
-Given the input list of R packages or git repositories containing the R packages, as well as a list of R package
-repositories (e.g. in a package manager, CRAN, BioConductor etc.), locksmith will try to determine the list of
-all dependencies and their versions required to make the input list of packages work.
-It will then save the result in an renv.lock-compatible file.`,
+		Long: `locksmith is a utility to generate renv.lock file containing all dependencies
+of given set of R packages. Given the input list of R packages or git repositories containing
+the R packages, as well as a list of R package repositories (e.g. in a package manager, CRAN,
+BioConductor etc.), locksmith will try to determine the list of all dependencies and their
+versions required to make the input list of packages work. It will then save the result
+in an renv.lock-compatible file.`,
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			initializeConfig()
 		},
@@ -80,11 +81,11 @@ It will then save the result in an renv.lock-compatible file.`,
 			fmt.Println("inputPackageList =", inputPackageList)
 			fmt.Println("inputRepositoryList =", inputRepositoryList)
 
-			packageList, repositoryList := parseInput()
-			log.Info("inputPackageList = ", packageList)
+			packageDescriptionList, repositoryList := parseInput()
+			log.Info("inputPackageList = ", packageDescriptionList)
 			log.Info("inputRepositoryList = ", repositoryList)
 
-			inputDescriptionFiles := downloadDescriptionFiles(packageList)
+			inputDescriptionFiles := downloadDescriptionFiles(packageDescriptionList)
 			inputPackages := parseDescriptionFileList(inputDescriptionFiles)
 			repositoryPackagesFiles := downloadPackagesFiles(repositoryList)
 			packagesFiles := parsePackagesFiles(repositoryPackagesFiles)
