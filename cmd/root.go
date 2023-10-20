@@ -28,7 +28,10 @@ import (
 
 var cfgFile string
 var logLevel string
-var exampleParameter string
+var inputPackageList string
+var inputRepositoryList string
+var gitHubToken string
+var gitLabToken string
 
 var log = logrus.New()
 
@@ -37,8 +40,8 @@ func setLogLevel() {
 	customFormatter.TimestampFormat = "2006-01-02 15:04:05"
 	customFormatter.ForceColors = true
 	log.SetFormatter(customFormatter)
-	log.SetReportCaller(true)
-	customFormatter.FullTimestamp = true
+	log.SetReportCaller(false)
+	customFormatter.FullTimestamp = false
 	fmt.Println("logLevel =", logLevel)
 	switch logLevel {
 	case "trace":
@@ -62,11 +65,12 @@ func newRootCommand() {
 	rootCmd = &cobra.Command{
 		Use:   "locksmith",
 		Short: "renv.lock generator",
-		Long: `locksmith is a utility to generate renv.lock file containing all dependencies of given set of R packages.
-Given the input list of R packages or git repositories containing the R packages, as well as a list of R package
-repositories (e.g. in a package manager, CRAN, BioConductor etc.), locksmith will try to determine the list of
-all dependencies and their versions required to make the input list of packages work.
-It will then save the result in an renv.lock-compatible file.`,
+		Long: `locksmith is a utility to generate renv.lock file containing all dependencies
+of given set of R packages. Given the input list of R packages or git repositories containing
+the R packages, as well as a list of R package repositories (e.g. in a package manager, CRAN,
+BioConductor etc.), locksmith will try to determine the list of all dependencies and their
+versions required to make the input list of packages work. It will then save the result
+in an renv.lock-compatible file.`,
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			initializeConfig()
 		},
@@ -74,15 +78,33 @@ It will then save the result in an renv.lock-compatible file.`,
 			setLogLevel()
 
 			fmt.Println("config =", cfgFile)
-			fmt.Println("exampleParameter =", exampleParameter)
+			fmt.Println("inputPackageList =", inputPackageList)
+			fmt.Println("inputRepositoryList =", inputRepositoryList)
+
+			packageDescriptionList, repositoryList := parseInput()
+			log.Debug("inputPackageList = ", packageDescriptionList)
+			log.Debug("inputRepositoryList = ", repositoryList)
+
+			inputDescriptionFiles := downloadDescriptionFiles(packageDescriptionList)
+			inputPackages := parseDescriptionFileList(inputDescriptionFiles)
+			repositoryPackagesFiles := downloadPackagesFiles(repositoryList)
+			packagesFiles := parsePackagesFiles(repositoryPackagesFiles)
+			outputPackageList := constructOutputPackageList(inputPackages, packagesFiles, repositoryList)
+			prettyPrint(outputPackageList)
 		},
 	}
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "",
 		"config file (default is $HOME/.locksmith.yaml)")
 	rootCmd.PersistentFlags().StringVar(&logLevel, "logLevel", "info",
 		"Logging level (trace, debug, info, warn, error). ")
-	rootCmd.PersistentFlags().StringVar(&exampleParameter, "exampleParameter", "",
-		"Example parameter that does nothing.")
+	rootCmd.PersistentFlags().StringVar(&inputPackageList, "inputPackageList", "",
+		"Comma-separated list of URLs for raw DESCRIPTION files in git repositories for input packages.")
+	rootCmd.PersistentFlags().StringVar(&inputRepositoryList, "inputRepositoryList", "",
+		"Comma-separated list of package repositories URLs, sorted according to their priorities (descending).")
+	rootCmd.PersistentFlags().StringVar(&gitHubToken, "gitHubToken", "",
+		"Token to download non-public files from GitHub.")
+	rootCmd.PersistentFlags().StringVar(&gitLabToken, "gitLabToken", "",
+		"Token to download non-public files from GitLab.")
 
 	// Add version command.
 	rootCmd.AddCommand(extension.NewVersionCobraCmd())
@@ -132,7 +154,10 @@ func Execute() {
 func initializeConfig() {
 	for _, v := range []string{
 		"logLevel",
-		"exampleParameter",
+		"inputPackageList",
+		"inputRepositoryList",
+		"gitHubToken",
+		"gitLabToken",
 	} {
 		// If the flag has not been set in newRootCommand() and it has been set in initConfig().
 		// In other words: if it's not been provided in command line, but has been

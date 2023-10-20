@@ -15,8 +15,45 @@ limitations under the License.
 */
 package cmd
 
+import (
+	"encoding/json"
+	"strconv"
+	"strings"
+)
+
 func checkError(err error) {
 	if err != nil {
 		log.Error(err)
 	}
+}
+
+func prettyPrint(i interface{}) {
+	s, err := json.MarshalIndent(i, "", "  ")
+	checkError(err)
+	log.Debug(string(s))
+}
+
+func stringInSlice(a string, list []string) bool {
+	for _, b := range list {
+		if b == a {
+			return true
+		}
+	}
+	return false
+}
+
+func parseInput() ([]string, []string) {
+	packageList := strings.Split(inputPackageList, ",")
+	repositoryList := strings.Split(inputRepositoryList, ",")
+	return packageList, repositoryList
+}
+
+func stringsToInts(input []string) []int {
+	var output []int
+	for _, i := range input {
+		j, err := strconv.Atoi(i)
+		checkError(err)
+		output = append(output, j)
+	}
+	return output
 }

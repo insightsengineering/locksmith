@@ -1,0 +1,30 @@
+Type: Package
+Package: my.awesome.package
+Title: Package title
+Version: 0.14.0.9012
+Date: 2023-10-13
+Description: This is a multiline string
+    representing package description.
+License: Apache License 2.0
+Depends:
+    R(>= 4.0),
+    shiny (>= 1.7.0)
+Imports:
+    checkmate,
+    lifecycle,
+    logger (>= 0.2.0), magrittr, rlang, shinyjs,
+    rmarkdown (>=
+    0.1.1),
+    MultiAssayExperiment
+    (>= 0.2.0),
+    yaml (>= 0.4.0),
+    utils
+Suggests: covr,
+    dplyr, knitr,
+    testthat (>= 3.1.5),
+    withr
+VignetteBuilder:
+    knitr
+Encoding: UTF-8
+Language: en-US
+RoxygenNote: 7.2.3
