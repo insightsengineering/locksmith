@@ -213,14 +213,19 @@ func checkIfVersionSufficient(availableVersionValue string, versionOperator stri
 	available := "="
 	// Compare up to 4 dot- or dash-separated version components.
 	for i := 0; i < 4; i++ {
-		if availableVersion[i] > requiredVersion[i] {
+		breakLoop := false
+		switch {
+		case availableVersion[i] > requiredVersion[i]:
 			available = ">"
-			break
-		} else if availableVersion[i] < requiredVersion[i] {
+			breakLoop = true
+		case availableVersion[i] < requiredVersion[i]:
 			available = "<"
-			break
-		} else if availableVersion[i] == requiredVersion[i] && len(requiredVersion) <= i+1 {
+			breakLoop = true
+		case availableVersion[i] == requiredVersion[i] && len(requiredVersion) <= i+1:
 			available = "="
+			breakLoop = true
+		}
+		if breakLoop {
 			break
 		}
 	}
