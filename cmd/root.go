@@ -41,7 +41,7 @@ func setLogLevel() {
 	customFormatter.ForceColors = true
 	log.SetFormatter(customFormatter)
 	log.SetReportCaller(false)
-	customFormatter.FullTimestamp = true
+	customFormatter.FullTimestamp = false
 	fmt.Println("logLevel =", logLevel)
 	switch logLevel {
 	case "trace":
@@ -82,8 +82,8 @@ in an renv.lock-compatible file.`,
 			fmt.Println("inputRepositoryList =", inputRepositoryList)
 
 			packageDescriptionList, repositoryList := parseInput()
-			log.Info("inputPackageList = ", packageDescriptionList)
-			log.Info("inputRepositoryList = ", repositoryList)
+			log.Debug("inputPackageList = ", packageDescriptionList)
+			log.Debug("inputRepositoryList = ", repositoryList)
 
 			inputDescriptionFiles := downloadDescriptionFiles(packageDescriptionList)
 			inputPackages := parseDescriptionFileList(inputDescriptionFiles)

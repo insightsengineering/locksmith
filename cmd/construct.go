@@ -102,12 +102,11 @@ func resolveDependenciesRecursively(outputList *[]OutputPackage, name string, ve
 			}
 		}
 	}
-	// TODO Should we fail in this case?
 	var versionConstraint string
 	if versionOperator != "" && versionValue != "" {
 		versionConstraint = " in version " + versionOperator + " " + versionValue
 	}
-	log.Warn(
+	log.Fatal(
 		indentation, "Could not find package ", name, versionConstraint,
 		" in any of the repositories.",
 	)
