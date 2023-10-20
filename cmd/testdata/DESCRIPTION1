@@ -7,7 +7,7 @@ Description: This is a multiline string
     representing package description.
 License: Apache License 2.0
 Depends:
-    R (>= 4.0),
+    R(>= 4.0),
     shiny (>= 1.7.0)
 Imports:
     checkmate,

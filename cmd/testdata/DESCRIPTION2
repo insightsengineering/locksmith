@@ -10,7 +10,7 @@ Depends:
 Imports:
     dplyr,
     forcats (>= 1.0.0), formatters (>= 0.5.3),
-    ggplot2 (>= 3.4.0),
+    ggplot2(>= 3.4.0),
     stats,
     survival (>=
         3.2-13),

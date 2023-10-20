@@ -67,14 +67,6 @@ func resolveDependenciesRecursively(outputList *[]OutputPackage, name string, ve
 	for i := 0; i < recursionLevel; i++ {
 		indentation += "  "
 	}
-	if checkIfBasePackage(name) {
-		log.Debug(indentation, "Skipping package ", name, " as it is a base R package.")
-		return
-	}
-	if checkIfPackageOnOutputList(name, *outputList) {
-		log.Debug(indentation, "Package ", name, " is already present on the output list.")
-		return
-	}
 	for _, r := range repositoryList {
 		// Check if the package is present in the PACKAGES file for the repository.
 		for _, p := range packagesFiles[r].Packages {
@@ -116,6 +108,7 @@ func resolveDependenciesRecursively(outputList *[]OutputPackage, name string, ve
 			}
 		}
 	}
+	// TODO Should we fail in this case?
 	var versionConstraint string
 	if versionOperator != "" && versionValue != "" {
 		versionConstraint = " in version " + versionOperator + " " + versionValue

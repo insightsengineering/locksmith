@@ -317,6 +317,18 @@ func Test_constructOutputPackageList(t *testing.T) {
 						"",
 					},
 					{
+						"Suggests",
+						"package16",
+						"",
+						"",
+					},
+					{
+						"Suggests",
+						"package1",
+						"",
+						"",
+					},
+					{
 						"Imports",
 						"package8",
 						">",
@@ -327,6 +339,12 @@ func Test_constructOutputPackageList(t *testing.T) {
 						"package9",
 						">=",
 						"2.3",
+					},
+					{
+						"Depends",
+						"non.existent.package",
+						"<",
+						"4.0.4",
 					},
 					{
 						"LinkingTo",

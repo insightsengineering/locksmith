@@ -130,6 +130,10 @@ func cleanDescriptionOrPackagesEntry(description string) string {
 	return outputContent
 }
 
+func splitPackageName(r rune) bool {
+	return r == ' ' || r == '('
+}
+
 // Processes a map containing a YAML-like object representing dependencies of a package.
 // Returns a list of Dependency structures corresponding to dependency name, and version constraints.
 func processDependencyFields(packageMap map[string]string,
@@ -140,7 +144,10 @@ func processDependencyFields(packageMap map[string]string,
 		if _, ok := packageMap[field]; ok {
 			dependencyList := strings.Split(packageMap[field], ", ")
 			for _, dependency := range dependencyList {
-				dependencyName := strings.Split(dependency, " ")[0]
+				// There might be a space or '(' right after the package name,
+				// so both space and '(' are treated as a delimiter to get the
+				// package name from the first field.
+				dependencyName := strings.FieldsFunc(dependency, splitPackageName)[0]
 				versionConstraintOperator := ""
 				versionConstraintValue := ""
 				// Check if package is required in some particular version.
