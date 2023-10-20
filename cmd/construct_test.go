@@ -341,12 +341,6 @@ func Test_constructOutputPackageList(t *testing.T) {
 						"2.3",
 					},
 					{
-						"Depends",
-						"non.existent.package",
-						"<",
-						"4.0.4",
-					},
-					{
 						"LinkingTo",
 						"package10",
 						"",
