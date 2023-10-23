@@ -17,12 +17,12 @@ package cmd
 
 import (
 	"crypto/tls"
+	"encoding/json"
 	"io"
 	"net/http"
-	"strings"
 	"os"
 	"regexp"
-	"encoding/json"
+	"strings"
 )
 
 type GitLabAPIResponse struct {

@@ -41,6 +41,7 @@ func Test_processPackagesFile(t *testing.T) {
 							"2.15.0",
 						},
 					},
+					"", "", "", "", "", "", "",
 				},
 				{
 					"somePackage2",
@@ -66,6 +67,7 @@ func Test_processPackagesFile(t *testing.T) {
 							"",
 						},
 					},
+					"", "", "", "", "", "", "",
 				},
 				{
 					"somePackage3",
@@ -103,6 +105,7 @@ func Test_processPackagesFile(t *testing.T) {
 							"1.22",
 						},
 					},
+					"", "", "", "", "", "", "",
 				},
 				{
 					"somePackage4",
@@ -146,6 +149,7 @@ func Test_processPackagesFile(t *testing.T) {
 							"7.1.0",
 						},
 					},
+					"", "", "", "", "", "", "",
 				},
 			},
 		},
@@ -158,8 +162,8 @@ func Test_parseDescriptionFileList(t *testing.T) {
 	byteValue2, err := os.ReadFile("testdata/DESCRIPTION2")
 	checkError(err)
 	descriptionFileList := []DescriptionFile{
-		{string(byteValue1), "github"},
-		{string(byteValue2), "github"},
+		{string(byteValue1), "github", "", "", "", "", "", "", ""},
+		{string(byteValue2), "github", "", "", "", "", "", "", ""},
 	}
 	allPackages := parseDescriptionFileList(descriptionFileList)
 	assert.Equal(t, allPackages,
@@ -272,6 +276,7 @@ func Test_parseDescriptionFileList(t *testing.T) {
 						"",
 					},
 				},
+				"", "", "", "", "", "", "",
 			},
 			{
 				"my.awesome.package.2",
@@ -387,6 +392,7 @@ func Test_parseDescriptionFileList(t *testing.T) {
 						"1.0.0",
 					},
 				},
+				"", "", "", "", "", "", "",
 			},
 		},
 	)
