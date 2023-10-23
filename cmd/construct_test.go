@@ -125,6 +125,7 @@ func Test_constructOutputPackageList(t *testing.T) {
 						"",
 					},
 				},
+				"", "", "", "", "", "", "",
 			},
 			{
 				"package4",
@@ -144,12 +145,14 @@ func Test_constructOutputPackageList(t *testing.T) {
 						"",
 					},
 				},
+				"", "", "", "", "", "", "",
 			},
 			{
 				"package11",
 				"0.7.8",
 				"",
 				[]Dependency{},
+				"", "", "", "", "", "", "",
 			},
 			{
 				"package14",
@@ -169,12 +172,14 @@ func Test_constructOutputPackageList(t *testing.T) {
 						"2.2",
 					},
 				},
+				"", "", "", "", "", "", "",
 			},
 			{
 				"package16",
 				"2.4.5",
 				"",
 				[]Dependency{},
+				"", "", "", "", "", "", "",
 			},
 		},
 	}
@@ -204,18 +209,21 @@ func Test_constructOutputPackageList(t *testing.T) {
 						"",
 					},
 				},
+				"", "", "", "", "", "", "",
 			},
 			{
 				"package5",
 				"3.2.0",
 				"",
 				[]Dependency{},
+				"", "", "", "", "", "", "",
 			},
 			{
 				"package7",
 				"1.6.2",
 				"",
 				[]Dependency{},
+				"", "", "", "", "", "", "",
 			},
 			{
 				"package9",
@@ -229,24 +237,28 @@ func Test_constructOutputPackageList(t *testing.T) {
 						"3.6",
 					},
 				},
+				"", "", "", "", "", "", "",
 			},
 			{
 				"package11",
 				"5.4.7",
 				"",
 				[]Dependency{},
+				"", "", "", "", "", "", "",
 			},
 			{
 				"package12",
 				"1.2.3",
 				"",
 				[]Dependency{},
+				"", "", "", "", "", "", "",
 			},
 			{
 				"package15",
 				"3.3.4.5",
 				"",
 				[]Dependency{},
+				"", "", "", "", "", "", "",
 			},
 		},
 	}
@@ -257,6 +269,7 @@ func Test_constructOutputPackageList(t *testing.T) {
 				"1.9.2",
 				"",
 				[]Dependency{},
+				"", "", "", "", "", "", "",
 			},
 		},
 	}
@@ -298,6 +311,7 @@ func Test_constructOutputPackageList(t *testing.T) {
 						"",
 					},
 				},
+				"", "", "", "", "", "", "",
 			},
 			{
 				"package2",
@@ -347,6 +361,7 @@ func Test_constructOutputPackageList(t *testing.T) {
 						"",
 					},
 				},
+				"", "", "", "", "", "", "",
 			},
 		},
 		packagesFiles, repositoryList,

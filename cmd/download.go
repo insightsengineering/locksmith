@@ -192,9 +192,10 @@ func processDescriptionURL(descriptionURL string) (map[string]string, string, st
 		remoteHost = "https://" + strings.Split(shorterURL, "/")[0]
 		remoteRef = strings.TrimPrefix(re.FindString(descriptionURL), "ref=")
 		projectURL := "https://" + strings.Join(strings.Split(shorterURL, "/")[0:5], "/")
-		if strings.Contains(strings.Split(shorterURL, "/")[7], "%2F") {
+		descriptionPath := strings.Split(shorterURL, "/")[7]
+		if strings.Contains(descriptionPath, "%2F") {
 			// DESCRIPTION is in a directory within the repository.
-			descriptionPath := strings.Split(strings.ReplaceAll(strings.Split(shorterURL, "/")[7], "%2F", "/"), "/")
+			descriptionPath := strings.Split(strings.ReplaceAll(descriptionPath, "%2F", "/"), "/")
 			remoteSubdir = strings.Join(descriptionPath[:len(descriptionPath)-1], "/")
 		}
 		remoteUsername, remoteRepo, remoteSha = getGitLabProjectAndSha(projectURL, remoteRef, token)
