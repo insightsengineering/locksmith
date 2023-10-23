@@ -158,8 +158,8 @@ func Test_parseDescriptionFileList(t *testing.T) {
 	byteValue2, err := os.ReadFile("testdata/DESCRIPTION2")
 	checkError(err)
 	descriptionFileList := []DescriptionFile{
-		{string(byteValue1), "GitHub"},
-		{string(byteValue2), "GitHub"},
+		{string(byteValue1), "github"},
+		{string(byteValue2), "github"},
 	}
 	allPackages := parseDescriptionFileList(descriptionFileList)
 	assert.Equal(t, allPackages,
@@ -167,7 +167,7 @@ func Test_parseDescriptionFileList(t *testing.T) {
 			{
 				"my.awesome.package",
 				"0.14.0.9012",
-				"GitHub",
+				"github",
 				[]Dependency{
 					{
 						"Depends",
@@ -276,7 +276,7 @@ func Test_parseDescriptionFileList(t *testing.T) {
 			{
 				"my.awesome.package.2",
 				"0.9.1.9013",
-				"GitHub",
+				"github",
 				[]Dependency{
 					{
 						"Depends",

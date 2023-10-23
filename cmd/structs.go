@@ -17,9 +17,15 @@ limitations under the License.
 package cmd
 
 type DescriptionFile struct {
-	Contents   string `json:"contents"`
-	Repository string `json:"repository"`
-	GitRef     string `json:"gitref"`
+	Contents       string `json:"contents"`
+	PackageSource  string `json:"source"`
+	RemoteType     string `json:"remoteType"`
+	RemoteHost     string `json:"remoteHost"`
+	RemoteUsername string `json:"remoteUsername"`
+	RemoteRepo     string `json:"remoteRepo"`
+	RemoteSubdir   string `json:"remoteSubdir"`
+	RemoteRef      string `json:"remoteRef"`
+	RemoteSha      string `json:"remoteSha"`
 }
 
 type PackagesFile struct {
@@ -27,10 +33,17 @@ type PackagesFile struct {
 }
 
 type PackageDescription struct {
-	Package      string       `json:"package"`
-	Version      string       `json:"version"`
-	Repository   string       `json:"repository"`
-	Dependencies []Dependency `json:"dependencies"`
+	Package        string       `json:"package"`
+	Version        string       `json:"version"`
+	Repository     string       `json:"repository"`
+	Dependencies   []Dependency `json:"dependencies"`
+	RemoteType     string       `json:"remoteType"`
+	RemoteHost     string       `json:"remoteHost"`
+	RemoteUsername string       `json:"remoteUsername"`
+	RemoteRepo     string       `json:"remoteRepo"`
+	RemoteSubdir   string       `json:"remoteSubdir"`
+	RemoteRef      string       `json:"remoteRef"`
+	RemoteSha      string       `json:"remoteSha"`
 }
 
 type Dependency struct {

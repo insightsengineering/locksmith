@@ -22,7 +22,28 @@ import (
 	"strings"
 	"os"
 	"regexp"
+	"encoding/json"
 )
+
+type GitLabAPIResponse struct {
+	PathWithNamespace string `json:"path_with_namespace"`
+}
+
+type GitLabTagOrBranchResponse struct {
+	Commit GitLabCommit `json:"commit"`
+}
+
+type GitLabCommit struct {
+	Id string `json:"id"`
+}
+
+type GitHubTagOrBranchResponse struct {
+	Object GitHubObject `json:"object"`
+}
+
+type GitHubObject struct {
+	Sha string `json:"sha"`
+}
 
 // Returns HTTP status code for downloaded file, number of bytes in downloaded content,
 // and the downloaded content itself.
@@ -51,54 +72,154 @@ func downloadTextFile(url string, parameters map[string]string) (int, int64, str
 	return -1, 0, ""
 }
 
-func processDescriptionURL(descriptionURL string) (map[string]string, string, string, string, string, string) {
+func getGitLabProjectAndSha(projectURL string, remoteRef string, token map[string]string) (string, string, string) {
+	var remoteUsername string
+	var remoteRepo string
+	var remoteSha string
+	log.Debug("Downloading project information from ", projectURL)
+	statusCode, _, projectDataResponse := downloadTextFile(projectURL, token)
+	if statusCode == 200 {
+		var projectData GitLabAPIResponse
+		json.Unmarshal([]byte(projectDataResponse), &projectData)
+		prettyPrint(projectData)
+		projectPath := strings.Split(projectData.PathWithNamespace, "/")
+		projectPathLength := len(projectPath)
+		remoteUsername = strings.Join(projectPath[:projectPathLength-1], "/")
+		remoteRepo = projectPath[projectPathLength-1]
+	} else {
+		log.Warn("An error occurred while retrieving project information from ", projectURL)
+	}
+	match, err := regexp.MatchString(`v\d+(\.\d+)*`, remoteRef)
+	if match {
+		log.Debug("remoteRef = ", remoteRef, " matches tag name regexp.")
+		tagURL := projectURL + "/repository/tags/" + remoteRef
+		statusCode, _, tagDataResponse := downloadTextFile(tagURL, token)
+		if statusCode == 200 {
+			var tagData GitLabTagOrBranchResponse
+			json.Unmarshal([]byte(tagDataResponse), &tagData)
+			prettyPrint(tagData)
+			remoteSha = tagData.Commit.Id
+		} else {
+			log.Warn("An error occurred while retrieving tag information from ", tagURL)
+		}
+	} else {
+		log.Debug("remoteRef = ", remoteRef, " doesn't match tag name regexp.")
+		branchURL := projectURL + "/repository/branches/" + remoteRef
+		statusCode, _, branchDataResponse := downloadTextFile(branchURL, token)
+		if statusCode == 200 {
+			var branchData GitLabTagOrBranchResponse
+			json.Unmarshal([]byte(branchDataResponse), &branchData)
+			prettyPrint(branchData)
+			remoteSha = branchData.Commit.Id
+		} else {
+			log.Warn("An error occurred while retrieving branch information from ", branchURL)
+		}
+	}
+	checkError(err)
+	return remoteUsername, remoteRepo, remoteSha
+}
+
+func getGitHubSha(remoteUsername string, remoteRepo string, remoteRef string,
+	token map[string]string) string {
+	var remoteSha string
+	log.Debug("Downloading information for GitHub project ", remoteUsername, "/", remoteRepo)
+	match, err := regexp.MatchString(`v\d+(\.\d+)*`, remoteRef)
+	if match {
+		log.Debug("remoteRef = ", remoteRef, " matches tag name regexp.")
+		tagURL := "https://api.github.com/repos/" + remoteUsername + "/" + remoteRepo + "/git/ref/tags/" + remoteRef
+		statusCode, _, tagDataResponse := downloadTextFile(tagURL, token)
+		if statusCode == 200 {
+			var tagData GitHubTagOrBranchResponse
+			json.Unmarshal([]byte(tagDataResponse), &tagData)
+			prettyPrint(tagData)
+			remoteSha = tagData.Object.Sha
+		} else {
+			log.Warn("An error occurred while retrieving tag information from ", tagURL)
+		}
+	} else {
+		log.Debug("remoteRef = ", remoteRef, " doesn't match tag name regexp.")
+		branchURL := "https://api.github.com/repos/" + remoteUsername + "/" + remoteRepo + "/git/ref/heads/" + remoteRef
+		statusCode, _, branchDataResponse := downloadTextFile(branchURL, token)
+		if statusCode == 200 {
+			var branchData GitHubTagOrBranchResponse
+			json.Unmarshal([]byte(branchDataResponse), &branchData)
+			prettyPrint(branchData)
+			remoteSha = branchData.Object.Sha
+		} else {
+			log.Warn("An error occurred while retrieving branch information from ", branchURL)
+		}
+	}
+	checkError(err)
+	return remoteSha
+}
+
+func processDescriptionURL(descriptionURL string) (map[string]string, string, string, string, string, string, string, string, string) {
 	token := make(map[string]string)
-	var repositoryType string
+	var remoteType string
 	var remoteRef string
 	var remoteHost string
 	var remoteUsername string
 	var remoteRepo string
+	var remoteSubdir string
+	var remoteSha string
+	var packageSource string
 	if strings.HasPrefix(descriptionURL, "https://raw.githubusercontent.com") {
 		// Expecting URL in form:
-		// https://raw.githubusercontent.com/<organization>/<repo-name>/<ref-name>/DESCRIPTION
+		// https://raw.githubusercontent.com/<organization>/<repo-name>/<ref-name>/<optional-subdirectories>/DESCRIPTION
 		token["Authorization"] = "token " + gitHubToken
-		repositoryType = "GitHub"
+		remoteType = "github"
+		packageSource = "GitHub"
 		shorterURL := strings.TrimPrefix(descriptionURL, "https://raw.githubusercontent.com/")
 		remoteHost = "api.github.com"
 		remoteUsername = strings.Split(shorterURL, "/")[0]
 		remoteRepo = strings.Split(shorterURL, "/")[1]
 		remoteRef = strings.Split(shorterURL, "/")[2]
-		// TODO get remoteSha based on remoteRef
+		remoteSha = getGitHubSha(remoteUsername, remoteRepo, remoteRef, token)
+		for i, j := range strings.Split(shorterURL, "/") {
+			if j == "DESCRIPTION" {
+				remoteSubdir = strings.Join(strings.Split(shorterURL, "/")[3:i], "/")
+			}
+		}
 	} else {
 		// Expecting URL in form:
-		// https://example.gitlab.com/api/v4/projects/<project-id>/repository/files/DESCRIPTION/raw?ref=<ref-name>
+		// https://example.gitlab.com/api/v4/projects/<project-id>/repository/files/<optional-subdirectories>/DESCRIPTION/raw?ref=<ref-name>
+		// <optional-subdirectories> contains '/' encoded as '%2F'
 		re := regexp.MustCompile(`ref=.*$`)
 		token["Private-Token"] = gitLabToken
-		repositoryType = "GitLab"
+		remoteType = "gitlab"
+		packageSource = "GitLab"
 		shorterURL := strings.TrimPrefix(descriptionURL, "https://")
-		remoteHost = strings.Split(shorterURL, "/")[0]
+		remoteHost = "https://" + strings.Split(shorterURL, "/")[0]
 		remoteRef = strings.TrimPrefix(re.FindString(descriptionURL), "ref=")
-		// TODO get remoteSha based on remoteRef
-		// TODO get remoteUsername and remoteRepo from GitLab API based on project ID
+		projectURL := "https://" + strings.Join(strings.Split(shorterURL, "/")[0:5], "/")
+		if strings.Contains(strings.Split(shorterURL, "/")[7], "%2F") {
+			// DESCRIPTION is in a directory within the repository.
+			descriptionPath := strings.Split(strings.ReplaceAll(strings.Split(shorterURL, "/")[7], "%2F", "/"), "/")
+			remoteSubdir = strings.Join(descriptionPath[:len(descriptionPath)-1], "/")
+		}
+		remoteUsername, remoteRepo, remoteSha = getGitLabProjectAndSha(projectURL, remoteRef, token)
 	}
-	return token, repositoryType, remoteHost, remoteUsername, remoteRepo, remoteRef
+	return token, remoteType, packageSource, remoteHost, remoteUsername, remoteRepo, remoteSubdir, remoteRef, remoteSha
 }
 
 func downloadDescriptionFiles(packageDescriptionList []string) []DescriptionFile {
 	var inputDescriptionFiles []DescriptionFile
 	for _, packageDescriptionURL := range packageDescriptionList {
-		token, repositoryType, _, remoteUsername, remoteRepo, remoteRef :=
+		token, remoteType, packageSource, remoteHost, remoteUsername, remoteRepo, remoteSubdir, remoteRef, remoteSha :=
 			processDescriptionURL(packageDescriptionURL)
 		log.Info(
-			"Downloading ", packageDescriptionURL, "\nremoteRef = ", remoteRef, ", ",
-			"repositoryType = ", repositoryType, ", remoteUsername = ", remoteUsername,
-			", remoteRepo = ", remoteRepo,
+			"Downloading ", packageDescriptionURL, "\nremoteType = ", remoteType,
+			", remoteUsername = ", remoteUsername, ", remoteRepo = ", remoteRepo,
+			", remoteSubdir = ", remoteSubdir, ", remoteRef = ", remoteRef, ", remoteSha = ", remoteSha,
 		)
 		statusCode, _, descriptionContent := downloadTextFile(packageDescriptionURL, token)
 		if statusCode == 200 {
 			inputDescriptionFiles = append(
 				inputDescriptionFiles,
-				DescriptionFile{descriptionContent, repositoryType, remoteRef},
+				DescriptionFile{
+					descriptionContent, packageSource, remoteType, remoteHost,
+					remoteUsername, remoteRepo, remoteSubdir, remoteRef, remoteSha,
+				},
 			)
 		} else {
 			log.Warn(

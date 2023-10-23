@@ -59,7 +59,10 @@ func processPackagesFile(content string) PackagesFile {
 		processDependencyFields(packageMap, &packageDependencies)
 		allPackages.Packages = append(
 			allPackages.Packages,
-			PackageDescription{packageName, packageMap["Version"], "", packageDependencies},
+			PackageDescription{
+				packageName, packageMap["Version"], "", packageDependencies,
+				"", "", "", "", "", "", "",
+			},
 		)
 	}
 	return allPackages
@@ -78,7 +81,9 @@ func processDescription(description DescriptionFile, allPackages *[]PackageDescr
 	*allPackages = append(
 		*allPackages,
 		PackageDescription{
-			packageMap["Package"], packageMap["Version"], description.Repository, packageDependencies,
+			packageMap["Package"], packageMap["Version"], description.PackageSource, packageDependencies,
+			description.RemoteType, description.RemoteHost, description.RemoteUsername, description.RemoteRepo,
+			description.RemoteSubdir, description.RemoteRef, description.RemoteSha,
 		},
 	)
 }
