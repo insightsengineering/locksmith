@@ -84,6 +84,7 @@ in an renv.lock-compatible file.`,
 			packageDescriptionList, repositoryList, repositoryMap := parseInput()
 			log.Debug("inputPackageList = ", packageDescriptionList)
 			log.Debug("inputRepositoryList = ", repositoryList)
+			log.Debug("inputRepositoryMap = ", repositoryMap)
 
 			inputDescriptionFiles := downloadDescriptionFiles(packageDescriptionList)
 			inputPackages := parseDescriptionFileList(inputDescriptionFiles)

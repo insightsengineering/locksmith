@@ -69,10 +69,10 @@ func downloadTextFile(url string, parameters map[string]string) (int, int64, str
 	return -1, 0, ""
 }
 
+// Retrieve information about GitLab repository (project path, repository name and commit SHA) from
+// projectURL repository GitLab API endpoint.
 func getGitLabProjectAndSha(projectURL string, remoteRef string, token map[string]string) (string, string, string) {
-	var remoteUsername string
-	var remoteRepo string
-	var remoteSha string
+	var remoteUsername, remoteRepo, remoteSha string
 	log.Debug("Downloading project information from ", projectURL)
 	statusCode, _, projectDataResponse := downloadTextFile(projectURL, token)
 	if statusCode == 200 {
@@ -119,6 +119,7 @@ func getGitLabProjectAndSha(projectURL string, remoteRef string, token map[strin
 	return remoteUsername, remoteRepo, remoteSha
 }
 
+// Retrieve SHA of the remoteRef from the 'remoteUsername/remoteRepo' GitHub repository.
 func getGitHubSha(remoteUsername string, remoteRepo string, remoteRef string,
 	token map[string]string) string {
 	var remoteSha string
@@ -155,16 +156,11 @@ func getGitHubSha(remoteUsername string, remoteRepo string, remoteRef string,
 	return remoteSha
 }
 
+// Get information about packages stored in git repositories.
 func processDescriptionURL(descriptionURL string) (map[string]string, string, string, string, string, string, string, string, string) {
 	token := make(map[string]string)
-	var remoteType string
-	var remoteRef string
-	var remoteHost string
-	var remoteUsername string
-	var remoteRepo string
-	var remoteSubdir string
-	var remoteSha string
-	var packageSource string
+	var remoteType, remoteRef, remoteHost, remoteUsername, remoteRepo string
+	var remoteSubdir, remoteSha, packageSource string
 	if strings.HasPrefix(descriptionURL, "https://raw.githubusercontent.com") {
 		// Expecting URL in form:
 		// https://raw.githubusercontent.com/<organization>/<repo-name>/<ref-name>/<optional-subdirectories>/DESCRIPTION
@@ -177,6 +173,7 @@ func processDescriptionURL(descriptionURL string) (map[string]string, string, st
 		remoteRepo = strings.Split(shorterURL, "/")[1]
 		remoteRef = strings.Split(shorterURL, "/")[2]
 		remoteSha = getGitHubSha(remoteUsername, remoteRepo, remoteRef, token)
+		// Check whether package is stored in a subdirectory of the git repository.
 		for i, j := range strings.Split(shorterURL, "/") {
 			if j == "DESCRIPTION" {
 				remoteSubdir = strings.Join(strings.Split(shorterURL, "/")[3:i], "/")
@@ -195,8 +192,8 @@ func processDescriptionURL(descriptionURL string) (map[string]string, string, st
 		remoteRef = strings.TrimPrefix(re.FindString(descriptionURL), "ref=")
 		projectURL := "https://" + strings.Join(strings.Split(shorterURL, "/")[0:5], "/")
 		descriptionPath := strings.Split(shorterURL, "/")[7]
+		// Check whether package is stored in a subdirectory of the git repository.
 		if strings.Contains(descriptionPath, "%2F") {
-			// DESCRIPTION is in a directory within the repository.
 			descriptionPath := strings.Split(strings.ReplaceAll(descriptionPath, "%2F", "/"), "/")
 			remoteSubdir = strings.Join(descriptionPath[:len(descriptionPath)-1], "/")
 		}

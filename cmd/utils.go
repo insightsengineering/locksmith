@@ -54,6 +54,9 @@ func parseInput() ([]string, []string, map[string]string) {
 	outputRepositoryMap := make(map[string]string)
 	var outputRepositoryList []string
 	for _, r := range repositoryList {
+		if !strings.Contains(r, "=") {
+			log.Fatal("Incorrent format of package repositories. Please try: 'Repo1=URL1,Repo2=URL2,...'")
+		}
 		repository := strings.Split(r, "=")
 		outputRepositoryMap[repository[0]] = repository[1]
 		outputRepositoryList = append(outputRepositoryList, repository[1])
