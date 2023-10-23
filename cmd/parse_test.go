@@ -32,7 +32,7 @@ func Test_processPackagesFile(t *testing.T) {
 				{
 					"somePackage1",
 					"1.0.0",
-					"",
+					"", "",
 					[]Dependency{
 						{
 							"Depends",
@@ -46,7 +46,7 @@ func Test_processPackagesFile(t *testing.T) {
 				{
 					"somePackage2",
 					"2.0.0",
-					"",
+					"", "",
 					[]Dependency{
 						{
 							"Depends",
@@ -72,7 +72,7 @@ func Test_processPackagesFile(t *testing.T) {
 				{
 					"somePackage3",
 					"0.0.1",
-					"",
+					"", "",
 					[]Dependency{
 						{
 							"Depends",
@@ -110,7 +110,7 @@ func Test_processPackagesFile(t *testing.T) {
 				{
 					"somePackage4",
 					"0.2",
-					"",
+					"", "",
 					[]Dependency{
 						{
 							"Suggests",
@@ -162,8 +162,8 @@ func Test_parseDescriptionFileList(t *testing.T) {
 	byteValue2, err := os.ReadFile("testdata/DESCRIPTION2")
 	checkError(err)
 	descriptionFileList := []DescriptionFile{
-		{string(byteValue1), "github", "", "", "", "", "", "", ""},
-		{string(byteValue2), "github", "", "", "", "", "", "", ""},
+		{string(byteValue1), "GitHub", "", "", "", "", "", "", ""},
+		{string(byteValue2), "GitHub", "", "", "", "", "", "", ""},
 	}
 	allPackages := parseDescriptionFileList(descriptionFileList)
 	assert.Equal(t, allPackages,
@@ -171,7 +171,8 @@ func Test_parseDescriptionFileList(t *testing.T) {
 			{
 				"my.awesome.package",
 				"0.14.0.9012",
-				"github",
+				"GitHub",
+				"",
 				[]Dependency{
 					{
 						"Depends",
@@ -281,7 +282,8 @@ func Test_parseDescriptionFileList(t *testing.T) {
 			{
 				"my.awesome.package.2",
 				"0.9.1.9013",
-				"github",
+				"GitHub",
+				"",
 				[]Dependency{
 					{
 						"Depends",

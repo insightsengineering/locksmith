@@ -26,7 +26,7 @@ func constructOutputPackageList(packages []PackageDescription, packagesFiles map
 	// Add all input packages to output list, as the packages should be downloaded from git repositories.
 	for _, p := range packages {
 		outputPackageList = append(outputPackageList, PackageDescription{
-			p.Package, p.Version, p.Repository, []Dependency{},
+			p.Package, p.Version, p.Source, "", []Dependency{},
 			p.RemoteType, p.RemoteHost, p.RemoteUsername, p.RemoteRepo, p.RemoteSubdir,
 			p.RemoteRef, p.RemoteSha,
 		})
@@ -85,7 +85,7 @@ func resolveDependenciesRecursively(outputList *[]PackageDescription, name strin
 				// Repository is saved as an URL, and will be changed into an alias
 				// during the processing of output package list into renv.lock file.
 				*outputList = append(*outputList, PackageDescription{
-					p.Package, p.Version, r, []Dependency{},
+					p.Package, p.Version, "Repository", r, []Dependency{},
 					"", "", "", "", "", "", "",
 				})
 				for _, d := range p.Dependencies {
@@ -160,6 +160,7 @@ func checkIfSkipDependency(indentation string, packageName string, dependencyNam
 			// When generating the output renv.lock, these empty entries will be filtered out.
 			(*outputList)[i].Package = ""
 			(*outputList)[i].Version = ""
+			(*outputList)[i].Source = ""
 			(*outputList)[i].Repository = ""
 			return false
 		}

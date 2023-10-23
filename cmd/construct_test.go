@@ -104,7 +104,7 @@ func Test_constructOutputPackageList(t *testing.T) {
 			{
 				"package3",
 				"1.2.0",
-				"",
+				"", "",
 				[]Dependency{
 					{
 						"Depends",
@@ -130,7 +130,7 @@ func Test_constructOutputPackageList(t *testing.T) {
 			{
 				"package4",
 				"0.7.5",
-				"",
+				"", "",
 				[]Dependency{
 					{
 						"Imports",
@@ -150,14 +150,14 @@ func Test_constructOutputPackageList(t *testing.T) {
 			{
 				"package11",
 				"0.7.8",
-				"",
+				"", "",
 				[]Dependency{},
 				"", "", "", "", "", "", "",
 			},
 			{
 				"package14",
 				"2.5.8",
-				"",
+				"", "",
 				[]Dependency{
 					{
 						"Depends",
@@ -177,7 +177,7 @@ func Test_constructOutputPackageList(t *testing.T) {
 			{
 				"package16",
 				"2.4.5",
-				"",
+				"", "",
 				[]Dependency{},
 				"", "", "", "", "", "", "",
 			},
@@ -188,7 +188,7 @@ func Test_constructOutputPackageList(t *testing.T) {
 			{
 				"package4",
 				"1.1.1",
-				"",
+				"", "",
 				[]Dependency{
 					{
 						"Imports",
@@ -214,21 +214,21 @@ func Test_constructOutputPackageList(t *testing.T) {
 			{
 				"package5",
 				"3.2.0",
-				"",
+				"", "",
 				[]Dependency{},
 				"", "", "", "", "", "", "",
 			},
 			{
 				"package7",
 				"1.6.2",
-				"",
+				"", "",
 				[]Dependency{},
 				"", "", "", "", "", "", "",
 			},
 			{
 				"package9",
 				"2.4",
-				"",
+				"", "",
 				[]Dependency{
 					{
 						"Imports",
@@ -242,21 +242,21 @@ func Test_constructOutputPackageList(t *testing.T) {
 			{
 				"package11",
 				"5.4.7",
-				"",
+				"", "",
 				[]Dependency{},
 				"", "", "", "", "", "", "",
 			},
 			{
 				"package12",
 				"1.2.3",
-				"",
+				"", "",
 				[]Dependency{},
 				"", "", "", "", "", "", "",
 			},
 			{
 				"package15",
 				"3.3.4.5",
-				"",
+				"", "",
 				[]Dependency{},
 				"", "", "", "", "", "", "",
 			},
@@ -267,7 +267,7 @@ func Test_constructOutputPackageList(t *testing.T) {
 			{
 				"package8",
 				"1.9.2",
-				"",
+				"", "",
 				[]Dependency{},
 				"", "", "", "", "", "", "",
 			},
@@ -279,6 +279,7 @@ func Test_constructOutputPackageList(t *testing.T) {
 				"package1",
 				"1.2.3",
 				"GitHub",
+				"",
 				[]Dependency{
 					{
 						"Depends",
@@ -317,6 +318,7 @@ func Test_constructOutputPackageList(t *testing.T) {
 				"package2",
 				"2.3.4",
 				"GitHub",
+				"",
 				[]Dependency{
 					{
 						"Depends",
@@ -372,6 +374,7 @@ func Test_constructOutputPackageList(t *testing.T) {
 				"package1",
 				"1.2.3",
 				"GitHub",
+				"",
 				[]Dependency{},
 				"", "", "", "", "", "", "",
 			},
@@ -379,12 +382,14 @@ func Test_constructOutputPackageList(t *testing.T) {
 				"package2",
 				"2.3.4",
 				"GitHub",
+				"",
 				[]Dependency{},
 				"", "", "", "", "", "", "",
 			},
 			{
 				"package3",
 				"1.2.0",
+				"Repository",
 				"https://repo1.example.com/ExampleRepo1",
 				[]Dependency{},
 				"", "", "", "", "", "", "",
@@ -396,11 +401,12 @@ func Test_constructOutputPackageList(t *testing.T) {
 				// However afterwards, package4 requested package11 >= 4.5
 				// so it had to be retrieved from repo2.
 				// The reference to repo1 was overwritten here.
-				"", "", "", []Dependency{}, "", "", "", "", "", "", "",
+				"", "", "", "", []Dependency{}, "", "", "", "", "", "", "",
 			},
 			{
 				"package12",
 				"1.2.3",
+				"Repository",
 				"https://repo2.example.com/ExampleRepo2",
 				[]Dependency{},
 				"", "", "", "", "", "", "",
@@ -408,6 +414,7 @@ func Test_constructOutputPackageList(t *testing.T) {
 			{
 				"package4",
 				"1.1.1",
+				"Repository",
 				"https://repo2.example.com/ExampleRepo2",
 				[]Dependency{},
 				"", "", "", "", "", "", "",
@@ -415,6 +422,7 @@ func Test_constructOutputPackageList(t *testing.T) {
 			{
 				"package11",
 				"5.4.7",
+				"Repository",
 				"https://repo2.example.com/ExampleRepo2",
 				[]Dependency{},
 				"", "", "", "", "", "", "",
@@ -422,6 +430,7 @@ func Test_constructOutputPackageList(t *testing.T) {
 			{
 				"package14",
 				"2.5.8",
+				"Repository",
 				"https://repo1.example.com/ExampleRepo1",
 				[]Dependency{},
 				"", "", "", "", "", "", "",
@@ -429,6 +438,7 @@ func Test_constructOutputPackageList(t *testing.T) {
 			{
 				"package15",
 				"3.3.4.5",
+				"Repository",
 				"https://repo2.example.com/ExampleRepo2",
 				[]Dependency{},
 				"", "", "", "", "", "", "",
@@ -436,6 +446,7 @@ func Test_constructOutputPackageList(t *testing.T) {
 			{
 				"package16",
 				"2.4.5",
+				"Repository",
 				"https://repo1.example.com/ExampleRepo1",
 				[]Dependency{},
 				"", "", "", "", "", "", "",
@@ -443,6 +454,7 @@ func Test_constructOutputPackageList(t *testing.T) {
 			{
 				"package5",
 				"3.2.0",
+				"Repository",
 				"https://repo2.example.com/ExampleRepo2",
 				[]Dependency{},
 				"", "", "", "", "", "", "",
@@ -450,6 +462,7 @@ func Test_constructOutputPackageList(t *testing.T) {
 			{
 				"package7",
 				"1.6.2",
+				"Repository",
 				"https://repo2.example.com/ExampleRepo2",
 				[]Dependency{},
 				"", "", "", "", "", "", "",
@@ -457,6 +470,7 @@ func Test_constructOutputPackageList(t *testing.T) {
 			{
 				"package8",
 				"1.9.2",
+				"Repository",
 				"https://repo3.example.com/ExampleRepo3",
 				[]Dependency{},
 				"", "", "", "", "", "", "",
@@ -464,6 +478,7 @@ func Test_constructOutputPackageList(t *testing.T) {
 			{
 				"package9",
 				"2.4",
+				"Repository",
 				"https://repo2.example.com/ExampleRepo2",
 				[]Dependency{},
 				"", "", "", "", "", "", "",
