@@ -33,19 +33,33 @@ type PackagesFile struct {
 	Packages []PackageDescription `json:"packages"`
 }
 
+type RenvLock struct {
+	R RenvLockContents `json:"R"`
+}
+
+type RenvLockRepository struct {
+	Name string `json:"Name"`
+	URL  string `json:"URL"`
+}
+
+type RenvLockContents struct {
+	Packages     map[string]PackageDescription `json:"Packages"`
+	Repositories []RenvLockRepository          `json:"Repositories"`
+}
+
 type PackageDescription struct {
 	Package        string       `json:"Package"`
 	Version        string       `json:"Version"`
 	Source         string       `json:"Source"`
-	Repository     string       `json:"Repository"`
+	Repository     string       `json:"Repository,omitempty"`
 	Dependencies   []Dependency `json:"Requirements"`
-	RemoteType     string       `json:"RemoteType"`
-	RemoteHost     string       `json:"RemoteHost"`
-	RemoteUsername string       `json:"RemoteUsername"`
-	RemoteRepo     string       `json:"RemoteRepo"`
-	RemoteSubdir   string       `json:"RemoteSubdir"`
-	RemoteRef      string       `json:"RemoteRef"`
-	RemoteSha      string       `json:"RemoteSha"`
+	RemoteType     string       `json:"RemoteType,omitempty"`
+	RemoteHost     string       `json:"RemoteHost,omitempty"`
+	RemoteUsername string       `json:"RemoteUsername,omitempty"`
+	RemoteRepo     string       `json:"RemoteRepo,omitempty"`
+	RemoteSubdir   string       `json:"RemoteSubdir,omitempty"`
+	RemoteRef      string       `json:"RemoteRef,omitempty"`
+	RemoteSha      string       `json:"RemoteSha,omitempty"`
 }
 
 type Dependency struct {

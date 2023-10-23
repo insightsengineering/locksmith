@@ -81,7 +81,7 @@ in an renv.lock-compatible file.`,
 			fmt.Println("inputPackageList =", inputPackageList)
 			fmt.Println("inputRepositoryList =", inputRepositoryList)
 
-			packageDescriptionList, repositoryList := parseInput()
+			packageDescriptionList, repositoryList, repositoryMap := parseInput()
 			log.Debug("inputPackageList = ", packageDescriptionList)
 			log.Debug("inputRepositoryList = ", repositoryList)
 
@@ -90,7 +90,7 @@ in an renv.lock-compatible file.`,
 			repositoryPackagesFiles := downloadPackagesFiles(repositoryList)
 			packagesFiles := parsePackagesFiles(repositoryPackagesFiles)
 			outputPackageList := constructOutputPackageList(inputPackages, packagesFiles, repositoryList)
-			prettyPrint(outputPackageList)
+			generateRenvLock(outputPackageList, repositoryMap)
 		},
 	}
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "",

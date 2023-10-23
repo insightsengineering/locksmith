@@ -205,6 +205,9 @@ func processDescriptionURL(descriptionURL string) (map[string]string, string, st
 	return token, remoteType, packageSource, remoteHost, remoteUsername, remoteRepo, remoteSubdir, remoteRef, remoteSha
 }
 
+// Downloads DESCRIPTION files from the list of supplied URLs.
+// Returns a list of structures representing the contents of DESCRIPTION file for the packages,
+// and the git repositories storing the packages.
 func downloadDescriptionFiles(packageDescriptionList []string) []DescriptionFile {
 	var inputDescriptionFiles []DescriptionFile
 	for _, packageDescriptionURL := range packageDescriptionList {
@@ -236,6 +239,9 @@ func downloadDescriptionFiles(packageDescriptionList []string) []DescriptionFile
 	return inputDescriptionFiles
 }
 
+// Downloads PACKAGES files from repository URLs specified in the repositoryList.
+// Returns a map from repository URL to the string with the contents of PACKAGES file
+// for that repository.
 func downloadPackagesFiles(repositoryList []string) map[string]string {
 	inputPackagesFiles := make(map[string]string)
 	for _, repository := range repositoryList {

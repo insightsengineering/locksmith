@@ -42,7 +42,7 @@ func stringInSlice(a string, list []string) bool {
 	return false
 }
 
-func parseInput() ([]string, []string) {
+func parseInput() ([]string, []string, map[string]string) {
 	if len(inputPackageList) < 1 {
 		log.Fatal("No packages specified. Please use the --inputPackageList flag.")
 	}
@@ -51,7 +51,14 @@ func parseInput() ([]string, []string) {
 	}
 	packageList := strings.Split(inputPackageList, ",")
 	repositoryList := strings.Split(inputRepositoryList, ",")
-	return packageList, repositoryList
+	outputRepositoryMap := make(map[string]string)
+	var outputRepositoryList []string
+	for _, r := range repositoryList {
+		repository := strings.Split(r, "=")
+		outputRepositoryMap[repository[0]] = repository[1]
+		outputRepositoryList = append(outputRepositoryList, repository[1])
+	}
+	return packageList, outputRepositoryList, outputRepositoryMap
 }
 
 func stringsToInts(input []string) []int {
