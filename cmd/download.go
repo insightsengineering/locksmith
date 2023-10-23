@@ -34,7 +34,7 @@ type GitLabTagOrBranchResponse struct {
 }
 
 type GitLabCommit struct {
-	Id string `json:"id"`
+	ID string `json:"id"`
 }
 
 type GitHubTagOrBranchResponse struct {
@@ -47,10 +47,8 @@ type GitHubObject struct {
 
 // Returns HTTP status code for downloaded file, number of bytes in downloaded content,
 // and the downloaded content itself.
-func downloadTextFile(url string, parameters map[string]string) (int, int64, string) {
-	tr := &http.Transport{ // #nosec
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // #nosec
-	} // #nosec
+func downloadTextFile(url string, parameters map[string]string) (int, int64, string) { // #nosec G402
+	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
 	client := &http.Client{Transport: tr}
 	req, err := http.NewRequest("GET", url, nil)
 	checkError(err)
@@ -80,7 +78,8 @@ func getGitLabProjectAndSha(projectURL string, remoteRef string, token map[strin
 	statusCode, _, projectDataResponse := downloadTextFile(projectURL, token)
 	if statusCode == 200 {
 		var projectData GitLabAPIResponse
-		json.Unmarshal([]byte(projectDataResponse), &projectData)
+		err := json.Unmarshal([]byte(projectDataResponse), &projectData)
+		checkError(err)
 		prettyPrint(projectData)
 		projectPath := strings.Split(projectData.PathWithNamespace, "/")
 		projectPathLength := len(projectPath)
@@ -89,16 +88,17 @@ func getGitLabProjectAndSha(projectURL string, remoteRef string, token map[strin
 	} else {
 		log.Warn("An error occurred while retrieving project information from ", projectURL)
 	}
-	match, err := regexp.MatchString(`v\d+(\.\d+)*`, remoteRef)
+	match, errMatch := regexp.MatchString(`v\d+(\.\d+)*`, remoteRef)
 	if match {
 		log.Debug("remoteRef = ", remoteRef, " matches tag name regexp.")
 		tagURL := projectURL + "/repository/tags/" + remoteRef
 		statusCode, _, tagDataResponse := downloadTextFile(tagURL, token)
 		if statusCode == 200 {
 			var tagData GitLabTagOrBranchResponse
-			json.Unmarshal([]byte(tagDataResponse), &tagData)
+			err := json.Unmarshal([]byte(tagDataResponse), &tagData)
+			checkError(err)
 			prettyPrint(tagData)
-			remoteSha = tagData.Commit.Id
+			remoteSha = tagData.Commit.ID
 		} else {
 			log.Warn("An error occurred while retrieving tag information from ", tagURL)
 		}
@@ -108,14 +108,15 @@ func getGitLabProjectAndSha(projectURL string, remoteRef string, token map[strin
 		statusCode, _, branchDataResponse := downloadTextFile(branchURL, token)
 		if statusCode == 200 {
 			var branchData GitLabTagOrBranchResponse
-			json.Unmarshal([]byte(branchDataResponse), &branchData)
+			err := json.Unmarshal([]byte(branchDataResponse), &branchData)
+			checkError(err)
 			prettyPrint(branchData)
-			remoteSha = branchData.Commit.Id
+			remoteSha = branchData.Commit.ID
 		} else {
 			log.Warn("An error occurred while retrieving branch information from ", branchURL)
 		}
 	}
-	checkError(err)
+	checkError(errMatch)
 	return remoteUsername, remoteRepo, remoteSha
 }
 
@@ -123,14 +124,15 @@ func getGitHubSha(remoteUsername string, remoteRepo string, remoteRef string,
 	token map[string]string) string {
 	var remoteSha string
 	log.Debug("Downloading information for GitHub project ", remoteUsername, "/", remoteRepo)
-	match, err := regexp.MatchString(`v\d+(\.\d+)*`, remoteRef)
+	match, errMatch := regexp.MatchString(`v\d+(\.\d+)*`, remoteRef)
 	if match {
 		log.Debug("remoteRef = ", remoteRef, " matches tag name regexp.")
 		tagURL := "https://api.github.com/repos/" + remoteUsername + "/" + remoteRepo + "/git/ref/tags/" + remoteRef
 		statusCode, _, tagDataResponse := downloadTextFile(tagURL, token)
 		if statusCode == 200 {
 			var tagData GitHubTagOrBranchResponse
-			json.Unmarshal([]byte(tagDataResponse), &tagData)
+			err := json.Unmarshal([]byte(tagDataResponse), &tagData)
+			checkError(err)
 			prettyPrint(tagData)
 			remoteSha = tagData.Object.Sha
 		} else {
@@ -142,14 +144,15 @@ func getGitHubSha(remoteUsername string, remoteRepo string, remoteRef string,
 		statusCode, _, branchDataResponse := downloadTextFile(branchURL, token)
 		if statusCode == 200 {
 			var branchData GitHubTagOrBranchResponse
-			json.Unmarshal([]byte(branchDataResponse), &branchData)
+			err := json.Unmarshal([]byte(branchDataResponse), &branchData)
+			checkError(err)
 			prettyPrint(branchData)
 			remoteSha = branchData.Object.Sha
 		} else {
 			log.Warn("An error occurred while retrieving branch information from ", branchURL)
 		}
 	}
-	checkError(err)
+	checkError(errMatch)
 	return remoteSha
 }
 
