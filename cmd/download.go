@@ -20,7 +20,6 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
-	"os"
 	"regexp"
 	"strings"
 )
@@ -233,7 +232,7 @@ func downloadDescriptionFiles(packageDescriptionList []string) []DescriptionFile
 			)
 		}
 	}
-	os.Exit(0)
+	prettyPrint(inputDescriptionFiles)
 	return inputDescriptionFiles
 }
 

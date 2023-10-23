@@ -43,6 +43,12 @@ func stringInSlice(a string, list []string) bool {
 }
 
 func parseInput() ([]string, []string) {
+	if len(inputPackageList) < 1 {
+		log.Fatal("No packages specified. Please use the --inputPackageList flag.")
+	}
+	if len(inputRepositoryList) < 1 {
+		log.Fatal("No package repositories specified. Please use the --inputRepositoryList flag.")
+	}
 	packageList := strings.Split(inputPackageList, ",")
 	repositoryList := strings.Split(inputRepositoryList, ",")
 	return packageList, repositoryList

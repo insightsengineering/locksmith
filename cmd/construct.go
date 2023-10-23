@@ -21,12 +21,14 @@ import (
 )
 
 func constructOutputPackageList(packages []PackageDescription, packagesFiles map[string]PackagesFile,
-	repositoryList []string) []OutputPackage {
-	var outputPackageList []OutputPackage
+	repositoryList []string) []PackageDescription {
+	var outputPackageList []PackageDescription
 	// Add all input packages to output list, as the packages should be downloaded from git repositories.
 	for _, p := range packages {
-		outputPackageList = append(outputPackageList, OutputPackage{
-			p.Package, p.Version, p.Repository,
+		outputPackageList = append(outputPackageList, PackageDescription{
+			p.Package, p.Version, p.Repository, []Dependency{},
+			p.RemoteType, p.RemoteHost, p.RemoteUsername, p.RemoteRepo, p.RemoteSubdir,
+			p.RemoteRef, p.RemoteSha,
 		})
 	}
 	for _, p := range packages {
@@ -55,7 +57,7 @@ func constructOutputPackageList(packages []PackageDescription, packagesFiles map
 	return outputPackageList
 }
 
-func resolveDependenciesRecursively(outputList *[]OutputPackage, name string, versionOperator string,
+func resolveDependenciesRecursively(outputList *[]PackageDescription, name string, versionOperator string,
 	versionValue string, repositoryList []string, packagesFiles map[string]PackagesFile, recursionLevel int) {
 	var indentation string
 	for i := 0; i < recursionLevel; i++ {
@@ -82,8 +84,9 @@ func resolveDependenciesRecursively(outputList *[]OutputPackage, name string, ve
 				// Add package to the output list.
 				// Repository is saved as an URL, and will be changed into an alias
 				// during the processing of output package list into renv.lock file.
-				*outputList = append(*outputList, OutputPackage{
-					p.Package, p.Version, r,
+				*outputList = append(*outputList, PackageDescription{
+					p.Package, p.Version, r, []Dependency{},
+					"", "", "", "", "", "", "",
 				})
 				for _, d := range p.Dependencies {
 					if d.DependencyType == "Depends" || d.DependencyType == "Imports" {
@@ -121,7 +124,7 @@ func checkIfBasePackage(name string) bool {
 	return stringInSlice(name, basePackages)
 }
 
-func checkIfPackageOnOutputList(name string, outputList []OutputPackage) bool {
+func checkIfPackageOnOutputList(name string, outputList []PackageDescription) bool {
 	for _, o := range outputList {
 		if name == o.Package {
 			return true
@@ -131,7 +134,7 @@ func checkIfPackageOnOutputList(name string, outputList []OutputPackage) bool {
 }
 
 func checkIfSkipDependency(indentation string, packageName string, dependencyName string,
-	versionOperator string, versionValue string, outputList *[]OutputPackage) bool {
+	versionOperator string, versionValue string, outputList *[]PackageDescription) bool {
 	if checkIfBasePackage(dependencyName) {
 		log.Debug(indentation, "Skipping package ", dependencyName, " as it is a base R package.")
 		return true

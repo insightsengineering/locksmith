@@ -367,21 +367,27 @@ func Test_constructOutputPackageList(t *testing.T) {
 		packagesFiles, repositoryList,
 	)
 	assert.Equal(t, outputPackageList,
-		[]OutputPackage{
+		[]PackageDescription{
 			{
 				"package1",
 				"1.2.3",
 				"GitHub",
+				[]Dependency{},
+				"", "", "", "", "", "", "",
 			},
 			{
 				"package2",
 				"2.3.4",
 				"GitHub",
+				[]Dependency{},
+				"", "", "", "", "", "", "",
 			},
 			{
 				"package3",
 				"1.2.0",
 				"https://repo1.example.com/ExampleRepo1",
+				[]Dependency{},
+				"", "", "", "", "", "", "",
 			},
 			{
 				// package11 removed from here
@@ -390,59 +396,77 @@ func Test_constructOutputPackageList(t *testing.T) {
 				// However afterwards, package4 requested package11 >= 4.5
 				// so it had to be retrieved from repo2.
 				// The reference to repo1 was overwritten here.
-				"",
-				"",
-				"",
+				"", "", "", []Dependency{}, "", "", "", "", "", "", "",
 			},
 			{
 				"package12",
 				"1.2.3",
 				"https://repo2.example.com/ExampleRepo2",
+				[]Dependency{},
+				"", "", "", "", "", "", "",
 			},
 			{
 				"package4",
 				"1.1.1",
 				"https://repo2.example.com/ExampleRepo2",
+				[]Dependency{},
+				"", "", "", "", "", "", "",
 			},
 			{
 				"package11",
 				"5.4.7",
 				"https://repo2.example.com/ExampleRepo2",
+				[]Dependency{},
+				"", "", "", "", "", "", "",
 			},
 			{
 				"package14",
 				"2.5.8",
 				"https://repo1.example.com/ExampleRepo1",
+				[]Dependency{},
+				"", "", "", "", "", "", "",
 			},
 			{
 				"package15",
 				"3.3.4.5",
 				"https://repo2.example.com/ExampleRepo2",
+				[]Dependency{},
+				"", "", "", "", "", "", "",
 			},
 			{
 				"package16",
 				"2.4.5",
 				"https://repo1.example.com/ExampleRepo1",
+				[]Dependency{},
+				"", "", "", "", "", "", "",
 			},
 			{
 				"package5",
 				"3.2.0",
 				"https://repo2.example.com/ExampleRepo2",
+				[]Dependency{},
+				"", "", "", "", "", "", "",
 			},
 			{
 				"package7",
 				"1.6.2",
 				"https://repo2.example.com/ExampleRepo2",
+				[]Dependency{},
+				"", "", "", "", "", "", "",
 			},
 			{
 				"package8",
 				"1.9.2",
 				"https://repo3.example.com/ExampleRepo3",
+				[]Dependency{},
+				"", "", "", "", "", "", "",
 			},
 			{
 				"package9",
 				"2.4",
 				"https://repo2.example.com/ExampleRepo2",
+				[]Dependency{},
+				"", "", "", "", "", "", "",
 			},
 		},
 	)

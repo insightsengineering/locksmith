@@ -52,9 +52,3 @@ type Dependency struct {
 	VersionOperator string `json:"operator"`
 	VersionValue    string `json:"value"`
 }
-
-type OutputPackage struct {
-	Package    string `json:"package"`
-	Version    string `json:"version"`
-	Repository string `json:"repository"`
-}
