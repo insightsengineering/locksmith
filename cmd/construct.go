@@ -141,7 +141,7 @@ func checkIfSkipDependency(indentation string, packageName string, dependencyNam
 					requirementMessage = " since no required version has been specified."
 				}
 				log.Debug(
-					"Output list already contains dependency ", dependencyName, " version ",
+					indentation, "Output list already contains dependency ", dependencyName, " version ",
 					(*outputList)[i].Version, " which is sufficient for ", packageName,
 					requirementMessage,
 				)
