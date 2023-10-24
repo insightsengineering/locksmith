@@ -121,15 +121,6 @@ func checkIfBasePackage(name string) bool {
 	return stringInSlice(name, basePackages)
 }
 
-func checkIfPackageOnOutputList(name string, outputList []PackageDescription) bool {
-	for _, o := range outputList {
-		if name == o.Package {
-			return true
-		}
-	}
-	return false
-}
-
 func checkIfSkipDependency(indentation string, packageName string, dependencyName string,
 	versionOperator string, versionValue string, outputList *[]PackageDescription) bool {
 	if checkIfBasePackage(dependencyName) {
@@ -143,10 +134,16 @@ func checkIfSkipDependency(indentation string, packageName string, dependencyNam
 		if dependencyName == (*outputList)[i].Package {
 			// Dependency found on the output list.
 			if checkIfVersionSufficient((*outputList)[i].Version, versionOperator, versionValue) {
+				var requirementMessage string
+				if versionOperator != "" && versionValue != "" {
+					requirementMessage = " according to the requirement " + versionOperator + " " + versionValue
+				} else {
+					requirementMessage = " since no required version has been specified."
+				}
 				log.Debug(
 					"Output list already contains dependency ", dependencyName, " version ",
 					(*outputList)[i].Version, " which is sufficient for ", packageName,
-					" according to the requirement ", versionOperator, " ", versionValue,
+					requirementMessage,
 				)
 				return true
 			}
