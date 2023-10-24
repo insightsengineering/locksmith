@@ -21,7 +21,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func mockedDownloadTextFile(url string, _ map[string]string) (int, int64, string) {
+func mockedDownloadTextFile(url string, _ map[string]string) (int, int64, string) { // nolint: gocyclo
 	switch {
 	case url == "https://gitlab.example.com/api/v4/projects/37706/repository/tags/v1.3.1":
 		return 200, 0, `{
@@ -123,6 +123,12 @@ func mockedDownloadTextFile(url string, _ map[string]string) (int, int64, string
 		return 200, 0, "DESCRIPTION contents 9"
 	case url == "https://raw.githubusercontent.com/insightsengineering/rlistings/v0.2.6/DESCRIPTION":
 		return 200, 0, "DESCRIPTION contents 10"
+	case url == "https://repo1.example.com/repo1/src/contrib/PACKAGES":
+		return 200, 0, "PACKAGES contents 1"
+	case url == "https://repo2.example.com/repo2/src/contrib/PACKAGES":
+		return 200, 0, "PACKAGES contents 2"
+	case url == "https://repo3.example.com/repo3/src/contrib/PACKAGES":
+		return 200, 0, "PACKAGES contents 3"
 	}
 	return 200, 0, ""
 }
@@ -256,9 +262,15 @@ func Test_downloadDescriptionFiles(t *testing.T) {
 	})
 }
 
-// func Test_downloadPackagesFiles(t *testing.T) {
-// 	packagesFiles := downloadPackagesFiles([]string{
-
-// 	}, mockedDownloadTextFile)
-// 	assert.Equal(t, )
-// }
+func Test_downloadPackagesFiles(t *testing.T) {
+	packagesFiles := downloadPackagesFiles([]string{
+		"https://repo1.example.com/repo1",
+		"https://repo2.example.com/repo2",
+		"https://repo3.example.com/repo3",
+	}, mockedDownloadTextFile)
+	assert.Equal(t, packagesFiles, map[string]string{
+		"https://repo1.example.com/repo1": "PACKAGES contents 1",
+		"https://repo2.example.com/repo2": "PACKAGES contents 2",
+		"https://repo3.example.com/repo3": "PACKAGES contents 3",
+	})
+}

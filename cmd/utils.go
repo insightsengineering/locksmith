@@ -28,11 +28,11 @@ func checkError(err error) {
 	}
 }
 
-func prettyPrint(i interface{}) {
-	s, err := json.MarshalIndent(i, "", "  ")
-	checkError(err)
-	log.Debug(string(s))
-}
+// func prettyPrint(i interface{}) {
+// 	s, err := json.MarshalIndent(i, "", "  ")
+// 	checkError(err)
+// 	log.Debug(string(s))
+// }
 
 func stringInSlice(a string, list []string) bool {
 	for _, b := range list {
@@ -59,7 +59,7 @@ func parseInput() ([]string, []string, map[string]string) {
 	var outputRepositoryList []string
 	for _, r := range repositoryList {
 		if !strings.Contains(r, "=") {
-			log.Fatal("Incorrent format of package repositories. Please try: 'Repo1=URL1,Repo2=URL2,...'")
+			log.Fatal("Incorrect format of package repositories. Please try: 'Repo1=URL1,Repo2=URL2,...'")
 		}
 		repository := strings.Split(r, "=")
 		outputRepositoryMap[repository[0]] = repository[1]
