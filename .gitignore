@@ -26,3 +26,4 @@ coverage.html
 coverage.xml
 junit-report.xml
 test-results.txt
+renv.lock

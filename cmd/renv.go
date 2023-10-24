@@ -16,7 +16,7 @@ limitations under the License.
 
 package cmd
 
-func generateRenvLock(packageList []PackageDescription, repositoryMap map[string]string) {
+func generateRenvLock(packageList []PackageDescription, repositoryMap map[string]string) RenvLock {
 	var outputRenvLock RenvLock
 	outputRenvLock.R.Packages = make(map[string]PackageDescription)
 	for _, p := range packageList {
@@ -25,6 +25,7 @@ func generateRenvLock(packageList []PackageDescription, repositoryMap map[string
 		if p.Package == "" || p.Version == "" || p.Source == "" {
 			continue
 		}
+		// Replace package repository URL with package repository alias/name.
 		repositoryKey := getRepositoryKeyByValue(p.Repository, repositoryMap)
 		p.Repository = repositoryKey
 		outputRenvLock.R.Packages[p.Package] = p
@@ -32,7 +33,7 @@ func generateRenvLock(packageList []PackageDescription, repositoryMap map[string
 	for k, v := range repositoryMap {
 		outputRenvLock.R.Repositories = append(outputRenvLock.R.Repositories, RenvLockRepository{k, v})
 	}
-	prettyPrint(outputRenvLock)
+	return outputRenvLock
 }
 
 func getRepositoryKeyByValue(repositoryURL string, repositoryMap map[string]string) string {

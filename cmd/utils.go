@@ -17,6 +17,7 @@ package cmd
 
 import (
 	"encoding/json"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -42,6 +43,9 @@ func stringInSlice(a string, list []string) bool {
 	return false
 }
 
+// Parses input parameters, and returns: list of package DESCRIPTION URLs, list of
+// package repository URLs (in descending priority order), and a map from package
+// repository alias (name) to the package repository URL.
 func parseInput() ([]string, []string, map[string]string) {
 	if len(inputPackageList) < 1 {
 		log.Fatal("No packages specified. Please use the --inputPackageList flag.")
@@ -61,6 +65,9 @@ func parseInput() ([]string, []string, map[string]string) {
 		outputRepositoryMap[repository[0]] = repository[1]
 		outputRepositoryList = append(outputRepositoryList, repository[1])
 	}
+	log.Debug("inputPackageList = ", packageList)
+	log.Debug("inputRepositoryList = ", outputRepositoryList)
+	log.Debug("inputRepositoryMap = ", outputRepositoryMap)
 	return packageList, outputRepositoryList, outputRepositoryMap
 }
 
@@ -72,4 +79,12 @@ func stringsToInts(input []string) []int {
 		output = append(output, j)
 	}
 	return output
+}
+
+func writeJSON(filename string, j interface{}) {
+	s, err := json.MarshalIndent(j, "", "  ")
+	checkError(err)
+
+	err = os.WriteFile(filename, s, 0644) //#nosec
+	checkError(err)
 }

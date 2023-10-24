@@ -71,15 +71,15 @@ func downloadTextFile(url string, parameters map[string]string) (int, int64, str
 
 // Retrieve information about GitLab repository (project path, repository name and commit SHA) from
 // projectURL repository GitLab API endpoint.
-func getGitLabProjectAndSha(projectURL string, remoteRef string, token map[string]string) (string, string, string) {
+func getGitLabProjectAndSha(projectURL string, remoteRef string, token map[string]string,
+	downloadFileFunction func(string, map[string]string) (int, int64, string)) (string, string, string) {
 	var remoteUsername, remoteRepo, remoteSha string
 	log.Debug("Downloading project information from ", projectURL)
-	statusCode, _, projectDataResponse := downloadTextFile(projectURL, token)
+	statusCode, _, projectDataResponse := downloadFileFunction(projectURL, token)
 	if statusCode == 200 {
 		var projectData GitLabAPIResponse
 		err := json.Unmarshal([]byte(projectDataResponse), &projectData)
 		checkError(err)
-		prettyPrint(projectData)
 		projectPath := strings.Split(projectData.PathWithNamespace, "/")
 		projectPathLength := len(projectPath)
 		remoteUsername = strings.Join(projectPath[:projectPathLength-1], "/")
@@ -91,12 +91,11 @@ func getGitLabProjectAndSha(projectURL string, remoteRef string, token map[strin
 	if match {
 		log.Debug("remoteRef = ", remoteRef, " matches tag name regexp.")
 		tagURL := projectURL + "/repository/tags/" + remoteRef
-		statusCode, _, tagDataResponse := downloadTextFile(tagURL, token)
+		statusCode, _, tagDataResponse := downloadFileFunction(tagURL, token)
 		if statusCode == 200 {
 			var tagData GitLabTagOrBranchResponse
 			err := json.Unmarshal([]byte(tagDataResponse), &tagData)
 			checkError(err)
-			prettyPrint(tagData)
 			remoteSha = tagData.Commit.ID
 		} else {
 			log.Warn("An error occurred while retrieving tag information from ", tagURL)
@@ -104,12 +103,11 @@ func getGitLabProjectAndSha(projectURL string, remoteRef string, token map[strin
 	} else {
 		log.Debug("remoteRef = ", remoteRef, " doesn't match tag name regexp.")
 		branchURL := projectURL + "/repository/branches/" + remoteRef
-		statusCode, _, branchDataResponse := downloadTextFile(branchURL, token)
+		statusCode, _, branchDataResponse := downloadFileFunction(branchURL, token)
 		if statusCode == 200 {
 			var branchData GitLabTagOrBranchResponse
 			err := json.Unmarshal([]byte(branchDataResponse), &branchData)
 			checkError(err)
-			prettyPrint(branchData)
 			remoteSha = branchData.Commit.ID
 		} else {
 			log.Warn("An error occurred while retrieving branch information from ", branchURL)
@@ -120,20 +118,19 @@ func getGitLabProjectAndSha(projectURL string, remoteRef string, token map[strin
 }
 
 // Retrieve SHA of the remoteRef from the 'remoteUsername/remoteRepo' GitHub repository.
-func getGitHubSha(remoteUsername string, remoteRepo string, remoteRef string,
-	token map[string]string) string {
+func getGitHubSha(remoteUsername string, remoteRepo string, remoteRef string, token map[string]string,
+	downloadFileFunction func(string, map[string]string) (int, int64, string)) string {
 	var remoteSha string
 	log.Debug("Downloading information for GitHub project ", remoteUsername, "/", remoteRepo)
 	match, errMatch := regexp.MatchString(`v\d+(\.\d+)*`, remoteRef)
 	if match {
 		log.Debug("remoteRef = ", remoteRef, " matches tag name regexp.")
 		tagURL := "https://api.github.com/repos/" + remoteUsername + "/" + remoteRepo + "/git/ref/tags/" + remoteRef
-		statusCode, _, tagDataResponse := downloadTextFile(tagURL, token)
+		statusCode, _, tagDataResponse := downloadFileFunction(tagURL, token)
 		if statusCode == 200 {
 			var tagData GitHubTagOrBranchResponse
 			err := json.Unmarshal([]byte(tagDataResponse), &tagData)
 			checkError(err)
-			prettyPrint(tagData)
 			remoteSha = tagData.Object.Sha
 		} else {
 			log.Warn("An error occurred while retrieving tag information from ", tagURL)
@@ -141,12 +138,11 @@ func getGitHubSha(remoteUsername string, remoteRepo string, remoteRef string,
 	} else {
 		log.Debug("remoteRef = ", remoteRef, " doesn't match tag name regexp.")
 		branchURL := "https://api.github.com/repos/" + remoteUsername + "/" + remoteRepo + "/git/ref/heads/" + remoteRef
-		statusCode, _, branchDataResponse := downloadTextFile(branchURL, token)
+		statusCode, _, branchDataResponse := downloadFileFunction(branchURL, token)
 		if statusCode == 200 {
 			var branchData GitHubTagOrBranchResponse
 			err := json.Unmarshal([]byte(branchDataResponse), &branchData)
 			checkError(err)
-			prettyPrint(branchData)
 			remoteSha = branchData.Object.Sha
 		} else {
 			log.Warn("An error occurred while retrieving branch information from ", branchURL)
@@ -157,7 +153,9 @@ func getGitHubSha(remoteUsername string, remoteRepo string, remoteRef string,
 }
 
 // Get information about packages stored in git repositories.
-func processDescriptionURL(descriptionURL string) (map[string]string, string, string, string, string, string, string, string, string) {
+func processDescriptionURL(descriptionURL string,
+	downloadFileFunction func(string, map[string]string) (int, int64, string),
+) (map[string]string, string, string, string, string, string, string, string, string) {
 	token := make(map[string]string)
 	var remoteType, remoteRef, remoteHost, remoteUsername, remoteRepo string
 	var remoteSubdir, remoteSha, packageSource string
@@ -172,7 +170,7 @@ func processDescriptionURL(descriptionURL string) (map[string]string, string, st
 		remoteUsername = strings.Split(shorterURL, "/")[0]
 		remoteRepo = strings.Split(shorterURL, "/")[1]
 		remoteRef = strings.Split(shorterURL, "/")[2]
-		remoteSha = getGitHubSha(remoteUsername, remoteRepo, remoteRef, token)
+		remoteSha = getGitHubSha(remoteUsername, remoteRepo, remoteRef, token, downloadFileFunction)
 		// Check whether package is stored in a subdirectory of the git repository.
 		for i, j := range strings.Split(shorterURL, "/") {
 			if j == "DESCRIPTION" {
@@ -197,7 +195,7 @@ func processDescriptionURL(descriptionURL string) (map[string]string, string, st
 			descriptionPath := strings.Split(strings.ReplaceAll(descriptionPath, "%2F", "/"), "/")
 			remoteSubdir = strings.Join(descriptionPath[:len(descriptionPath)-1], "/")
 		}
-		remoteUsername, remoteRepo, remoteSha = getGitLabProjectAndSha(projectURL, remoteRef, token)
+		remoteUsername, remoteRepo, remoteSha = getGitLabProjectAndSha(projectURL, remoteRef, token, downloadFileFunction)
 	}
 	return token, remoteType, packageSource, remoteHost, remoteUsername, remoteRepo, remoteSubdir, remoteRef, remoteSha
 }
@@ -205,17 +203,18 @@ func processDescriptionURL(descriptionURL string) (map[string]string, string, st
 // Downloads DESCRIPTION files from the list of supplied URLs.
 // Returns a list of structures representing the contents of DESCRIPTION file for the packages,
 // and the git repositories storing the packages.
-func downloadDescriptionFiles(packageDescriptionList []string) []DescriptionFile {
+func downloadDescriptionFiles(packageDescriptionList []string,
+	downloadFileFunction func(string, map[string]string) (int, int64, string)) []DescriptionFile {
 	var inputDescriptionFiles []DescriptionFile
 	for _, packageDescriptionURL := range packageDescriptionList {
 		token, remoteType, packageSource, remoteHost, remoteUsername, remoteRepo, remoteSubdir, remoteRef, remoteSha :=
-			processDescriptionURL(packageDescriptionURL)
+			processDescriptionURL(packageDescriptionURL, downloadFileFunction)
 		log.Info(
 			"Downloading ", packageDescriptionURL, "\nremoteType = ", remoteType,
 			", remoteUsername = ", remoteUsername, ", remoteRepo = ", remoteRepo,
 			", remoteSubdir = ", remoteSubdir, ", remoteRef = ", remoteRef, ", remoteSha = ", remoteSha,
 		)
-		statusCode, _, descriptionContent := downloadTextFile(packageDescriptionURL, token)
+		statusCode, _, descriptionContent := downloadFileFunction(packageDescriptionURL, token)
 		if statusCode == 200 {
 			inputDescriptionFiles = append(
 				inputDescriptionFiles,
@@ -232,17 +231,17 @@ func downloadDescriptionFiles(packageDescriptionList []string) []DescriptionFile
 			)
 		}
 	}
-	prettyPrint(inputDescriptionFiles)
 	return inputDescriptionFiles
 }
 
 // Downloads PACKAGES files from repository URLs specified in the repositoryList.
 // Returns a map from repository URL to the string with the contents of PACKAGES file
 // for that repository.
-func downloadPackagesFiles(repositoryList []string) map[string]string {
+func downloadPackagesFiles(repositoryList []string,
+	downloadFileFunction func(string, map[string]string) (int, int64, string)) map[string]string {
 	inputPackagesFiles := make(map[string]string)
 	for _, repository := range repositoryList {
-		statusCode, _, packagesFileContent := downloadTextFile(repository+"/src/contrib/PACKAGES", map[string]string{})
+		statusCode, _, packagesFileContent := downloadFileFunction(repository+"/src/contrib/PACKAGES", map[string]string{})
 		if statusCode == 200 {
 			inputPackagesFiles[repository] = packagesFileContent
 		} else {
