@@ -40,7 +40,7 @@ func generateRenvLock(packageList []PackageDescription, repositoryMap map[string
 	for k := range repositoryMap {
 		repositoryKeys = append(repositoryKeys, k)
 	}
-	sort.Sort(sort.StringSlice(repositoryKeys))
+	sort.Strings(repositoryKeys)
 	for _, k := range repositoryKeys {
 		outputRenvLock.R.Repositories = append(outputRenvLock.R.Repositories, RenvLockRepository{k, repositoryMap[k]})
 	}
