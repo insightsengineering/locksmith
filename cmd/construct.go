@@ -36,12 +36,8 @@ func constructOutputPackageList(packages []PackageDescription, packagesFiles map
 			skipDependency := false
 			if d.DependencyType == "Depends" || d.DependencyType == "Imports" ||
 				d.DependencyType == "Suggests" || d.DependencyType == "LinkingTo" {
-				if checkIfBasePackage(d.DependencyName) {
-					log.Debug("Skipping package ", d.DependencyName, " as it is a base R package.")
-					skipDependency = true
-				}
-				if checkIfPackageOnOutputList(d.DependencyName, outputPackageList) {
-					log.Debug("Package ", d.DependencyName, " is already present on the output list.")
+				if checkIfSkipDependency("", p.Package, d.DependencyName,
+					d.VersionOperator, d.VersionValue, &outputPackageList) {
 					skipDependency = true
 				}
 				if !skipDependency {
