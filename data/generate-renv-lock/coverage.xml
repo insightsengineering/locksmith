@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE coverage SYSTEM "http://cobertura.sourceforge.net/xml/coverage-04.dtd">
-<coverage line-rate="0.64181525" branch-rate="0" version="" timestamp="1698138497078" lines-covered="396" lines-valid="617" branches-covered="0" branches-valid="0" complexity="0">
+<coverage line-rate="0.6784566" branch-rate="0" version="" timestamp="1698141306196" lines-covered="422" lines-valid="622" branches-covered="0" branches-valid="0" complexity="0">
   <sources>
     <source>/home/runner/work/locksmith/locksmith</source>
   </sources>
   <packages>
-    <package name="github.com/insightsengineering/locksmith/cmd" line-rate="0.64181525" branch-rate="0" complexity="0">
+    <package name="github.com/insightsengineering/locksmith/cmd" line-rate="0.6784566" branch-rate="0" complexity="0">
       <classes>
         <class name="-" filename="cmd/construct.go" line-rate="0.93125" branch-rate="0" complexity="0">
           <methods>
@@ -967,60 +967,70 @@
             <line number="158" hits="50"></line>
           </lines>
         </class>
-        <class name="-" filename="cmd/renv.go" line-rate="0" branch-rate="0" complexity="0">
+        <class name="-" filename="cmd/renv.go" line-rate="1" branch-rate="0" complexity="0">
           <methods>
-            <method name="generateRenvLock" signature="" line-rate="0" branch-rate="0" complexity="0">
+            <method name="generateRenvLock" signature="" line-rate="1" branch-rate="0" complexity="0">
               <lines>
-                <line number="19" hits="0"></line>
-                <line number="20" hits="0"></line>
-                <line number="21" hits="0"></line>
-                <line number="22" hits="0"></line>
-                <line number="23" hits="0"></line>
-                <line number="24" hits="0"></line>
-                <line number="25" hits="0"></line>
-                <line number="26" hits="0"></line>
-                <line number="29" hits="0"></line>
-                <line number="30" hits="0"></line>
-                <line number="31" hits="0"></line>
-                <line number="33" hits="0"></line>
-                <line number="34" hits="0"></line>
-                <line number="35" hits="0"></line>
-                <line number="36" hits="0"></line>
+                <line number="23" hits="1"></line>
+                <line number="24" hits="1"></line>
+                <line number="25" hits="1"></line>
+                <line number="26" hits="1"></line>
+                <line number="27" hits="6"></line>
+                <line number="28" hits="6"></line>
+                <line number="29" hits="1"></line>
+                <line number="30" hits="1"></line>
+                <line number="33" hits="5"></line>
+                <line number="34" hits="5"></line>
+                <line number="35" hits="5"></line>
+                <line number="39" hits="1"></line>
+                <line number="40" hits="1"></line>
+                <line number="41" hits="3"></line>
+                <line number="42" hits="3"></line>
+                <line number="43" hits="1"></line>
+                <line number="44" hits="1"></line>
+                <line number="45" hits="3"></line>
+                <line number="46" hits="3"></line>
+                <line number="47" hits="1"></line>
               </lines>
             </method>
-            <method name="getRepositoryKeyByValue" signature="" line-rate="0" branch-rate="0" complexity="0">
+            <method name="getRepositoryKeyByValue" signature="" line-rate="1" branch-rate="0" complexity="0">
               <lines>
-                <line number="39" hits="0"></line>
-                <line number="40" hits="0"></line>
-                <line number="41" hits="0"></line>
-                <line number="42" hits="0"></line>
-                <line number="43" hits="0"></line>
-                <line number="45" hits="0"></line>
+                <line number="50" hits="5"></line>
+                <line number="51" hits="5"></line>
+                <line number="52" hits="3"></line>
+                <line number="53" hits="3"></line>
+                <line number="54" hits="3"></line>
+                <line number="56" hits="2"></line>
               </lines>
             </method>
           </methods>
           <lines>
-            <line number="19" hits="0"></line>
-            <line number="20" hits="0"></line>
-            <line number="21" hits="0"></line>
-            <line number="22" hits="0"></line>
-            <line number="23" hits="0"></line>
-            <line number="24" hits="0"></line>
-            <line number="25" hits="0"></line>
-            <line number="26" hits="0"></line>
-            <line number="29" hits="0"></line>
-            <line number="30" hits="0"></line>
-            <line number="31" hits="0"></line>
-            <line number="33" hits="0"></line>
-            <line number="34" hits="0"></line>
-            <line number="35" hits="0"></line>
-            <line number="36" hits="0"></line>
-            <line number="39" hits="0"></line>
-            <line number="40" hits="0"></line>
-            <line number="41" hits="0"></line>
-            <line number="42" hits="0"></line>
-            <line number="43" hits="0"></line>
-            <line number="45" hits="0"></line>
+            <line number="23" hits="1"></line>
+            <line number="24" hits="1"></line>
+            <line number="25" hits="1"></line>
+            <line number="26" hits="1"></line>
+            <line number="27" hits="6"></line>
+            <line number="28" hits="6"></line>
+            <line number="29" hits="1"></line>
+            <line number="30" hits="1"></line>
+            <line number="33" hits="5"></line>
+            <line number="34" hits="5"></line>
+            <line number="35" hits="5"></line>
+            <line number="39" hits="1"></line>
+            <line number="40" hits="1"></line>
+            <line number="41" hits="3"></line>
+            <line number="42" hits="3"></line>
+            <line number="43" hits="1"></line>
+            <line number="44" hits="1"></line>
+            <line number="45" hits="3"></line>
+            <line number="46" hits="3"></line>
+            <line number="47" hits="1"></line>
+            <line number="50" hits="5"></line>
+            <line number="51" hits="5"></line>
+            <line number="52" hits="3"></line>
+            <line number="53" hits="3"></line>
+            <line number="54" hits="3"></line>
+            <line number="56" hits="2"></line>
           </lines>
         </class>
         <class name="-" filename="cmd/root.go" line-rate="0.025423728" branch-rate="0" complexity="0">
