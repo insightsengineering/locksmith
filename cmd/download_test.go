@@ -25,81 +25,106 @@ func mockedDownloadTextFile(url string, _ map[string]string) (int, int64, string
 	switch {
 	case url == "https://gitlab.example.com/api/v4/projects/37706/repository/tags/v1.3.1":
 		return 200, 0, `{
+			"someotherdata": "someotherdata",
 			"commit": {
+				"someotherdata": "someotherdata",
 				"id": "aaabbbcccddd111"
 			}
 		}`
 	case url == "https://gitlab.example.com/api/v4/projects/37706":
 		return 200, 0, `{
+			"someotherdata": "someotherdata",
 			"path_with_namespace": "group1/group2/project1"
 		}`
 	case url == "https://gitlab.example.com/api/v4/projects/38706/repository/tags/v1.4.2":
 		return 200, 0, `{
+			"someotherdata": "someotherdata",
 			"commit": {
+				"someotherdata": "someotherdata",
 				"id": "aaa222ccc444111"
 			}
 		}`
 	case url == "https://gitlab.example.com/api/v4/projects/38706":
 		return 200, 0, `{
+			"someotherdata": "someotherdata",
 			"path_with_namespace": "group3/group4/group5/project4"
 		}`
 	case url == "https://gitlab.example.com/api/v4/projects/30176/repository/tags/v0.2.0":
 		return 200, 0, `{
+			"someotherdata": "someotherdata",
 			"commit": {
+				"someotherdata": "someotherdata",
 				"id": "fff222ccc444eee"
 			}
 		}`
 	case url == "https://gitlab.example.com/api/v4/projects/30176":
 		return 200, 0, `{
+			"someotherdata": "someotherdata",
 			"path_with_namespace": "group6/project7"
 		}`
 	case url == "https://gitlab.example.com/api/v4/projects/39307/repository/branches/main":
 		return 200, 0, `{
+			"someotherdata": "someotherdata",
 			"commit": {
+				"someotherdata": "someotherdata",
 				"id": "fff555ddd888eee"
 			}
 		}`
 	case url == "https://gitlab.example.com/api/v4/projects/39307":
 		return 200, 0, `{
+			"someotherdata": "someotherdata",
 			"path_with_namespace": "group7/project8"
 		}`
 	case url == "https://gitlab.example.com/api/v4/projects/39211/repository/branches/main":
 		return 200, 0, `{
+			"someotherdata": "someotherdata",
 			"commit": {
+				"someotherdata": "someotherdata",
 				"id": "fffeee999888aaa"
 			}
 		}`
 	case url == "https://gitlab.example.com/api/v4/projects/39211":
 		return 200, 0, `{
+			"someotherdata": "someotherdata",
 			"path_with_namespace": "group9/subgroup10/subgroup11/project9"
 		}`
 	case url == "https://api.github.com/repos/insightsengineering/formatters/git/ref/tags/v0.5.4":
 		return 200, 0, `{
+			"someotherdata": "someotherdata",
 			"object": {
+				"someotherdata": "someotherdata",
 				"sha": "444eee222111eee"
 			}
 		}`
 	case url == "https://api.github.com/repos/insightsengineering/rtables/git/ref/tags/v0.6.5":
 		return 200, 0, `{
+			"someotherdata": "someotherdata",
 			"object": {
+				"someotherdata": "someotherdata",
 				"sha": "555ddd222111ddd"
 			}
 		}`
 	case url == "https://api.github.com/repos/insightsengineering/nestcolor/git/ref/heads/main":
 		return 200, 0, `{
+			"someotherdata": "someotherdata",
 			"object": {
+				"someotherdata": "someotherdata",
 				"sha": "555333aaabbbddd"
 			}
 		}`
 	case url == "https://api.github.com/repos/insightsengineering/tern/git/ref/heads/main":
 		return 200, 0, `{
+			"someotherdata": "someotherdata",
 			"object": {
+				"someotherdata": "someotherdata",
 				"sha": "555333aaaeeefff"
 			}
 		}`
 	case url == "https://api.github.com/repos/insightsengineering/rlistings/git/ref/tags/v0.2.6":
 		return 200, 0, `{
+			"someotherdata": "someotherdata",
 			"object": {
+				"someotherdata": "someotherdata",
 				"sha": "111444999eee222"
 			}
 		}`
@@ -134,8 +159,6 @@ func mockedDownloadTextFile(url string, _ map[string]string) (int, int64, string
 }
 
 func Test_downloadDescriptionFiles(t *testing.T) {
-	gitHubToken = "contentIrrelevantForTheTest"
-	gitLabToken = "contentIrrelevantForTheTest"
 	descriptionFileList := downloadDescriptionFiles([]string{
 		"https://gitlab.example.com/api/v4/projects/37706/repository/files/subdirectory%2FDESCRIPTION/raw?ref=v1.3.1",
 		"https://gitlab.example.com/api/v4/projects/38706/repository/files/subdirectory1%2Fsubdirectory2%2FDESCRIPTION/raw?ref=v1.4.2",
