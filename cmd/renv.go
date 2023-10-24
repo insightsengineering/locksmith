@@ -16,6 +16,10 @@ limitations under the License.
 
 package cmd
 
+import (
+	"sort"
+)
+
 func generateRenvLock(packageList []PackageDescription, repositoryMap map[string]string) RenvLock {
 	var outputRenvLock RenvLock
 	outputRenvLock.R.Packages = make(map[string]PackageDescription)
@@ -30,8 +34,15 @@ func generateRenvLock(packageList []PackageDescription, repositoryMap map[string
 		p.Repository = repositoryKey
 		outputRenvLock.R.Packages[p.Package] = p
 	}
-	for k, v := range repositoryMap {
-		outputRenvLock.R.Repositories = append(outputRenvLock.R.Repositories, RenvLockRepository{k, v})
+	// As the repository map is not sorted, in order to generate predictable output
+	// we have to process the repository names in sorted order.
+	var repositoryKeys []string
+	for k := range repositoryMap {
+		repositoryKeys = append(repositoryKeys, k)
+	}
+	sort.Sort(sort.StringSlice(repositoryKeys))
+	for _, k := range repositoryKeys {
+		outputRenvLock.R.Repositories = append(outputRenvLock.R.Repositories, RenvLockRepository{k, repositoryMap[k]})
 	}
 	return outputRenvLock
 }
