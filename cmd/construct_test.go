@@ -181,6 +181,20 @@ func Test_constructOutputPackageList(t *testing.T) {
 				[]Dependency{},
 				"", "", "", "", "", "", "",
 			},
+			{
+				"package6",
+				"3.0.1",
+				"", "",
+				[]Dependency{},
+				"", "", "", "", "", "", "",
+			},
+			{
+				"package10",
+				"3.0.2",
+				"", "",
+				[]Dependency{},
+				"", "", "", "", "", "", "",
+			},
 		},
 	}
 	packagesFiles["https://repo2.example.com/ExampleRepo2"] = PackagesFile{
@@ -460,6 +474,14 @@ func Test_constructOutputPackageList(t *testing.T) {
 				"", "", "", "", "", "", "",
 			},
 			{
+				"package6",
+				"3.0.1",
+				"Repository",
+				"https://repo1.example.com/ExampleRepo1",
+				[]Dependency{},
+				"", "", "", "", "", "", "",
+			},
+			{
 				"package7",
 				"1.6.2",
 				"Repository",
@@ -480,6 +502,14 @@ func Test_constructOutputPackageList(t *testing.T) {
 				"2.4",
 				"Repository",
 				"https://repo2.example.com/ExampleRepo2",
+				[]Dependency{},
+				"", "", "", "", "", "", "",
+			},
+			{
+				"package10",
+				"3.0.2",
+				"Repository",
+				"https://repo1.example.com/ExampleRepo1",
 				[]Dependency{},
 				"", "", "", "", "", "", "",
 			},

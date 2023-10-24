@@ -35,7 +35,7 @@ func constructOutputPackageList(packages []PackageDescription, packagesFiles map
 		for _, d := range p.Dependencies {
 			skipDependency := false
 			if d.DependencyType == "Depends" || d.DependencyType == "Imports" ||
-				d.DependencyType == "Suggests" {
+				d.DependencyType == "Suggests" || d.DependencyType == "LinkingTo" {
 				if checkIfBasePackage(d.DependencyName) {
 					log.Debug("Skipping package ", d.DependencyName, " as it is a base R package.")
 					skipDependency = true
@@ -89,7 +89,8 @@ func resolveDependenciesRecursively(outputList *[]PackageDescription, name strin
 					"", "", "", "", "", "", "",
 				})
 				for _, d := range p.Dependencies {
-					if d.DependencyType == "Depends" || d.DependencyType == "Imports" {
+					if d.DependencyType == "Depends" || d.DependencyType == "Imports" ||
+						d.DependencyType == "LinkingTo" {
 						if !checkIfSkipDependency(indentation, p.Package, d.DependencyName,
 							d.VersionOperator, d.VersionValue, outputList) {
 							log.Info(indentation, p.Package, " → ", d.DependencyName)
@@ -146,6 +147,11 @@ func checkIfSkipDependency(indentation string, packageName string, dependencyNam
 		if dependencyName == (*outputList)[i].Package {
 			// Dependency found on the output list.
 			if checkIfVersionSufficient((*outputList)[i].Version, versionOperator, versionValue) {
+				log.Debug(
+					"Output list already contains dependency ", dependencyName, " version ",
+					(*outputList)[i].Version, " which is sufficient for ", packageName,
+					" according to the requirement ", versionOperator, " ", versionValue,
+				)
 				return true
 			}
 			log.Warn(
