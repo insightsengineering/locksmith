@@ -81,16 +81,14 @@ in an renv.lock-compatible file.`,
 			fmt.Println("inputPackageList =", inputPackageList)
 			fmt.Println("inputRepositoryList =", inputRepositoryList)
 
-			packageDescriptionList, repositoryList := parseInput()
-			log.Debug("inputPackageList = ", packageDescriptionList)
-			log.Debug("inputRepositoryList = ", repositoryList)
-
-			inputDescriptionFiles := downloadDescriptionFiles(packageDescriptionList)
+			packageDescriptionList, repositoryList, repositoryMap := parseInput()
+			inputDescriptionFiles := downloadDescriptionFiles(packageDescriptionList, downloadTextFile)
 			inputPackages := parseDescriptionFileList(inputDescriptionFiles)
-			repositoryPackagesFiles := downloadPackagesFiles(repositoryList)
+			repositoryPackagesFiles := downloadPackagesFiles(repositoryList, downloadTextFile)
 			packagesFiles := parsePackagesFiles(repositoryPackagesFiles)
 			outputPackageList := constructOutputPackageList(inputPackages, packagesFiles, repositoryList)
-			prettyPrint(outputPackageList)
+			renvLock := generateRenvLock(outputPackageList, repositoryMap)
+			writeJSON("renv.lock", renvLock)
 		},
 	}
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "",

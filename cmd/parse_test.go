@@ -32,7 +32,7 @@ func Test_processPackagesFile(t *testing.T) {
 				{
 					"somePackage1",
 					"1.0.0",
-					"",
+					"", "",
 					[]Dependency{
 						{
 							"Depends",
@@ -41,11 +41,12 @@ func Test_processPackagesFile(t *testing.T) {
 							"2.15.0",
 						},
 					},
+					"", "", "", "", "", "", "",
 				},
 				{
 					"somePackage2",
 					"2.0.0",
-					"",
+					"", "",
 					[]Dependency{
 						{
 							"Depends",
@@ -66,11 +67,12 @@ func Test_processPackagesFile(t *testing.T) {
 							"",
 						},
 					},
+					"", "", "", "", "", "", "",
 				},
 				{
 					"somePackage3",
 					"0.0.1",
-					"",
+					"", "",
 					[]Dependency{
 						{
 							"Depends",
@@ -103,11 +105,12 @@ func Test_processPackagesFile(t *testing.T) {
 							"1.22",
 						},
 					},
+					"", "", "", "", "", "", "",
 				},
 				{
 					"somePackage4",
 					"0.2",
-					"",
+					"", "",
 					[]Dependency{
 						{
 							"Suggests",
@@ -146,6 +149,7 @@ func Test_processPackagesFile(t *testing.T) {
 							"7.1.0",
 						},
 					},
+					"", "", "", "", "", "", "",
 				},
 			},
 		},
@@ -158,8 +162,8 @@ func Test_parseDescriptionFileList(t *testing.T) {
 	byteValue2, err := os.ReadFile("testdata/DESCRIPTION2")
 	checkError(err)
 	descriptionFileList := []DescriptionFile{
-		{string(byteValue1), "GitHub"},
-		{string(byteValue2), "GitHub"},
+		{string(byteValue1), "GitHub", "", "", "", "", "", "", ""},
+		{string(byteValue2), "GitHub", "", "", "", "", "", "", ""},
 	}
 	allPackages := parseDescriptionFileList(descriptionFileList)
 	assert.Equal(t, allPackages,
@@ -168,6 +172,7 @@ func Test_parseDescriptionFileList(t *testing.T) {
 				"my.awesome.package",
 				"0.14.0.9012",
 				"GitHub",
+				"",
 				[]Dependency{
 					{
 						"Depends",
@@ -272,11 +277,13 @@ func Test_parseDescriptionFileList(t *testing.T) {
 						"",
 					},
 				},
+				"", "", "", "", "", "", "",
 			},
 			{
 				"my.awesome.package.2",
 				"0.9.1.9013",
 				"GitHub",
+				"",
 				[]Dependency{
 					{
 						"Depends",
@@ -387,6 +394,7 @@ func Test_parseDescriptionFileList(t *testing.T) {
 						"1.0.0",
 					},
 				},
+				"", "", "", "", "", "", "",
 			},
 		},
 	)

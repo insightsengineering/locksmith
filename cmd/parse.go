@@ -59,7 +59,10 @@ func processPackagesFile(content string) PackagesFile {
 		processDependencyFields(packageMap, &packageDependencies)
 		allPackages.Packages = append(
 			allPackages.Packages,
-			PackageDescription{packageName, packageMap["Version"], "", packageDependencies},
+			PackageDescription{
+				packageName, packageMap["Version"], "", "", packageDependencies,
+				"", "", "", "", "", "", "",
+			},
 		)
 	}
 	return allPackages
@@ -78,7 +81,9 @@ func processDescription(description DescriptionFile, allPackages *[]PackageDescr
 	*allPackages = append(
 		*allPackages,
 		PackageDescription{
-			packageMap["Package"], packageMap["Version"], description.Repository, packageDependencies,
+			packageMap["Package"], packageMap["Version"], description.PackageSource, "", packageDependencies,
+			description.RemoteType, description.RemoteHost, description.RemoteUsername, description.RemoteRepo,
+			description.RemoteSubdir, description.RemoteRef, description.RemoteSha,
 		},
 	)
 }
@@ -126,12 +131,15 @@ func processDependencyFields(packageMap map[string]string,
 	re := regexp.MustCompile(`\(.*\)`)
 	for _, field := range dependencyFields {
 		if _, ok := packageMap[field]; ok {
-			dependencyList := strings.Split(packageMap[field], ", ")
+			dependencyList := strings.Split(packageMap[field], ",")
 			for _, dependency := range dependencyList {
+				if dependency == "" {
+					continue
+				}
 				// There might be a space or '(' right after the package name,
 				// so both space and '(' are treated as a delimiter to get the
 				// package name from the first field.
-				dependencyName := strings.FieldsFunc(dependency, splitPackageName)[0]
+				dependencyName := strings.FieldsFunc(strings.TrimSpace(dependency), splitPackageName)[0]
 				versionConstraintOperator := ""
 				versionConstraintValue := ""
 				// Check if package is required in some particular version.

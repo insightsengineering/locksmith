@@ -17,6 +17,7 @@ package cmd
 
 import (
 	"encoding/json"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -27,11 +28,11 @@ func checkError(err error) {
 	}
 }
 
-func prettyPrint(i interface{}) {
-	s, err := json.MarshalIndent(i, "", "  ")
-	checkError(err)
-	log.Debug(string(s))
-}
+// func prettyPrint(i interface{}) {
+// 	s, err := json.MarshalIndent(i, "", "  ")
+// 	checkError(err)
+// 	log.Debug(string(s))
+// }
 
 func stringInSlice(a string, list []string) bool {
 	for _, b := range list {
@@ -42,10 +43,32 @@ func stringInSlice(a string, list []string) bool {
 	return false
 }
 
-func parseInput() ([]string, []string) {
+// Parses input parameters, and returns: list of package DESCRIPTION URLs, list of
+// package repository URLs (in descending priority order), and a map from package
+// repository alias (name) to the package repository URL.
+func parseInput() ([]string, []string, map[string]string) {
+	if len(inputPackageList) < 1 {
+		log.Fatal("No packages specified. Please use the --inputPackageList flag.")
+	}
+	if len(inputRepositoryList) < 1 {
+		log.Fatal("No package repositories specified. Please use the --inputRepositoryList flag.")
+	}
 	packageList := strings.Split(inputPackageList, ",")
 	repositoryList := strings.Split(inputRepositoryList, ",")
-	return packageList, repositoryList
+	outputRepositoryMap := make(map[string]string)
+	var outputRepositoryList []string
+	for _, r := range repositoryList {
+		if !strings.Contains(r, "=") {
+			log.Fatal("Incorrect format of package repositories. Please try: 'Repo1=URL1,Repo2=URL2,...'")
+		}
+		repository := strings.Split(r, "=")
+		outputRepositoryMap[repository[0]] = repository[1]
+		outputRepositoryList = append(outputRepositoryList, repository[1])
+	}
+	log.Debug("inputPackageList = ", packageList)
+	log.Debug("inputRepositoryList = ", outputRepositoryList)
+	log.Debug("inputRepositoryMap = ", outputRepositoryMap)
+	return packageList, outputRepositoryList, outputRepositoryMap
 }
 
 func stringsToInts(input []string) []int {
@@ -56,4 +79,12 @@ func stringsToInts(input []string) []int {
 		output = append(output, j)
 	}
 	return output
+}
+
+func writeJSON(filename string, j interface{}) {
+	s, err := json.MarshalIndent(j, "", "  ")
+	checkError(err)
+
+	err = os.WriteFile(filename, s, 0644) //#nosec
+	checkError(err)
 }

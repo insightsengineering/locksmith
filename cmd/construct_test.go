@@ -104,7 +104,7 @@ func Test_constructOutputPackageList(t *testing.T) {
 			{
 				"package3",
 				"1.2.0",
-				"",
+				"", "",
 				[]Dependency{
 					{
 						"Depends",
@@ -125,11 +125,12 @@ func Test_constructOutputPackageList(t *testing.T) {
 						"",
 					},
 				},
+				"", "", "", "", "", "", "",
 			},
 			{
 				"package4",
 				"0.7.5",
-				"",
+				"", "",
 				[]Dependency{
 					{
 						"Imports",
@@ -144,17 +145,19 @@ func Test_constructOutputPackageList(t *testing.T) {
 						"",
 					},
 				},
+				"", "", "", "", "", "", "",
 			},
 			{
 				"package11",
 				"0.7.8",
-				"",
+				"", "",
 				[]Dependency{},
+				"", "", "", "", "", "", "",
 			},
 			{
 				"package14",
 				"2.5.8",
-				"",
+				"", "",
 				[]Dependency{
 					{
 						"Depends",
@@ -169,12 +172,28 @@ func Test_constructOutputPackageList(t *testing.T) {
 						"2.2",
 					},
 				},
+				"", "", "", "", "", "", "",
 			},
 			{
 				"package16",
 				"2.4.5",
-				"",
+				"", "",
 				[]Dependency{},
+				"", "", "", "", "", "", "",
+			},
+			{
+				"package6",
+				"3.0.1",
+				"", "",
+				[]Dependency{},
+				"", "", "", "", "", "", "",
+			},
+			{
+				"package10",
+				"3.0.2",
+				"", "",
+				[]Dependency{},
+				"", "", "", "", "", "", "",
 			},
 		},
 	}
@@ -183,7 +202,7 @@ func Test_constructOutputPackageList(t *testing.T) {
 			{
 				"package4",
 				"1.1.1",
-				"",
+				"", "",
 				[]Dependency{
 					{
 						"Imports",
@@ -204,23 +223,26 @@ func Test_constructOutputPackageList(t *testing.T) {
 						"",
 					},
 				},
+				"", "", "", "", "", "", "",
 			},
 			{
 				"package5",
 				"3.2.0",
-				"",
+				"", "",
 				[]Dependency{},
+				"", "", "", "", "", "", "",
 			},
 			{
 				"package7",
 				"1.6.2",
-				"",
+				"", "",
 				[]Dependency{},
+				"", "", "", "", "", "", "",
 			},
 			{
 				"package9",
 				"2.4",
-				"",
+				"", "",
 				[]Dependency{
 					{
 						"Imports",
@@ -229,24 +251,28 @@ func Test_constructOutputPackageList(t *testing.T) {
 						"3.6",
 					},
 				},
+				"", "", "", "", "", "", "",
 			},
 			{
 				"package11",
 				"5.4.7",
-				"",
+				"", "",
 				[]Dependency{},
+				"", "", "", "", "", "", "",
 			},
 			{
 				"package12",
 				"1.2.3",
-				"",
+				"", "",
 				[]Dependency{},
+				"", "", "", "", "", "", "",
 			},
 			{
 				"package15",
 				"3.3.4.5",
-				"",
+				"", "",
 				[]Dependency{},
+				"", "", "", "", "", "", "",
 			},
 		},
 	}
@@ -255,8 +281,9 @@ func Test_constructOutputPackageList(t *testing.T) {
 			{
 				"package8",
 				"1.9.2",
-				"",
+				"", "",
 				[]Dependency{},
+				"", "", "", "", "", "", "",
 			},
 		},
 	}
@@ -266,6 +293,7 @@ func Test_constructOutputPackageList(t *testing.T) {
 				"package1",
 				"1.2.3",
 				"GitHub",
+				"",
 				[]Dependency{
 					{
 						"Depends",
@@ -298,11 +326,13 @@ func Test_constructOutputPackageList(t *testing.T) {
 						"",
 					},
 				},
+				"", "", "", "", "", "", "",
 			},
 			{
 				"package2",
 				"2.3.4",
 				"GitHub",
+				"",
 				[]Dependency{
 					{
 						"Depends",
@@ -347,26 +377,36 @@ func Test_constructOutputPackageList(t *testing.T) {
 						"",
 					},
 				},
+				"", "", "", "", "", "", "",
 			},
 		},
 		packagesFiles, repositoryList,
 	)
 	assert.Equal(t, outputPackageList,
-		[]OutputPackage{
+		[]PackageDescription{
 			{
 				"package1",
 				"1.2.3",
 				"GitHub",
+				"",
+				[]Dependency{},
+				"", "", "", "", "", "", "",
 			},
 			{
 				"package2",
 				"2.3.4",
 				"GitHub",
+				"",
+				[]Dependency{},
+				"", "", "", "", "", "", "",
 			},
 			{
 				"package3",
 				"1.2.0",
+				"Repository",
 				"https://repo1.example.com/ExampleRepo1",
+				[]Dependency{},
+				"", "", "", "", "", "", "",
 			},
 			{
 				// package11 removed from here
@@ -375,59 +415,103 @@ func Test_constructOutputPackageList(t *testing.T) {
 				// However afterwards, package4 requested package11 >= 4.5
 				// so it had to be retrieved from repo2.
 				// The reference to repo1 was overwritten here.
-				"",
-				"",
-				"",
+				"", "", "", "", []Dependency{}, "", "", "", "", "", "", "",
 			},
 			{
 				"package12",
 				"1.2.3",
+				"Repository",
 				"https://repo2.example.com/ExampleRepo2",
+				[]Dependency{},
+				"", "", "", "", "", "", "",
 			},
 			{
 				"package4",
 				"1.1.1",
+				"Repository",
 				"https://repo2.example.com/ExampleRepo2",
+				[]Dependency{},
+				"", "", "", "", "", "", "",
 			},
 			{
 				"package11",
 				"5.4.7",
+				"Repository",
 				"https://repo2.example.com/ExampleRepo2",
+				[]Dependency{},
+				"", "", "", "", "", "", "",
 			},
 			{
 				"package14",
 				"2.5.8",
+				"Repository",
 				"https://repo1.example.com/ExampleRepo1",
+				[]Dependency{},
+				"", "", "", "", "", "", "",
 			},
 			{
 				"package15",
 				"3.3.4.5",
+				"Repository",
 				"https://repo2.example.com/ExampleRepo2",
+				[]Dependency{},
+				"", "", "", "", "", "", "",
 			},
 			{
 				"package16",
 				"2.4.5",
+				"Repository",
 				"https://repo1.example.com/ExampleRepo1",
+				[]Dependency{},
+				"", "", "", "", "", "", "",
 			},
 			{
 				"package5",
 				"3.2.0",
+				"Repository",
 				"https://repo2.example.com/ExampleRepo2",
+				[]Dependency{},
+				"", "", "", "", "", "", "",
+			},
+			{
+				"package6",
+				"3.0.1",
+				"Repository",
+				"https://repo1.example.com/ExampleRepo1",
+				[]Dependency{},
+				"", "", "", "", "", "", "",
 			},
 			{
 				"package7",
 				"1.6.2",
+				"Repository",
 				"https://repo2.example.com/ExampleRepo2",
+				[]Dependency{},
+				"", "", "", "", "", "", "",
 			},
 			{
 				"package8",
 				"1.9.2",
+				"Repository",
 				"https://repo3.example.com/ExampleRepo3",
+				[]Dependency{},
+				"", "", "", "", "", "", "",
 			},
 			{
 				"package9",
 				"2.4",
+				"Repository",
 				"https://repo2.example.com/ExampleRepo2",
+				[]Dependency{},
+				"", "", "", "", "", "", "",
+			},
+			{
+				"package10",
+				"3.0.2",
+				"Repository",
+				"https://repo1.example.com/ExampleRepo1",
+				[]Dependency{},
+				"", "", "", "", "", "", "",
 			},
 		},
 	)
