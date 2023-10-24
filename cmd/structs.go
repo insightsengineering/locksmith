@@ -34,7 +34,8 @@ type PackagesFile struct {
 }
 
 type RenvLock struct {
-	R RenvLockContents `json:"R"`
+	R        RenvLockContents              `json:"R"`
+	Packages map[string]PackageDescription `json:"Packages"`
 }
 
 type RenvLockRepository struct {
@@ -43,8 +44,7 @@ type RenvLockRepository struct {
 }
 
 type RenvLockContents struct {
-	Packages     map[string]PackageDescription `json:"Packages"`
-	Repositories []RenvLockRepository          `json:"Repositories"`
+	Repositories []RenvLockRepository `json:"Repositories"`
 }
 
 type PackageDescription struct {

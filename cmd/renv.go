@@ -22,7 +22,7 @@ import (
 
 func generateRenvLock(packageList []PackageDescription, repositoryMap map[string]string) RenvLock {
 	var outputRenvLock RenvLock
-	outputRenvLock.R.Packages = make(map[string]PackageDescription)
+	outputRenvLock.Packages = make(map[string]PackageDescription)
 	for _, p := range packageList {
 		// Filter out package entries that were intentionally cleared during the process
 		// of generating the package list.
@@ -32,7 +32,7 @@ func generateRenvLock(packageList []PackageDescription, repositoryMap map[string
 		// Replace package repository URL with package repository alias/name.
 		repositoryKey := getRepositoryKeyByValue(p.Repository, repositoryMap)
 		p.Repository = repositoryKey
-		outputRenvLock.R.Packages[p.Package] = p
+		outputRenvLock.Packages[p.Package] = p
 	}
 	// As the repository map is not sorted, in order to generate predictable output
 	// we have to process the repository names in sorted order.
