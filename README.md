@@ -27,8 +27,14 @@ locksmith --logLevel debug --exampleParameter 'exampleValue'
 Real-life example with multiple input packages and repositories.
 
 ```bash
-locksmith --inputPackageList https://raw.githubusercontent.com/insightsengineering/formatters/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/rtables/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/scda/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/scda.2022/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/nestcolor/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/tern/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/rlistings/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/citril/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/scda.test/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/citril.metadata/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/chevron/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/dunlin/main/DESCRIPTION --inputRepositoryList https://bioconductor.org/packages/release/bioc,https://cran.rstudio.com/
+locksmith --inputPackageList https://raw.githubusercontent.com/insightsengineering/formatters/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/rtables/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/scda/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/scda.2022/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/nestcolor/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/tern/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/rlistings/main/DESCRIPTION --inputRepositoryList BioC=https://bioconductor.org/packages/release/bioc,CRAN=https://cran.rstudio.com/
 ```
+
+In order to download the packages from GitHub or GitLab repositories, please set the environment variables containing the Personal Access Tokens.
+* For GitHub, set the `LOCKSMITH_GITHUBTOKEN` environment variable.
+* For GitLab, set the `LOCKSMITH_GITLABTOKEN` environment variable.
+
+By default `locksmith` will save the resulting output file to `renv.lock`.
 
 ## Configuration file
 

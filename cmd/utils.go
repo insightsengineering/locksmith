@@ -43,10 +43,10 @@ func stringInSlice(a string, list []string) bool {
 	return false
 }
 
-// Parses input parameters, and returns: list of package DESCRIPTION URLs, list of
-// package repository URLs (in descending priority order), and a map from package
+// ParseInput parses CLI input parameters, and returns: list of package DESCRIPTION URLs,
+// list of package repository URLs (in descending priority order), and a map from package
 // repository alias (name) to the package repository URL.
-func parseInput() ([]string, []string, map[string]string) {
+func ParseInput() ([]string, []string, map[string]string) {
 	if len(inputPackageList) < 1 {
 		log.Fatal("No packages specified. Please use the --inputPackageList flag.")
 	}

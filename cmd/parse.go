@@ -22,25 +22,27 @@ import (
 	yaml "gopkg.in/yaml.v3"
 )
 
-func parseDescriptionFileList(inputDescriptionFiles []DescriptionFile) []PackageDescription {
+// ParseDescriptionFileList iterates through package DESCRIPTION files.
+func ParseDescriptionFileList(inputDescriptionFiles []DescriptionFile) []PackageDescription {
 	var allPackages []PackageDescription
 	for _, descriptionFile := range inputDescriptionFiles {
-		processDescription(descriptionFile, &allPackages)
+		ProcessDescription(descriptionFile, &allPackages)
 	}
 	return allPackages
 }
 
-func parsePackagesFiles(repositoryPackageFiles map[string]string) map[string]PackagesFile {
+// ParsePackagesFiles iterates through package repository PACKAGES files.
+func ParsePackagesFiles(repositoryPackageFiles map[string]string) map[string]PackagesFile {
 	packagesFilesMap := make(map[string]PackagesFile)
 	for repository, packagesFile := range repositoryPackageFiles {
-		packagesFilesMap[repository] = processPackagesFile(packagesFile)
+		packagesFilesMap[repository] = ProcessPackagesFile(packagesFile)
 	}
 	return packagesFilesMap
 }
 
-// Reads a string containing PACKAGES file, and returns structure with
-// fields/properties required for further processing.
-func processPackagesFile(content string) PackagesFile {
+// ProcessPackagesFile reads a string containing PACKAGES file, and returns a structure
+// with those fields/properties that are required for further processing.
+func ProcessPackagesFile(content string) PackagesFile {
 	var allPackages PackagesFile
 	for _, lineGroup := range strings.Split(content, "\n\n") {
 		if lineGroup == "" {
@@ -49,14 +51,14 @@ func processPackagesFile(content string) PackagesFile {
 		// Each lineGroup contains information about one package and is separated by an empty line.
 		firstLine := strings.Split(lineGroup, "\n")[0]
 		packageName := strings.ReplaceAll(firstLine, "Package: ", "")
-		cleaned := cleanDescriptionOrPackagesEntry(lineGroup)
+		cleaned := CleanDescriptionOrPackagesEntry(lineGroup)
 		packageMap := make(map[string]string)
 		err := yaml.Unmarshal([]byte(cleaned), &packageMap)
 		if err != nil {
 			log.Error("Error reading ", packageName, " package data from PACKAGES: ", err)
 		}
 		var packageDependencies []Dependency
-		processDependencyFields(packageMap, &packageDependencies)
+		ProcessDependencyFields(packageMap, &packageDependencies)
 		allPackages.Packages = append(
 			allPackages.Packages,
 			PackageDescription{
@@ -68,16 +70,16 @@ func processPackagesFile(content string) PackagesFile {
 	return allPackages
 }
 
-// Reads a string containing DESCRIPTION file and returns a structure with fields/properties
-// required for further processing.
-func processDescription(description DescriptionFile, allPackages *[]PackageDescription) {
-	cleaned := cleanDescriptionOrPackagesEntry(description.Contents)
+// ProcessDescription reads a string containing DESCRIPTION file and returns a structure
+// with those fields/properties that are required for further processing.
+func ProcessDescription(description DescriptionFile, allPackages *[]PackageDescription) {
+	cleaned := CleanDescriptionOrPackagesEntry(description.Contents)
 	packageMap := make(map[string]string)
 	err := yaml.Unmarshal([]byte(cleaned), &packageMap)
 	checkError(err)
 
 	var packageDependencies []Dependency
-	processDependencyFields(packageMap, &packageDependencies)
+	ProcessDependencyFields(packageMap, &packageDependencies)
 	*allPackages = append(
 		*allPackages,
 		PackageDescription{
@@ -88,10 +90,11 @@ func processDescription(description DescriptionFile, allPackages *[]PackageDescr
 	)
 }
 
-// Processes a multiline string representing information about one package from PACKAGES file, or the whole
-// contents of DESCRIPTION file. Removes newlines occurring within filtered fields (which are predominantly
-// fields containing lists of package dependencies). Also removes fields which are not required for further processing.
-func cleanDescriptionOrPackagesEntry(description string) string {
+// CleanDescriptionOrPackagesEntry processes a multiline string representing information about one package
+// from PACKAGES file, or the whole contents of DESCRIPTION file. Removes newlines occurring within
+// filtered fields (which are predominantly fields containing lists of package dependencies).
+// Also removes fields which are not required for further processing.
+func CleanDescriptionOrPackagesEntry(description string) string {
 	lines := strings.Split(description, "\n")
 	filterFields := []string{"Package:", "Version:", "Depends:", "Imports:", "Suggests:", "LinkingTo:"}
 	outputContent := ""
@@ -123,9 +126,9 @@ func splitPackageName(r rune) bool {
 	return r == ' ' || r == '('
 }
 
-// Processes a map containing a YAML-like object representing dependencies of a package.
+// ProcessDependencyFields processes a map containing a YAML-like object representing dependencies of a package.
 // Returns a list of Dependency structures corresponding to dependency name, and version constraints.
-func processDependencyFields(packageMap map[string]string,
+func ProcessDependencyFields(packageMap map[string]string,
 	packageDependencies *[]Dependency) {
 	dependencyFields := []string{"Depends", "Imports", "Suggests", "Enhances", "LinkingTo"}
 	re := regexp.MustCompile(`\(.*\)`)

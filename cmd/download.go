@@ -44,9 +44,9 @@ type GitHubObject struct {
 	Sha string `json:"sha"`
 }
 
-// Returns HTTP status code for downloaded file, number of bytes in downloaded content,
-// and the downloaded content itself.
-func downloadTextFile(url string, parameters map[string]string) (int, int64, string) { // #nosec G402
+// DownloadTextFile returns HTTP status code for downloaded file, number of bytes
+// in downloaded content, and the downloaded content itself as a string.
+func DownloadTextFile(url string, parameters map[string]string) (int, int64, string) { // #nosec G402
 	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
 	client := &http.Client{Transport: tr}
 	req, err := http.NewRequest("GET", url, nil)
@@ -69,12 +69,13 @@ func downloadTextFile(url string, parameters map[string]string) (int, int64, str
 	return -1, 0, ""
 }
 
-// Retrieve information about GitLab repository (project path, repository name and commit SHA) from
-// projectURL repository GitLab API endpoint.
-func getGitLabProjectAndSha(projectURL string, remoteRef string, token map[string]string,
+// GetGitLabProjectAndSha retrieves information about GitLab repository
+// (project path, repository name and commit SHA)
+// from projectURL GitLab API endpoint.
+func GetGitLabProjectAndSha(projectURL string, remoteRef string, token map[string]string,
 	downloadFileFunction func(string, map[string]string) (int, int64, string)) (string, string, string) {
 	var remoteUsername, remoteRepo, remoteSha string
-	log.Trace("Downloading project information from ", projectURL)
+	log.Trace("Downloading data for GitLab project from ", projectURL)
 	statusCode, _, projectDataResponse := downloadFileFunction(projectURL, token)
 	if statusCode == 200 {
 		var projectData GitLabAPIResponse
@@ -85,7 +86,7 @@ func getGitLabProjectAndSha(projectURL string, remoteRef string, token map[strin
 		remoteUsername = strings.Join(projectPath[:projectPathLength-1], "/")
 		remoteRepo = projectPath[projectPathLength-1]
 	} else {
-		log.Warn("An error occurred while retrieving project information from ", projectURL)
+		log.Warn("An error occurred while retrieving project data from ", projectURL)
 	}
 	match, errMatch := regexp.MatchString(`v\d+(\.\d+)*`, remoteRef)
 	var urlPath string
@@ -104,14 +105,14 @@ func getGitLabProjectAndSha(projectURL string, remoteRef string, token map[strin
 		checkError(err)
 		remoteSha = tagOrBranchData.Commit.ID
 	} else {
-		log.Warn("An error occurred while retrieving tag information from ", tagOrBranchURL)
+		log.Warn("An error occurred while retrieving data from ", tagOrBranchURL)
 	}
 	checkError(errMatch)
 	return remoteUsername, remoteRepo, remoteSha
 }
 
-// Retrieve SHA of the remoteRef from the 'remoteUsername/remoteRepo' GitHub repository.
-func getGitHubSha(remoteUsername string, remoteRepo string, remoteRef string, token map[string]string,
+// GetGitHubSha retrieves SHA of the remoteRef from the remoteUsername/remoteRepo GitHub repository.
+func GetGitHubSha(remoteUsername string, remoteRepo string, remoteRef string, token map[string]string,
 	downloadFileFunction func(string, map[string]string) (int, int64, string)) string {
 	var remoteSha string
 	log.Trace("Downloading data for GitHub project ", remoteUsername, "/", remoteRepo)
@@ -139,15 +140,16 @@ func getGitHubSha(remoteUsername string, remoteRepo string, remoteRef string, to
 	return remoteSha
 }
 
-// Get information about packages stored in git repositories.
-func processDescriptionURL(descriptionURL string,
+// ProcessDescriptionURL gets information about the git repository in which the packages is stored
+// based on the provided descriptionURL to the package DESCRIPTION file.
+func ProcessDescriptionURL(descriptionURL string,
 	downloadFileFunction func(string, map[string]string) (int, int64, string),
 ) (map[string]string, string, string, string, string, string, string, string, string) {
 	token := make(map[string]string)
 	var remoteType, remoteRef, remoteHost, remoteUsername, remoteRepo string
 	var remoteSubdir, remoteSha, packageSource string
 	if strings.HasPrefix(descriptionURL, "https://raw.githubusercontent.com") {
-		// Expecting URL in form:
+		// Expecting GitHub URL in form:
 		// https://raw.githubusercontent.com/<organization>/<repo-name>/<ref-name>/<optional-subdirectories>/DESCRIPTION
 		token["Authorization"] = "token " + gitHubToken
 		remoteType = "github"
@@ -157,7 +159,7 @@ func processDescriptionURL(descriptionURL string,
 		remoteUsername = strings.Split(shorterURL, "/")[0]
 		remoteRepo = strings.Split(shorterURL, "/")[1]
 		remoteRef = strings.Split(shorterURL, "/")[2]
-		remoteSha = getGitHubSha(remoteUsername, remoteRepo, remoteRef, token, downloadFileFunction)
+		remoteSha = GetGitHubSha(remoteUsername, remoteRepo, remoteRef, token, downloadFileFunction)
 		// Check whether package is stored in a subdirectory of the git repository.
 		for i, j := range strings.Split(shorterURL, "/") {
 			if j == "DESCRIPTION" {
@@ -165,7 +167,7 @@ func processDescriptionURL(descriptionURL string,
 			}
 		}
 	} else {
-		// Expecting URL in form:
+		// Expecting GitLab URL in form:
 		// https://example.gitlab.com/api/v4/projects/<project-id>/repository/files/<optional-subdirectories>/DESCRIPTION/raw?ref=<ref-name>
 		// <optional-subdirectories> contains '/' encoded as '%2F'
 		re := regexp.MustCompile(`ref=.*$`)
@@ -182,20 +184,21 @@ func processDescriptionURL(descriptionURL string,
 			descriptionPath := strings.Split(strings.ReplaceAll(descriptionPath, "%2F", "/"), "/")
 			remoteSubdir = strings.Join(descriptionPath[:len(descriptionPath)-1], "/")
 		}
-		remoteUsername, remoteRepo, remoteSha = getGitLabProjectAndSha(projectURL, remoteRef, token, downloadFileFunction)
+		remoteUsername, remoteRepo, remoteSha = GetGitLabProjectAndSha(projectURL, remoteRef, token, downloadFileFunction)
 	}
 	return token, remoteType, packageSource, remoteHost, remoteUsername, remoteRepo, remoteSubdir, remoteRef, remoteSha
 }
 
-// Downloads DESCRIPTION files from the list of supplied URLs.
-// Returns a list of structures representing the contents of DESCRIPTION file for the packages,
-// and the git repositories storing the packages.
-func downloadDescriptionFiles(packageDescriptionList []string,
+// DownloadDescriptionFiles downloads DESCRIPTION files from packageDescriptionList.
+// It returns a list of structures representing:
+// * the contents of DESCRIPTION file for the packages and
+// * various information about git repositories storing the packages.
+func DownloadDescriptionFiles(packageDescriptionList []string,
 	downloadFileFunction func(string, map[string]string) (int, int64, string)) []DescriptionFile {
 	var inputDescriptionFiles []DescriptionFile
 	for _, packageDescriptionURL := range packageDescriptionList {
 		token, remoteType, packageSource, remoteHost, remoteUsername, remoteRepo, remoteSubdir, remoteRef, remoteSha :=
-			processDescriptionURL(packageDescriptionURL, downloadFileFunction)
+			ProcessDescriptionURL(packageDescriptionURL, downloadFileFunction)
 		log.Info(
 			"Downloading ", packageDescriptionURL, "\nremoteType = ", remoteType,
 			", remoteUsername = ", remoteUsername, ", remoteRepo = ", remoteRepo,
@@ -221,10 +224,10 @@ func downloadDescriptionFiles(packageDescriptionList []string,
 	return inputDescriptionFiles
 }
 
-// Downloads PACKAGES files from repository URLs specified in the repositoryList.
+// DownloadPackagesFiles downloads PACKAGES files from repository URLs specified in the repositoryList.
 // Returns a map from repository URL to the string with the contents of PACKAGES file
 // for that repository.
-func downloadPackagesFiles(repositoryList []string,
+func DownloadPackagesFiles(repositoryList []string,
 	downloadFileFunction func(string, map[string]string) (int, int64, string)) map[string]string {
 	inputPackagesFiles := make(map[string]string)
 	for _, repository := range repositoryList {
