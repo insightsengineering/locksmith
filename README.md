@@ -31,6 +31,7 @@ locksmith --inputPackageList https://raw.githubusercontent.com/insightsengineeri
 ```
 
 In order to download the packages from GitHub or GitLab repositories, please set the environment variables containing the Personal Access Tokens.
+
 * For GitHub, set the `LOCKSMITH_GITHUBTOKEN` environment variable.
 * For GitLab, set the `LOCKSMITH_GITLABTOKEN` environment variable.
 

@@ -44,7 +44,7 @@ func ConstructOutputPackageList(packages []PackageDescription, packagesFiles map
 					skipDependency = true
 				}
 				if !skipDependency {
-					log.Info(p.Package, " → ", d.DependencyName)
+					log.Info(p.Package, " → ", d.DependencyName, " (", d.DependencyType, ")")
 					ResolveDependenciesRecursively(
 						&outputPackageList, d.DependencyName, d.VersionOperator,
 						d.VersionValue, repositoryList, packagesFiles, 1,
@@ -96,7 +96,10 @@ func ResolveDependenciesRecursively(outputList *[]PackageDescription, name strin
 						d.DependencyType == "LinkingTo" {
 						if !CheckIfSkipDependency(indentation, p.Package, d.DependencyName,
 							d.VersionOperator, d.VersionValue, outputList) {
-							log.Info(indentation, p.Package, " → ", d.DependencyName)
+							log.Info(
+								indentation, p.Package, " → ", d.DependencyName,
+								" (", d.DependencyType, ")",
+							)
 							ResolveDependenciesRecursively(
 								outputList, d.DependencyName, d.VersionOperator,
 								d.VersionValue, repositoryList, packagesFiles, recursionLevel+1,
