@@ -21,8 +21,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_generateRenvLock(t *testing.T) {
-	renvLock := generateRenvLock([]PackageDescription{
+func Test_GenerateRenvLock(t *testing.T) {
+	renvLock := GenerateRenvLock([]PackageDescription{
 		{
 			"package1",
 			"1.0.2",
