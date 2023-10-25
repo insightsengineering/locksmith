@@ -124,7 +124,7 @@ func checkIfBasePackage(name string) bool {
 func checkIfSkipDependency(indentation string, packageName string, dependencyName string,
 	versionOperator string, versionValue string, outputList *[]PackageDescription) bool {
 	if checkIfBasePackage(dependencyName) {
-		log.Debug(indentation, "Skipping package ", dependencyName, " as it is a base R package.")
+		log.Trace(indentation, "Skipping package ", dependencyName, " as it is a base R package.")
 		return true
 	}
 	// Go through the list of dependencies added to the output list previously, to check
@@ -141,7 +141,7 @@ func checkIfSkipDependency(indentation string, packageName string, dependencyNam
 					requirementMessage = " since no required version has been specified."
 				}
 				log.Debug(
-					indentation, "Output list already contains dependency ", dependencyName, " version ",
+					indentation, "Output list already contains ", dependencyName, " version ",
 					(*outputList)[i].Version, " which is sufficient for ", packageName,
 					requirementMessage,
 				)
@@ -149,8 +149,8 @@ func checkIfSkipDependency(indentation string, packageName string, dependencyNam
 			}
 			log.Warn(
 				indentation,
-				"Output list already contains dependency ", dependencyName, " version ",
-				(*outputList)[i].Version, " but it is insufficient as ", packageName,
+				"Output list already contains ", dependencyName, " but the version ",
+				(*outputList)[i].Version, " is insufficient as ", packageName,
 				" requires ", dependencyName, " ", versionOperator, " ", versionValue,
 			)
 			// Overwrite the information about the previous version of the dependency on the output list.

@@ -74,7 +74,7 @@ func downloadTextFile(url string, parameters map[string]string) (int, int64, str
 func getGitLabProjectAndSha(projectURL string, remoteRef string, token map[string]string,
 	downloadFileFunction func(string, map[string]string) (int, int64, string)) (string, string, string) {
 	var remoteUsername, remoteRepo, remoteSha string
-	log.Debug("Downloading project information from ", projectURL)
+	log.Trace("Downloading project information from ", projectURL)
 	statusCode, _, projectDataResponse := downloadFileFunction(projectURL, token)
 	if statusCode == 200 {
 		var projectData GitLabAPIResponse
@@ -88,30 +88,23 @@ func getGitLabProjectAndSha(projectURL string, remoteRef string, token map[strin
 		log.Warn("An error occurred while retrieving project information from ", projectURL)
 	}
 	match, errMatch := regexp.MatchString(`v\d+(\.\d+)*`, remoteRef)
+	var urlPath string
 	if match {
-		log.Debug("remoteRef = ", remoteRef, " matches tag name regexp.")
-		tagURL := projectURL + "/repository/tags/" + remoteRef
-		statusCode, _, tagDataResponse := downloadFileFunction(tagURL, token)
-		if statusCode == 200 {
-			var tagData GitLabTagOrBranchResponse
-			err := json.Unmarshal([]byte(tagDataResponse), &tagData)
-			checkError(err)
-			remoteSha = tagData.Commit.ID
-		} else {
-			log.Warn("An error occurred while retrieving tag information from ", tagURL)
-		}
+		log.Trace("remoteRef = ", remoteRef, " matches tag name regexp.")
+		urlPath = "tags"
 	} else {
-		log.Debug("remoteRef = ", remoteRef, " doesn't match tag name regexp.")
-		branchURL := projectURL + "/repository/branches/" + remoteRef
-		statusCode, _, branchDataResponse := downloadFileFunction(branchURL, token)
-		if statusCode == 200 {
-			var branchData GitLabTagOrBranchResponse
-			err := json.Unmarshal([]byte(branchDataResponse), &branchData)
-			checkError(err)
-			remoteSha = branchData.Commit.ID
-		} else {
-			log.Warn("An error occurred while retrieving branch information from ", branchURL)
-		}
+		log.Trace("remoteRef = ", remoteRef, " doesn't match tag name regexp.")
+		urlPath = "branches"
+	}
+	tagOrBranchURL := projectURL + "/repository/" + urlPath + "/" + remoteRef
+	statusCode, _, tagOrBranchDataResponse := downloadFileFunction(tagOrBranchURL, token)
+	if statusCode == 200 {
+		var tagOrBranchData GitLabTagOrBranchResponse
+		err := json.Unmarshal([]byte(tagOrBranchDataResponse), &tagOrBranchData)
+		checkError(err)
+		remoteSha = tagOrBranchData.Commit.ID
+	} else {
+		log.Warn("An error occurred while retrieving tag information from ", tagOrBranchURL)
 	}
 	checkError(errMatch)
 	return remoteUsername, remoteRepo, remoteSha
@@ -121,32 +114,26 @@ func getGitLabProjectAndSha(projectURL string, remoteRef string, token map[strin
 func getGitHubSha(remoteUsername string, remoteRepo string, remoteRef string, token map[string]string,
 	downloadFileFunction func(string, map[string]string) (int, int64, string)) string {
 	var remoteSha string
-	log.Debug("Downloading information for GitHub project ", remoteUsername, "/", remoteRepo)
+	log.Trace("Downloading data for GitHub project ", remoteUsername, "/", remoteRepo)
 	match, errMatch := regexp.MatchString(`v\d+(\.\d+)*`, remoteRef)
+	var urlPath string
 	if match {
-		log.Debug("remoteRef = ", remoteRef, " matches tag name regexp.")
-		tagURL := "https://api.github.com/repos/" + remoteUsername + "/" + remoteRepo + "/git/ref/tags/" + remoteRef
-		statusCode, _, tagDataResponse := downloadFileFunction(tagURL, token)
-		if statusCode == 200 {
-			var tagData GitHubTagOrBranchResponse
-			err := json.Unmarshal([]byte(tagDataResponse), &tagData)
-			checkError(err)
-			remoteSha = tagData.Object.Sha
-		} else {
-			log.Warn("An error occurred while retrieving tag information from ", tagURL)
-		}
+		log.Trace("remoteRef = ", remoteRef, " matches tag name regexp.")
+		urlPath = "tags"
+
 	} else {
-		log.Debug("remoteRef = ", remoteRef, " doesn't match tag name regexp.")
-		branchURL := "https://api.github.com/repos/" + remoteUsername + "/" + remoteRepo + "/git/ref/heads/" + remoteRef
-		statusCode, _, branchDataResponse := downloadFileFunction(branchURL, token)
-		if statusCode == 200 {
-			var branchData GitHubTagOrBranchResponse
-			err := json.Unmarshal([]byte(branchDataResponse), &branchData)
-			checkError(err)
-			remoteSha = branchData.Object.Sha
-		} else {
-			log.Warn("An error occurred while retrieving branch information from ", branchURL)
-		}
+		log.Trace("remoteRef = ", remoteRef, " doesn't match tag name regexp.")
+		urlPath = "heads"
+	}
+	tagOrBranchURL := "https://api.github.com/repos/" + remoteUsername + "/" + remoteRepo + "/git/ref/" + urlPath + "/" + remoteRef
+	statusCode, _, tagDataResponse := downloadFileFunction(tagOrBranchURL, token)
+	if statusCode == 200 {
+		var tagOrBranchData GitHubTagOrBranchResponse
+		err := json.Unmarshal([]byte(tagDataResponse), &tagOrBranchData)
+		checkError(err)
+		remoteSha = tagOrBranchData.Object.Sha
+	} else {
+		log.Warn("An error occurred while retrieving data from ", tagOrBranchURL)
 	}
 	checkError(errMatch)
 	return remoteSha
