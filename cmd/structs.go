@@ -23,12 +23,12 @@ package cmd
 type DescriptionFile struct {
 	// Contents stores the DESCRIPTION file.
 	Contents string `json:"contents"`
-	// PackageSource can be either 'GitHub' or 'GitLab'
+	// PackageSource can be either 'GitHub' or 'GitLab'.
 	PackageSource string `json:"source"`
-	// RemoteType can be either 'github' or 'gitlab'
+	// RemoteType can be either 'github' or 'gitlab'.
 	RemoteType string `json:"remoteType"`
 	// RemoteHost can be 'api.github.com' or the URL of GitLab instance,
-	// for example: 'https://gitlab.example.com'
+	// for example: 'https://gitlab.example.com'.
 	RemoteHost string `json:"remoteHost"`
 	// RemoteUsername represents the organization or the owner in case of a GitHub
 	// repository, or the path to the repository in the project tree in case of
@@ -79,7 +79,7 @@ type PackageDescription struct {
 	// of the package repository, in case Source is 'Repository'.
 	Repository string `json:"Repository,omitempty"`
 	// Dependencies contains the list of package dependencies.
-	Dependencies []Dependency `json:"Requirements"`
+	Dependencies []Dependency `json:"Requirements,omitempty"`
 	// When processing packages stored in package repositories, the fields below are empty.
 	// These fields are documented in the DescriptionFile struct.
 	RemoteType     string `json:"RemoteType,omitempty"`
