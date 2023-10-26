@@ -140,7 +140,7 @@ func GetGitHubSha(remoteUsername string, remoteRepo string, remoteRef string, to
 	return remoteSha
 }
 
-// ProcessDescriptionURL gets information about the git repository in which the packages is stored
+// ProcessDescriptionURL gets information about the git repository in which the package is stored
 // based on the provided descriptionURL to the package DESCRIPTION file.
 func ProcessDescriptionURL(descriptionURL string,
 	downloadFileFunction func(string, map[string]string) (int, int64, string),
@@ -151,7 +151,9 @@ func ProcessDescriptionURL(descriptionURL string,
 	if strings.HasPrefix(descriptionURL, "https://raw.githubusercontent.com") {
 		// Expecting GitHub URL in form:
 		// https://raw.githubusercontent.com/<organization>/<repo-name>/<ref-name>/<optional-subdirectories>/DESCRIPTION
-		token["Authorization"] = "token " + gitHubToken
+		if gitHubToken != "" {
+			token["Authorization"] = "token " + gitHubToken
+		}
 		remoteType = "github"
 		packageSource = "GitHub"
 		shorterURL := strings.TrimPrefix(descriptionURL, "https://raw.githubusercontent.com/")
@@ -171,7 +173,9 @@ func ProcessDescriptionURL(descriptionURL string,
 		// https://example.gitlab.com/api/v4/projects/<project-id>/repository/files/<optional-subdirectories>/DESCRIPTION/raw?ref=<ref-name>
 		// <optional-subdirectories> contains '/' encoded as '%2F'
 		re := regexp.MustCompile(`ref=.*$`)
-		token["Private-Token"] = gitLabToken
+		if gitLabToken != "" {
+			token["Private-Token"] = gitLabToken
+		}
 		remoteType = "gitlab"
 		packageSource = "GitLab"
 		shorterURL := strings.TrimPrefix(descriptionURL, "https://")
@@ -190,9 +194,8 @@ func ProcessDescriptionURL(descriptionURL string,
 }
 
 // DownloadDescriptionFiles downloads DESCRIPTION files from packageDescriptionList.
-// It returns a list of structures representing:
-// * the contents of DESCRIPTION file for the packages and
-// * various information about git repositories storing the packages.
+// It returns a list of structures representing: the contents of DESCRIPTION file
+// for the packages and various information about git repositories storing the packages.
 func DownloadDescriptionFiles(packageDescriptionList []string,
 	downloadFileFunction func(string, map[string]string) (int, int64, string)) []DescriptionFile {
 	var inputDescriptionFiles []DescriptionFile
@@ -216,7 +219,9 @@ func DownloadDescriptionFiles(packageDescriptionList []string,
 		} else {
 			log.Warn(
 				"An error occurred while downloading ", packageDescriptionURL,
-				" Please make sure you provided an access token (in LOCKSMITH_GITHUBTOKEN ",
+				"\nIt may have happened because the git repository is not public ",
+				"and you didn't set the Personal Access Token.",
+				"\nPlease make sure you provided an access token (in LOCKSMITH_GITHUBTOKEN ",
 				"or LOCKSMITH_GITLABTOKEN environment variable).",
 			)
 		}
