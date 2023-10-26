@@ -4,7 +4,7 @@
 
 `locksmith` is a utility to generate `renv.lock` file containing all dependencies of given set of R packages.
 
-Given the input list of R packages or git repositories containing the R packages, as well as a list of R package repositories (e.g. in a package manager, CRAN, BioConductor etc.), `locksmith` will try to determine the list of all dependencies and their versions required to make the input list of packages work. It will then save the result in an `renv.lock`-compatible file.
+Given the input list of git repositories containing the R packages, as well as a list of R package repositories (e.g. in a package manager, CRAN, BioConductor etc.), `locksmith` will try to determine the list of all dependencies and their versions required to make the input list of packages work. It will then save the result in an `renv.lock`-compatible file.
 
 ## Installing
 

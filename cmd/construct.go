@@ -36,14 +36,10 @@ func ConstructOutputPackageList(packages []PackageDescription, packagesFiles map
 	}
 	for _, p := range packages {
 		for _, d := range p.Dependencies {
-			skipDependency := false
 			if d.DependencyType == "Depends" || d.DependencyType == "Imports" ||
 				d.DependencyType == "Suggests" || d.DependencyType == "LinkingTo" {
-				if CheckIfSkipDependency("", p.Package, d.DependencyName,
+				if !CheckIfSkipDependency("", p.Package, d.DependencyName,
 					d.VersionOperator, d.VersionValue, &outputPackageList) {
-					skipDependency = true
-				}
-				if !skipDependency {
 					log.Info(p.Package, " → ", d.DependencyName, " (", d.DependencyType, ")")
 					ResolveDependenciesRecursively(
 						&outputPackageList, d.DependencyName, d.VersionOperator,
@@ -75,13 +71,13 @@ func ResolveDependenciesRecursively(outputList *[]PackageDescription, name strin
 				}
 				// Check if package in the repository is available in sufficient version.
 				if !CheckIfVersionSufficient(p.Version, versionOperator, versionValue) {
-					// Try to retrieve the package from the next repository.
 					log.Warn(
 						indentation, p.Package, " in repository ", r,
 						" is available in version ", p.Version,
 						" which is insufficient according to requirement ",
 						versionOperator, " ", versionValue,
 					)
+					// Try to retrieve the package from the next repository.
 					continue
 				}
 				// Add package to the output list.
