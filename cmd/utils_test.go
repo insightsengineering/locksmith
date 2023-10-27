@@ -21,10 +21,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_parseInput(t *testing.T) {
+func Test_ParseInput(t *testing.T) {
 	inputPackageList = "https://raw.githubusercontent.com/insightsengineering/tern/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/rlistings/v0.2.6/DESCRIPTION"
 	inputRepositoryList = "Repo1=https://repo1.example.com/repo1,Repo2=https://repo2.example.com/repo2,Repo3=https://repo3.example.com/repo3"
-	packageList, repositoryList, repositoryMap := parseInput()
+	packageList, repositoryList, repositoryMap := ParseInput()
 	assert.Equal(t, packageList, []string{
 		"https://raw.githubusercontent.com/insightsengineering/tern/main/DESCRIPTION",
 		"https://raw.githubusercontent.com/insightsengineering/rlistings/v0.2.6/DESCRIPTION",

@@ -20,7 +20,10 @@ import (
 	"sort"
 )
 
-func generateRenvLock(packageList []PackageDescription, repositoryMap map[string]string) RenvLock {
+// GenerateRenvLock generates renv.lock file structure which can be then saved as a JSON file.
+// It uses a list of package data created by ConstructOutputPackageList, and the map of
+// package repositories containing the packages.
+func GenerateRenvLock(packageList []PackageDescription, repositoryMap map[string]string) RenvLock {
 	var outputRenvLock RenvLock
 	outputRenvLock.Packages = make(map[string]PackageDescription)
 	for _, p := range packageList {
@@ -30,7 +33,7 @@ func generateRenvLock(packageList []PackageDescription, repositoryMap map[string
 			continue
 		}
 		// Replace package repository URL with package repository alias/name.
-		repositoryKey := getRepositoryKeyByValue(p.Repository, repositoryMap)
+		repositoryKey := GetRepositoryKeyByValue(p.Repository, repositoryMap)
 		p.Repository = repositoryKey
 		outputRenvLock.Packages[p.Package] = p
 	}
@@ -47,7 +50,9 @@ func generateRenvLock(packageList []PackageDescription, repositoryMap map[string
 	return outputRenvLock
 }
 
-func getRepositoryKeyByValue(repositoryURL string, repositoryMap map[string]string) string {
+// GetRepositoryKeyByValue searches for repository URL in repositoryMap and returns
+// the name (alias) of that repository which will then be used in output renv.lock file.
+func GetRepositoryKeyByValue(repositoryURL string, repositoryMap map[string]string) string {
 	for k, v := range repositoryMap {
 		if v == repositoryURL {
 			return k

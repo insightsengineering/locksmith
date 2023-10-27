@@ -4,7 +4,7 @@
 
 `locksmith` is a utility to generate `renv.lock` file containing all dependencies of given set of R packages.
 
-Given the input list of R packages or git repositories containing the R packages, as well as a list of R package repositories (e.g. in a package manager, CRAN, BioConductor etc.), `locksmith` will try to determine the list of all dependencies and their versions required to make the input list of packages work. It will then save the result in an `renv.lock`-compatible file.
+Given the input list of git repositories containing the R packages, as well as a list of R package repositories (e.g. in a package manager, CRAN, BioConductor etc.), `locksmith` will try to determine the list of all dependencies and their versions required to make the input list of packages work. It will then save the result in an `renv.lock`-compatible file.
 
 ## Installing
 
@@ -27,8 +27,15 @@ locksmith --logLevel debug --exampleParameter 'exampleValue'
 Real-life example with multiple input packages and repositories.
 
 ```bash
-locksmith --inputPackageList https://raw.githubusercontent.com/insightsengineering/formatters/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/rtables/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/scda/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/scda.2022/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/nestcolor/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/tern/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/rlistings/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/citril/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/scda.test/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/citril.metadata/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/chevron/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/dunlin/main/DESCRIPTION --inputRepositoryList https://bioconductor.org/packages/release/bioc,https://cran.rstudio.com/
+locksmith --inputPackageList https://raw.githubusercontent.com/insightsengineering/formatters/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/rtables/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/scda/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/scda.2022/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/nestcolor/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/tern/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/rlistings/main/DESCRIPTION --inputRepositoryList BioC=https://bioconductor.org/packages/release/bioc,CRAN=https://cran.rstudio.com/
 ```
+
+In order to download the packages from GitHub or GitLab repositories, please set the environment variables containing the Personal Access Tokens.
+
+* For GitHub, set the `LOCKSMITH_GITHUBTOKEN` environment variable.
+* For GitLab, set the `LOCKSMITH_GITLABTOKEN` environment variable.
+
+By default `locksmith` will save the resulting output file to `renv.lock`.
 
 ## Configuration file
 

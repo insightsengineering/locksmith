@@ -158,8 +158,8 @@ func mockedDownloadTextFile(url string, _ map[string]string) (int, int64, string
 	return 200, 0, ""
 }
 
-func Test_downloadDescriptionFiles(t *testing.T) {
-	descriptionFileList := downloadDescriptionFiles([]string{
+func Test_DownloadDescriptionFiles(t *testing.T) {
+	descriptionFileList := DownloadDescriptionFiles([]string{
 		"https://gitlab.example.com/api/v4/projects/37706/repository/files/subdirectory%2FDESCRIPTION/raw?ref=v1.3.1",
 		"https://gitlab.example.com/api/v4/projects/38706/repository/files/subdirectory1%2Fsubdirectory2%2FDESCRIPTION/raw?ref=v1.4.2",
 		"https://gitlab.example.com/api/v4/projects/30176/repository/files/DESCRIPTION/raw?ref=v0.2.0",
@@ -285,8 +285,8 @@ func Test_downloadDescriptionFiles(t *testing.T) {
 	})
 }
 
-func Test_downloadPackagesFiles(t *testing.T) {
-	packagesFiles := downloadPackagesFiles([]string{
+func Test_DownloadPackagesFiles(t *testing.T) {
+	packagesFiles := DownloadPackagesFiles([]string{
 		"https://repo1.example.com/repo1",
 		"https://repo2.example.com/repo2",
 		"https://repo3.example.com/repo3",

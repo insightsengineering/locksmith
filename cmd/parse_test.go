@@ -22,10 +22,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_processPackagesFile(t *testing.T) {
+func Test_ProcessPackagesFile(t *testing.T) {
 	byteValue, err := os.ReadFile("testdata/PACKAGES")
 	checkError(err)
-	allPackages := processPackagesFile(string(byteValue))
+	allPackages := ProcessPackagesFile(string(byteValue))
 	assert.Equal(t, allPackages,
 		PackagesFile{
 			[]PackageDescription{
@@ -156,7 +156,7 @@ func Test_processPackagesFile(t *testing.T) {
 	)
 }
 
-func Test_parseDescriptionFileList(t *testing.T) {
+func Test_ParseDescriptionFileList(t *testing.T) {
 	byteValue1, err := os.ReadFile("testdata/DESCRIPTION1")
 	checkError(err)
 	byteValue2, err := os.ReadFile("testdata/DESCRIPTION2")
@@ -165,7 +165,7 @@ func Test_parseDescriptionFileList(t *testing.T) {
 		{string(byteValue1), "GitHub", "", "", "", "", "", "", ""},
 		{string(byteValue2), "GitHub", "", "", "", "", "", "", ""},
 	}
-	allPackages := parseDescriptionFileList(descriptionFileList)
+	allPackages := ParseDescriptionFileList(descriptionFileList)
 	assert.Equal(t, allPackages,
 		[]PackageDescription{
 			{

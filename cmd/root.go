@@ -32,6 +32,7 @@ var inputPackageList string
 var inputRepositoryList string
 var gitHubToken string
 var gitLabToken string
+var outputRenvLock string
 
 var log = logrus.New()
 
@@ -66,8 +67,8 @@ func newRootCommand() {
 		Use:   "locksmith",
 		Short: "renv.lock generator",
 		Long: `locksmith is a utility to generate renv.lock file containing all dependencies
-of given set of R packages. Given the input list of R packages or git repositories containing
-the R packages, as well as a list of R package repositories (e.g. in a package manager, CRAN,
+of given set of R packages. Given the input list of git repositories containing the R packages,
+as well as a list of R package repositories (e.g. in a package manager, CRAN,
 BioConductor etc.), locksmith will try to determine the list of all dependencies and their
 versions required to make the input list of packages work. It will then save the result
 in an renv.lock-compatible file.`,
@@ -80,15 +81,16 @@ in an renv.lock-compatible file.`,
 			fmt.Println("config =", cfgFile)
 			fmt.Println("inputPackageList =", inputPackageList)
 			fmt.Println("inputRepositoryList =", inputRepositoryList)
+			fmt.Println("outputRenvLock = ", outputRenvLock)
 
-			packageDescriptionList, repositoryList, repositoryMap := parseInput()
-			inputDescriptionFiles := downloadDescriptionFiles(packageDescriptionList, downloadTextFile)
-			inputPackages := parseDescriptionFileList(inputDescriptionFiles)
-			repositoryPackagesFiles := downloadPackagesFiles(repositoryList, downloadTextFile)
-			packagesFiles := parsePackagesFiles(repositoryPackagesFiles)
-			outputPackageList := constructOutputPackageList(inputPackages, packagesFiles, repositoryList)
-			renvLock := generateRenvLock(outputPackageList, repositoryMap)
-			writeJSON("renv.lock", renvLock)
+			packageDescriptionList, repositoryList, repositoryMap := ParseInput()
+			inputDescriptionFiles := DownloadDescriptionFiles(packageDescriptionList, DownloadTextFile)
+			inputPackages := ParseDescriptionFileList(inputDescriptionFiles)
+			repositoryPackagesFiles := DownloadPackagesFiles(repositoryList, DownloadTextFile)
+			packagesFiles := ParsePackagesFiles(repositoryPackagesFiles)
+			outputPackageList := ConstructOutputPackageList(inputPackages, packagesFiles, repositoryList)
+			renvLock := GenerateRenvLock(outputPackageList, repositoryMap)
+			writeJSON(outputRenvLock, renvLock)
 		},
 	}
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "",
@@ -103,6 +105,8 @@ in an renv.lock-compatible file.`,
 		"Token to download non-public files from GitHub.")
 	rootCmd.PersistentFlags().StringVar(&gitLabToken, "gitLabToken", "",
 		"Token to download non-public files from GitLab.")
+	rootCmd.PersistentFlags().StringVar(&outputRenvLock, "outputRenvLock", "renv.lock",
+		"File name to save the output renv.lock file.")
 
 	// Add version command.
 	rootCmd.AddCommand(extension.NewVersionCobraCmd())
@@ -132,7 +136,8 @@ func initConfig() {
 		viper.SetConfigType("yaml")
 		viper.SetConfigName(".locksmith")
 	}
-	viper.AutomaticEnv() // read in environment variables that match
+	// Read in environment variables that match.
+	viper.AutomaticEnv()
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
@@ -156,6 +161,7 @@ func initializeConfig() {
 		"inputRepositoryList",
 		"gitHubToken",
 		"gitLabToken",
+		"outputRenvLock",
 	} {
 		// If the flag has not been set in newRootCommand() and it has been set in initConfig().
 		// In other words: if it's not been provided in command line, but has been

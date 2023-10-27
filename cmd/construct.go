@@ -20,9 +20,13 @@ import (
 	"strings"
 )
 
-func constructOutputPackageList(packages []PackageDescription, packagesFiles map[string]PackagesFile,
+// ConstructOutputPackageList generates a list of all packages and their dependencies
+// which should be included in the output renv.lock file,
+// based on the list of package descriptions, and information contained in the PACKAGES files.
+func ConstructOutputPackageList(packages []PackageDescription, packagesFiles map[string]PackagesFile,
 	repositoryList []string) []PackageDescription {
 	var outputPackageList []PackageDescription
+	var fatalErrors string
 	// Add all input packages to output list, as the packages should be downloaded from git repositories.
 	for _, p := range packages {
 		outputPackageList = append(outputPackageList, PackageDescription{
@@ -33,28 +37,32 @@ func constructOutputPackageList(packages []PackageDescription, packagesFiles map
 	}
 	for _, p := range packages {
 		for _, d := range p.Dependencies {
-			skipDependency := false
 			if d.DependencyType == "Depends" || d.DependencyType == "Imports" ||
 				d.DependencyType == "Suggests" || d.DependencyType == "LinkingTo" {
-				if checkIfSkipDependency("", p.Package, d.DependencyName,
+				if !CheckIfSkipDependency("", p.Package, d.DependencyName,
 					d.VersionOperator, d.VersionValue, &outputPackageList) {
-					skipDependency = true
-				}
-				if !skipDependency {
-					log.Info(p.Package, " → ", d.DependencyName)
-					resolveDependenciesRecursively(
+					log.Info(p.Package, " → ", d.DependencyName, " (", d.DependencyType, ")")
+					ResolveDependenciesRecursively(
 						&outputPackageList, d.DependencyName, d.VersionOperator,
-						d.VersionValue, repositoryList, packagesFiles, 1,
+						d.VersionValue, repositoryList, packagesFiles, 1, &fatalErrors,
 					)
 				}
 			}
 		}
 	}
+	if fatalErrors != "" {
+		log.Fatal(fatalErrors)
+	}
 	return outputPackageList
 }
 
-func resolveDependenciesRecursively(outputList *[]PackageDescription, name string, versionOperator string,
-	versionValue string, repositoryList []string, packagesFiles map[string]PackagesFile, recursionLevel int) {
+// ResolveDependenciesRecursively checks dependencies of the package, and their required versions.
+// Checks if the required version is already included in the output package list
+// (later used to generate the renv.lock), or if the dependency should be downloaded from a package repository.
+// Repeats the process recursively for all dependencies not yet processed.
+func ResolveDependenciesRecursively(outputList *[]PackageDescription, name string, versionOperator string,
+	versionValue string, repositoryList []string, packagesFiles map[string]PackagesFile, recursionLevel int,
+	fatalErrors *string) {
 	var indentation string
 	for i := 0; i < recursionLevel; i++ {
 		indentation += "  "
@@ -67,14 +75,14 @@ func resolveDependenciesRecursively(outputList *[]PackageDescription, name strin
 					log.Warn(indentation, name, " not found in top repository.")
 				}
 				// Check if package in the repository is available in sufficient version.
-				if !checkIfVersionSufficient(p.Version, versionOperator, versionValue) {
-					// Try to retrieve the package from the next repository.
+				if !CheckIfVersionSufficient(p.Version, versionOperator, versionValue) {
 					log.Warn(
 						indentation, p.Package, " in repository ", r,
 						" is available in version ", p.Version,
 						" which is insufficient according to requirement ",
 						versionOperator, " ", versionValue,
 					)
+					// Try to retrieve the package from the next repository.
 					continue
 				}
 				// Add package to the output list.
@@ -87,12 +95,15 @@ func resolveDependenciesRecursively(outputList *[]PackageDescription, name strin
 				for _, d := range p.Dependencies {
 					if d.DependencyType == "Depends" || d.DependencyType == "Imports" ||
 						d.DependencyType == "LinkingTo" {
-						if !checkIfSkipDependency(indentation, p.Package, d.DependencyName,
+						if !CheckIfSkipDependency(indentation, p.Package, d.DependencyName,
 							d.VersionOperator, d.VersionValue, outputList) {
-							log.Info(indentation, p.Package, " → ", d.DependencyName)
-							resolveDependenciesRecursively(
-								outputList, d.DependencyName, d.VersionOperator,
-								d.VersionValue, repositoryList, packagesFiles, recursionLevel+1,
+							log.Info(
+								indentation, p.Package, " → ", d.DependencyName,
+								" (", d.DependencyType, ")",
+							)
+							ResolveDependenciesRecursively(
+								outputList, d.DependencyName, d.VersionOperator, d.VersionValue,
+								repositoryList, packagesFiles, recursionLevel+1, fatalErrors,
 							)
 						}
 					}
@@ -106,13 +117,13 @@ func resolveDependenciesRecursively(outputList *[]PackageDescription, name strin
 	if versionOperator != "" && versionValue != "" {
 		versionConstraint = " in version " + versionOperator + " " + versionValue
 	}
-	log.Fatal(
-		indentation, "Could not find package ", name, versionConstraint,
-		" in any of the repositories.",
-	)
+	*fatalErrors += "Could not find package " + name + versionConstraint + " in any of the repositories.\n"
 }
 
-func checkIfBasePackage(name string) bool {
+// CheckIfBasePackage checks whether the package should be treated as a base R package
+// (included in every R installation) or if it should be treated as a dependency
+// to be downloaded from a package repository.
+func CheckIfBasePackage(name string) bool {
 	var basePackages = []string{
 		"base", "compiler", "datasets", "graphics", "grDevices", "grid",
 		"methods", "parallel", "splines", "stats", "stats4", "tcltk", "tools",
@@ -121,10 +132,13 @@ func checkIfBasePackage(name string) bool {
 	return stringInSlice(name, basePackages)
 }
 
-func checkIfSkipDependency(indentation string, packageName string, dependencyName string,
+// CheckIfSkipDependency checks if processing of the package (dependency) should be skipped.
+// Dependency should be skipped if it is a base R package, or has already been added to output
+// package list (later used to generate the renv.lock).
+func CheckIfSkipDependency(indentation string, packageName string, dependencyName string,
 	versionOperator string, versionValue string, outputList *[]PackageDescription) bool {
-	if checkIfBasePackage(dependencyName) {
-		log.Debug(indentation, "Skipping package ", dependencyName, " as it is a base R package.")
+	if CheckIfBasePackage(dependencyName) {
+		log.Trace(indentation, "Skipping package ", dependencyName, " as it is a base R package.")
 		return true
 	}
 	// Go through the list of dependencies added to the output list previously, to check
@@ -133,7 +147,7 @@ func checkIfSkipDependency(indentation string, packageName string, dependencyNam
 	for i := 0; i < len(*outputList); i++ {
 		if dependencyName == (*outputList)[i].Package {
 			// Dependency found on the output list.
-			if checkIfVersionSufficient((*outputList)[i].Version, versionOperator, versionValue) {
+			if CheckIfVersionSufficient((*outputList)[i].Version, versionOperator, versionValue) {
 				var requirementMessage string
 				if versionOperator != "" && versionValue != "" {
 					requirementMessage = " according to the requirement " + versionOperator + " " + versionValue
@@ -141,7 +155,7 @@ func checkIfSkipDependency(indentation string, packageName string, dependencyNam
 					requirementMessage = " since no required version has been specified."
 				}
 				log.Debug(
-					indentation, "Output list already contains dependency ", dependencyName, " version ",
+					indentation, "Output list already contains ", dependencyName, " version ",
 					(*outputList)[i].Version, " which is sufficient for ", packageName,
 					requirementMessage,
 				)
@@ -149,8 +163,8 @@ func checkIfSkipDependency(indentation string, packageName string, dependencyNam
 			}
 			log.Warn(
 				indentation,
-				"Output list already contains dependency ", dependencyName, " version ",
-				(*outputList)[i].Version, " but it is insufficient as ", packageName,
+				"Output list already contains ", dependencyName, " but the version ",
+				(*outputList)[i].Version, " is insufficient as ", packageName,
 				" requires ", dependencyName, " ", versionOperator, " ", versionValue,
 			)
 			// Overwrite the information about the previous version of the dependency on the output list.
@@ -172,7 +186,9 @@ func splitVersion(r rune) bool {
 	return r == '.' || r == '-'
 }
 
-func checkIfVersionSufficient(availableVersionValue string, versionOperator string,
+// CheckIfVersionSufficient checks if availableVersionValue fulfills the requirement
+// expressed by versionOperator ('>=' or '>') and requiredVersionValue.
+func CheckIfVersionSufficient(availableVersionValue string, versionOperator string,
 	requiredVersionValue string) bool {
 	// Check if there are any version requirements at all.
 	if versionOperator == "" && requiredVersionValue == "" {
