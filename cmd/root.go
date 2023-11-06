@@ -28,11 +28,18 @@ import (
 
 var cfgFile string
 var logLevel string
-var inputPackageList string
-var inputRepositoryList string
 var gitHubToken string
 var gitLabToken string
 var outputRenvLock string
+
+// In case the lists are provided as arrays in YAML configuration file:
+var inputPackages []string
+var inputRepositories []string
+
+// In case the lists are provided as strings of comma-separated values
+// via CLI flag or in an environment variable:
+var inputPackageList string
+var inputRepositoryList string
 
 var log = logrus.New()
 
@@ -81,7 +88,9 @@ in an renv.lock-compatible file.`,
 			fmt.Println("config =", cfgFile)
 			fmt.Println("inputPackageList =", inputPackageList)
 			fmt.Println("inputRepositoryList =", inputRepositoryList)
-			fmt.Println("outputRenvLock = ", outputRenvLock)
+			fmt.Println("inputPackages =", inputPackages)
+			fmt.Println("inputRepositories =", inputRepositories)
+			fmt.Println("outputRenvLock =", outputRenvLock)
 
 			packageDescriptionList, repositoryList, repositoryMap := ParseInput()
 			inputDescriptionFiles := DownloadDescriptionFiles(packageDescriptionList, DownloadTextFile)
@@ -173,4 +182,7 @@ func initializeConfig() {
 			checkError(err)
 		}
 	}
+	// Check if a YAML list of input packages or input repositories has been provided in the configuration file.
+	inputPackages = viper.GetStringSlice("inputPackages")
+	inputRepositories = viper.GetStringSlice("inputRepositories")
 }

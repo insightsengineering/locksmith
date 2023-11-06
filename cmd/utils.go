@@ -47,14 +47,39 @@ func stringInSlice(a string, list []string) bool {
 // list of package repository URLs (in descending priority order), and a map from package
 // repository alias (name) to the package repository URL.
 func ParseInput() ([]string, []string, map[string]string) {
-	if len(inputPackageList) < 1 {
-		log.Fatal("No packages specified. Please use the --inputPackageList flag.")
+	if len(inputPackageList) < 1 && len(inputPackages) == 0 {
+		log.Fatal(
+			"No packages specified. Please use the --inputPackageList flag ",
+			"or supply the list under inputPackages in YAML config.",
+		)
 	}
-	if len(inputRepositoryList) < 1 {
-		log.Fatal("No package repositories specified. Please use the --inputRepositoryList flag.")
+	if len(inputRepositoryList) < 1 && len(inputRepositories) == 0 {
+		log.Fatal(
+			"No package repositories specified. Please use the --inputRepositoryList flag ",
+			"or supply the list under inputRepositories in YAML config.",
+		)
 	}
-	packageList := strings.Split(inputPackageList, ",")
-	repositoryList := strings.Split(inputRepositoryList, ",")
+	var packageList []string
+	if len(inputPackageList) > 0 {
+		log.Debug(
+			"--inputPackageList CLI flag or LOCKSMITH_INPUTPACKAGELIST environment variable ",
+			"has been set and is taking precedence over inputPackages key from YAML config.",
+		)
+		packageList = strings.Split(inputPackageList, ",")
+	} else {
+		packageList = inputPackages
+	}
+	var repositoryList []string
+	if len(inputRepositoryList) > 0 {
+		log.Debug(
+			"--inputRepositoryList CLI flag or LOCKSMITH_INPUTREPOSITORYLIST environment variable ",
+			"has been set and is taking precedence over inputRepositories key from YAML config.",
+		)
+		repositoryList = strings.Split(inputRepositoryList, ",")
+	} else {
+		repositoryList = inputRepositories
+	}
+
 	outputRepositoryMap := make(map[string]string)
 	var outputRepositoryList []string
 	for _, r := range repositoryList {
