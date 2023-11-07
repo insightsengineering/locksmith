@@ -51,7 +51,7 @@ func ConstructOutputPackageList(packages []PackageDescription, packagesFiles map
 		}
 	}
 	if fatalErrors != "" {
-		log.Fatal(fatalErrors)
+		log.Error(fatalErrors)
 	}
 	return outputPackageList
 }
