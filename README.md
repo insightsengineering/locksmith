@@ -12,7 +12,7 @@ Simply download the project for your distribution from the [releases](https://gi
 
 Alternatively, you can install the latest version by running:
 
-```
+```shell
 go install github.com/insightsengineering/locksmith@latest
 ```
 
