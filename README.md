@@ -6,9 +6,15 @@
 
 Given the input list of git repositories containing the R packages, as well as a list of R package repositories (e.g. in a package manager, CRAN, BioConductor etc.), `locksmith` will try to determine the list of all dependencies and their versions required to make the input list of packages work. It will then save the result in an `renv.lock`-compatible file.
 
-## Installing
+## Installation
 
 Simply download the project for your distribution from the [releases](https://github.com/insightsengineering/locksmith/releases) page. `locksmith` is distributed as a single binary file and does not require any additional system requirements.
+
+Alternatively, you can install the latest version by running:
+
+```shell
+go install github.com/insightsengineering/locksmith@latest
+```
 
 ## Usage
 
