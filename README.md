@@ -25,6 +25,7 @@ locksmith --logLevel debug --exampleParameter 'exampleValue'
 ```
 
 Real-life example with multiple input packages and repositories.
+Please see below for [an example](#configuration-file) how to set package and repository lists more easily in a configuration file.
 
 ```bash
 locksmith --inputPackageList https://raw.githubusercontent.com/insightsengineering/formatters/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/rtables/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/scda/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/scda.2022/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/nestcolor/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/tern/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/rlistings/main/DESCRIPTION --inputRepositoryList BioC=https://bioconductor.org/packages/release/bioc,CRAN=https://cran.rstudio.com/
@@ -40,7 +41,8 @@ By default `locksmith` will save the resulting output file to `renv.lock`.
 ## Configuration file
 
 If you'd like to set the above options in a configuration file, by default `locksmith` checks `~/.locksmith`, `~/.locksmith.yaml` and `~/.locksmith.yml` files.
-If this file exists, `locksmith` uses options defined there, unless they are overridden by command line flags.
+
+If any of these files exist, `locksmith` will use options defined there, unless they are overridden by command line flags or environment variables.
 
 You can also specify custom path to configuration file with `--config <your-configuration-file>.yml` command line flag.
 When using custom configuration file, if you specify command line flags, the latter will still take precedence.
@@ -48,9 +50,21 @@ When using custom configuration file, if you specify command line flags, the lat
 Example contents of configuration file:
 
 ```yaml
-logLevel: trace
-exampleParameter: exampleValue
+logLevel: debug
+inputPackages:
+  - https://raw.githubusercontent.com/insightsengineering/formatters/main/DESCRIPTION
+  - https://raw.githubusercontent.com/insightsengineering/rtables/main/DESCRIPTION
+  - https://raw.githubusercontent.com/insightsengineering/scda/main/DESCRIPTION
+  - https://raw.githubusercontent.com/insightsengineering/scda.2022/main/DESCRIPTION
+inputRepositories:
+  - Bioconductor.BioCsoft=https://bioconductor.org/packages/release/bioc/
+  - CRAN=https://cran.rstudio.com/
 ```
+
+The example above shows an alternative way of providing input packages, and input repositories,
+as opposed to `inputPackageList` and `inputRepositoryList` CLI flags/YAML keys.
+
+Additionally, `inputPackageList`/`inputRepositoryList` CLI flags take precendence over `inputPackages`/`inputRepositories` YAML keys.
 
 ## Environment variables
 
