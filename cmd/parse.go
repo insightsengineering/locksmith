@@ -35,6 +35,7 @@ func ParseDescriptionFileList(inputDescriptionFiles []DescriptionFile) []Package
 func ParsePackagesFiles(repositoryPackageFiles map[string]string) map[string]PackagesFile {
 	packagesFilesMap := make(map[string]PackagesFile)
 	for repository, packagesFile := range repositoryPackageFiles {
+		log.Debug("Parsing PACKAGES file for ", repository)
 		packagesFilesMap[repository] = ProcessPackagesFile(packagesFile)
 	}
 	return packagesFilesMap
@@ -44,7 +45,7 @@ func ParsePackagesFiles(repositoryPackageFiles map[string]string) map[string]Pac
 // with those fields/properties that are required for further processing.
 func ProcessPackagesFile(content string) PackagesFile {
 	var allPackages PackagesFile
-	for _, lineGroup := range strings.Split(content, "\n\n") {
+	for _, lineGroup := range strings.Split(strings.ReplaceAll(content, "\r\n", "\n"), "\n\n") {
 		if lineGroup == "" {
 			continue
 		}

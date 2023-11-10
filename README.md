@@ -28,7 +28,7 @@ Real-life example with multiple input packages and repositories.
 Please see below for [an example](#configuration-file) how to set package and repository lists more easily in a configuration file.
 
 ```bash
-locksmith --inputPackageList https://raw.githubusercontent.com/insightsengineering/formatters/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/rtables/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/scda/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/scda.2022/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/nestcolor/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/tern/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/rlistings/main/DESCRIPTION --inputRepositoryList BioC=https://bioconductor.org/packages/release/bioc,CRAN=https://cran.rstudio.com/
+locksmith --inputPackageList https://raw.githubusercontent.com/insightsengineering/formatters/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/rtables/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/scda/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/scda.2022/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/nestcolor/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/tern/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/rlistings/main/DESCRIPTION --inputRepositoryList BioC=https://bioconductor.org/packages/release/bioc,CRAN=https://cran.rstudio.com
 ```
 
 In order to download the packages from GitHub or GitLab repositories, please set the environment variables containing the Personal Access Tokens.
@@ -57,8 +57,8 @@ inputPackages:
   - https://raw.githubusercontent.com/insightsengineering/scda/main/DESCRIPTION
   - https://raw.githubusercontent.com/insightsengineering/scda.2022/main/DESCRIPTION
 inputRepositories:
-  - Bioconductor.BioCsoft=https://bioconductor.org/packages/release/bioc/
-  - CRAN=https://cran.rstudio.com/
+  - Bioconductor.BioCsoft=https://bioconductor.org/packages/release/bioc
+  - CRAN=https://cran.rstudio.com
 ```
 
 The example above shows an alternative way of providing input packages, and input repositories,
