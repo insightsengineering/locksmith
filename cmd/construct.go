@@ -117,6 +117,7 @@ func ResolveDependenciesRecursively(outputList *[]PackageDescription, name strin
 	if versionOperator != "" && versionValue != "" {
 		versionConstraint = " in version " + versionOperator + " " + versionValue
 	}
+	log.Error("Could not find package " + name + versionConstraint + " in any of the repositories.\n")
 	*fatalErrors += "Could not find package " + name + versionConstraint + " in any of the repositories.\n"
 }
 
