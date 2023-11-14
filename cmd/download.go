@@ -237,11 +237,20 @@ func DownloadPackagesFiles(repositoryList []string,
 	downloadFileFunction func(string, map[string]string) (int, int64, string)) map[string]string {
 	inputPackagesFiles := make(map[string]string)
 	for _, repository := range repositoryList {
-		statusCode, _, packagesFileContent := downloadFileFunction(repository+"/src/contrib/PACKAGES", map[string]string{})
+		var packagesFileURL string
+		if strings.Contains(repository, "/bin/windows/") || strings.Contains(repository, "/bin/macosx") {
+			// If we're dealing with a repository with binary Windows or macOS packages,
+			// we're expecting it to be in a specific format documented in the README.
+			packagesFileURL = repository + "/PACKAGES"
+		} else {
+			packagesFileURL = repository + "/src/contrib/PACKAGES"
+		}
+		log.Debug("Downloading ", packagesFileURL)
+		statusCode, _, packagesFileContent := downloadFileFunction(packagesFileURL, map[string]string{})
 		if statusCode == 200 {
 			inputPackagesFiles[repository] = packagesFileContent
 		} else {
-			log.Warn("An error occurred while downloading ", repository+"/src/contrib/PACKAGES")
+			log.Warn("An error occurred while downloading ", packagesFileURL)
 		}
 	}
 	return inputPackagesFiles
