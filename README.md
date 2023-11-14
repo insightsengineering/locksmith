@@ -74,7 +74,7 @@ Additionally, `inputPackageList`/`inputRepositoryList` CLI flags take precendenc
 
 ## Binary dependencies
 
-In order to request `locksmith` to generate an `renv.lock` with binary R packages, it is necessary to provide an URL to the binary repository in `inputRepositories`/`inputRepositoryList`.
+For `locksmith` in order to generate an `renv.lock` with binary R packages, it is necessary to provide URLs to binary repositories in `inputRepositories`/`inputRepositoryList`.
 
 Examples illustrating the expected format of URLs to repositories with binary packages:
 
