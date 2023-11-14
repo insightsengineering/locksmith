@@ -240,12 +240,7 @@ func DownloadPackagesFiles(repositoryList []string,
 		var packagesFileURL string
 		if strings.Contains(repository, "/bin/windows/") || strings.Contains(repository, "/bin/macosx") {
 			// If we're dealing with a repository with binary Windows or macOS packages,
-			// we're expecting it to be in form of:
-			// https://cloud.r-project.org/bin/windows/contrib/4.2 or
-			// https://cloud.r-project.org/bin/macosx/contrib/4.2 or
-			// https://www.bioconductor.org/packages/release/bioc/bin/windows/contrib/4.2 or
-			// https://www.bioconductor.org/packages/release/bioc/bin/macosx/big-sur-arm64/contrib/4.2 or
-			// https://www.bioconductor.org/packages/release/bioc/bin/macosx/big-sur-x86_64/contrib/4.2
+			// we're expecting it to be in a specific format documented in the README.
 			packagesFileURL = repository + "/PACKAGES"
 		} else {
 			packagesFileURL = repository + "/src/contrib/PACKAGES"

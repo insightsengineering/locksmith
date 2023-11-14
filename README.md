@@ -72,6 +72,42 @@ as opposed to `inputPackageList` and `inputRepositoryList` CLI flags/YAML keys.
 
 Additionally, `inputPackageList`/`inputRepositoryList` CLI flags take precendence over `inputPackages`/`inputRepositories` YAML keys.
 
+## Binary dependencies
+
+In order to request `locksmith` to generate an `renv.lock` with binary R packages, it is necessary to provide an URL to the binary repository in `inputRepositories`/`inputRepositoryList`.
+
+Examples illustrating the expected format of URLs to repositories with binary packages:
+* Linux:
+    * `https://packagemanager.posit.co/cran/__linux__/<distribution-name>/latest`
+* Windows:
+    * `https://cloud.r-project.org/bin/windows/contrib/<r-version>`
+    * `https://www.bioconductor.org/packages/release/bioc/bin/windows/contrib/<r-version>`
+    * `https://packagemanager.posit.co/cran/latest/bin/windows/contrib/<r-version>`
+* macOS:
+    * `https://cloud.r-project.org/bin/macosx/contrib/<r-version>`
+    * `https://www.bioconductor.org/packages/release/bioc/bin/macosx/big-sur-arm64/contrib/<r-version>`
+    * `https://www.bioconductor.org/packages/release/bioc/bin/macosx/big-sur-x86_64/contrib/<r-version>`
+    * `https://packagemanager.posit.co/cran/latest/bin/macosx/big-sur-x86_64/contrib/<r-version>`
+    * `https://packagemanager.posit.co/cran/latest/bin/macosx/big-sur-arm64/contrib/<r-version>`
+
+where `<r-version>` is e.g. `4.2`, `4.3` etc.
+
+As a result, the configuration file could look like this:
+
+* for macOS:
+    ```yaml
+    inputRepositories:
+      - CRAN-macOS=https://cloud.r-project.org/bin/macosx/contrib/4.2
+      - Bioc-macOS=https://www.bioconductor.org/packages/release/bioc/bin/macosx/big-sur-x86_64/contrib/4.3
+    ```
+
+* for Windows:
+    ```yaml
+    inputRepositories:
+      - CRAN-Windows=https://cloud.r-project.org/bin/windows/contrib/4.2
+      - Bioc-Windows=https://www.bioconductor.org/packages/release/bioc/bin/windows/contrib/4.3
+    ```
+
 ## Environment variables
 
 `locksmith` reads environment variables with `LOCKSMITH_` prefix and tries to match them with CLI flags.
