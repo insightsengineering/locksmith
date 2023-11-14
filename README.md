@@ -93,6 +93,8 @@ Examples illustrating the expected format of URLs to repositories with binary pa
 
 where `<r-version>` is e.g. `4.2`, `4.3` etc.
 
+In all cases the URL points to a directory where the `PACKAGES` file is located.
+
 As a result, the configuration file could look like this:
 
 * for macOS:
