@@ -23,7 +23,7 @@ go install github.com/insightsengineering/locksmith@latest
 
 ## Usage
 
-`locksmith` is a command line utility, so after installing the binary in your `PATH`,simply run the
+`locksmith` is a command line utility, so after installing the binary in your `PATH`, simply run the
 following command to view its capabilities:
 
 ```bash

@@ -85,7 +85,7 @@ func ParseInput() ([]string, []string, map[string]string, []string) {
 	var allowedMissingDependencyTypes []string
 	if len(allowIncompleteRenvLock) > 0 {
 		allowedMissingDependencyTypes = strings.Split(allowIncompleteRenvLock, ",")
-		log.Debug("allowedMissingDependencyTypes =", allowedMissingDependencyTypes)
+		log.Debug("allowedMissingDependencyTypes = ", allowedMissingDependencyTypes)
 	}
 
 	outputRepositoryMap := make(map[string]string)
@@ -98,9 +98,9 @@ func ParseInput() ([]string, []string, map[string]string, []string) {
 		outputRepositoryMap[repository[0]] = repository[1]
 		outputRepositoryList = append(outputRepositoryList, repository[1])
 	}
-	log.Debug("inputPackageList =", packageList)
-	log.Debug("inputRepositoryList =", outputRepositoryList)
-	log.Debug("inputRepositoryMap =", outputRepositoryMap)
+	log.Debug("inputPackageList = ", packageList)
+	log.Debug("inputRepositoryList = ", outputRepositoryList)
+	log.Debug("inputRepositoryMap = ", outputRepositoryMap)
 	return packageList, outputRepositoryList, outputRepositoryMap, allowedMissingDependencyTypes
 }
 
