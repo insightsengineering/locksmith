@@ -46,6 +46,8 @@ func ParsePackagesFiles(repositoryPackageFiles map[string]string) map[string]Pac
 // with those fields/properties that are required for further processing.
 func ProcessPackagesFile(content string) PackagesFile {
 	var allPackages PackagesFile
+	// PACKAGES files in binary Windows repositories use CRLF line endings.
+	// Therefore, we first change them to LF line endings.
 	for _, lineGroup := range strings.Split(strings.ReplaceAll(content, "\r\n", "\n"), "\n\n") {
 		if lineGroup == "" {
 			continue
@@ -53,7 +55,12 @@ func ProcessPackagesFile(content string) PackagesFile {
 		// Each lineGroup contains information about one package and is separated by an empty line.
 		firstLine := strings.Split(lineGroup, "\n")[0]
 		packageName := strings.ReplaceAll(firstLine, "Package: ", "")
-		cleaned := CleanDescriptionOrPackagesEntry(lineGroup)
+		cleaned := CleanDescriptionOrPackagesEntry(lineGroup, false)
+		if cleaned == "" {
+			// Package entry pointing to a "Path:" subdirectory encountered.
+			// Such package entries are skipped altogether.
+			continue
+		}
 		packageMap := make(map[string]string)
 		err := yaml.Unmarshal([]byte(cleaned), &packageMap)
 		if err != nil {
@@ -75,7 +82,7 @@ func ProcessPackagesFile(content string) PackagesFile {
 // ProcessDescription reads a string containing DESCRIPTION file and returns a structure
 // with those fields/properties that are required for further processing.
 func ProcessDescription(description DescriptionFile, allPackages *[]PackageDescription) {
-	cleaned := CleanDescriptionOrPackagesEntry(description.Contents)
+	cleaned := CleanDescriptionOrPackagesEntry(description.Contents, true)
 	packageMap := make(map[string]string)
 	err := yaml.Unmarshal([]byte(cleaned), &packageMap)
 	checkError(err)
@@ -92,16 +99,24 @@ func ProcessDescription(description DescriptionFile, allPackages *[]PackageDescr
 	)
 }
 
-// CleanDescriptionOrPackagesEntry processes a multiline string representing information about one package
-// from PACKAGES file, or the whole contents of DESCRIPTION file. Removes newlines occurring within
-// filtered fields (which are predominantly fields containing lists of package dependencies).
-// Also removes fields which are not required for further processing.
-func CleanDescriptionOrPackagesEntry(description string) string {
+// CleanDescriptionOrPackagesEntry processes a multiline string representing information about one
+// package from PACKAGES file (if isDescription is false), or the whole contents of DESCRIPTION file
+// (if isDescription is true). Removes newlines occurring within filtered fields (which are
+// predominantly fields containing lists of package dependencies). Also removes fields which are not
+// required for further processing.
+func CleanDescriptionOrPackagesEntry(description string, isDescription bool) string {
 	lines := strings.Split(description, "\n")
 	filterFields := []string{"Package:", "Version:", "Depends:", "Imports:", "Suggests:", "LinkingTo:"}
 	outputContent := ""
 	processingFilteredField := false
 	for _, line := range lines {
+		if strings.HasPrefix(line, "Path:") && !isDescription {
+			// This means that the package is located in a subdirectory mentioned in this field.
+			// For example "Path: 4.4.0/Recommended" means that the package is located in
+			// "latest/src/contrib/4.4.0/Recommended/" subdirectory. We want to avoid these kinds of
+			// packages and prefer to download them from "latest/src/contrib/".
+			return ""
+		}
 		filteredFieldFound := false
 		// Check if we start processing any of the filtered fields.
 		for _, field := range filterFields {
