@@ -46,7 +46,7 @@ func ParsePackagesFiles(repositoryPackageFiles map[string]string) map[string]Pac
 // with those fields/properties that are required for further processing.
 func ProcessPackagesFile(content string) PackagesFile {
 	var allPackages PackagesFile
-	// PACKAGES file in binary Windows repositories uses CRLF line endings.
+	// PACKAGES files in binary Windows repositories use CRLF line endings.
 	// Therefore, we first change them to LF line endings.
 	for _, lineGroup := range strings.Split(strings.ReplaceAll(content, "\r\n", "\n"), "\n\n") {
 		if lineGroup == "" {
@@ -57,8 +57,8 @@ func ProcessPackagesFile(content string) PackagesFile {
 		packageName := strings.ReplaceAll(firstLine, "Package: ", "")
 		cleaned := CleanDescriptionOrPackagesEntry(lineGroup, false)
 		if cleaned == "" {
-			// Entry pointing to a "Path:" subdirectory encountered.
-			// We skip such package entry altogether.
+			// Package entry pointing to a "Path:" subdirectory encountered.
+			// Such package entries are skipped altogether.
 			continue
 		}
 		packageMap := make(map[string]string)
