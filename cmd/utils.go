@@ -45,9 +45,10 @@ func stringInSlice(a string, list []string) bool {
 }
 
 // ParseInput parses CLI input parameters, and returns: list of package DESCRIPTION URLs,
-// list of package repository URLs (in descending priority order), and a map from package
-// repository alias (name) to the package repository URL.
-func ParseInput() ([]string, []string, map[string]string) {
+// list of package repository URLs (in descending priority order), a map from package
+// repository alias (name) to the package repository URL, and a list of allowed types
+// of missing dependencies.
+func ParseInput() ([]string, []string, map[string]string, []string) {
 	if len(inputPackageList) < 1 && len(inputPackages) == 0 {
 		log.Fatal(
 			"No packages specified. Please use the --inputPackageList flag ",
@@ -81,6 +82,12 @@ func ParseInput() ([]string, []string, map[string]string) {
 		repositoryList = inputRepositories
 	}
 
+	var allowedMissingDependencyTypes []string
+	if len(allowIncompleteRenvLock) > 0 {
+		allowedMissingDependencyTypes = strings.Split(allowIncompleteRenvLock, ",")
+		log.Debug("allowedMissingDependencyTypes =", allowedMissingDependencyTypes)
+	}
+
 	outputRepositoryMap := make(map[string]string)
 	var outputRepositoryList []string
 	for _, r := range repositoryList {
@@ -91,10 +98,10 @@ func ParseInput() ([]string, []string, map[string]string) {
 		outputRepositoryMap[repository[0]] = repository[1]
 		outputRepositoryList = append(outputRepositoryList, repository[1])
 	}
-	log.Debug("inputPackageList = ", packageList)
-	log.Debug("inputRepositoryList = ", outputRepositoryList)
-	log.Debug("inputRepositoryMap = ", outputRepositoryMap)
-	return packageList, outputRepositoryList, outputRepositoryMap
+	log.Debug("inputPackageList =", packageList)
+	log.Debug("inputRepositoryList =", outputRepositoryList)
+	log.Debug("inputRepositoryMap =", outputRepositoryMap)
+	return packageList, outputRepositoryList, outputRepositoryMap, allowedMissingDependencyTypes
 }
 
 func stringsToInts(input []string) []int {

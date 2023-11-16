@@ -24,7 +24,7 @@ import (
 // which should be included in the output renv.lock file,
 // based on the list of package descriptions, and information contained in the PACKAGES files.
 func ConstructOutputPackageList(packages []PackageDescription, packagesFiles map[string]PackagesFile,
-	repositoryList []string) []PackageDescription {
+	repositoryList []string, allowedMissingDependencyTypes []string) []PackageDescription {
 	var outputPackageList []PackageDescription
 	var fatalErrors string
 	// Add all input packages to output list, as the packages should be downloaded from git repositories.
@@ -44,7 +44,8 @@ func ConstructOutputPackageList(packages []PackageDescription, packagesFiles map
 					log.Info(p.Package, " → ", d.DependencyName, " (", d.DependencyType, ")")
 					ResolveDependenciesRecursively(
 						&outputPackageList, d.DependencyName, d.VersionOperator,
-						d.VersionValue, repositoryList, packagesFiles, 1, &fatalErrors,
+						d.VersionValue, d.DependencyType, allowedMissingDependencyTypes,
+						repositoryList, packagesFiles, 1, &fatalErrors,
 					)
 				}
 			}
@@ -61,8 +62,8 @@ func ConstructOutputPackageList(packages []PackageDescription, packagesFiles map
 // (later used to generate the renv.lock), or if the dependency should be downloaded from a package repository.
 // Repeats the process recursively for all dependencies not yet processed.
 func ResolveDependenciesRecursively(outputList *[]PackageDescription, name string, versionOperator string,
-	versionValue string, repositoryList []string, packagesFiles map[string]PackagesFile, recursionLevel int,
-	fatalErrors *string) {
+	versionValue string, dependencyType string, allowedMissingDependencyTypes []string,
+	repositoryList []string, packagesFiles map[string]PackagesFile, recursionLevel int, fatalErrors *string) {
 	var indentation string
 	for i := 0; i < recursionLevel; i++ {
 		indentation += "  "
@@ -103,7 +104,8 @@ func ResolveDependenciesRecursively(outputList *[]PackageDescription, name strin
 							)
 							ResolveDependenciesRecursively(
 								outputList, d.DependencyName, d.VersionOperator, d.VersionValue,
-								repositoryList, packagesFiles, recursionLevel+1, fatalErrors,
+								d.DependencyType, allowedMissingDependencyTypes, repositoryList,
+								packagesFiles, recursionLevel+1, fatalErrors,
 							)
 						}
 					}
@@ -115,9 +117,15 @@ func ResolveDependenciesRecursively(outputList *[]PackageDescription, name strin
 	}
 	var versionConstraint string
 	if versionOperator != "" && versionValue != "" {
-		versionConstraint = " in version " + versionOperator + " " + versionValue
+		versionConstraint = " (version " + versionOperator + " " + versionValue + ")"
 	}
-	*fatalErrors += "Could not find package " + name + versionConstraint + " in any of the repositories.\n"
+	message := "Could not find package " + name + versionConstraint + " in any of the repositories.\n"
+	if stringInSlice(dependencyType, allowedMissingDependencyTypes) {
+		log.Warn(indentation + message)
+	} else {
+		log.Error(indentation + message)
+		*fatalErrors += message
+	}
 }
 
 // CheckIfBasePackage checks whether the package should be treated as a base R package

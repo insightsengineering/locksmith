@@ -33,6 +33,7 @@ var logLevel string
 var gitHubToken string
 var gitLabToken string
 var outputRenvLock string
+var allowIncompleteRenvLock string
 
 // In case the lists are provided as arrays in YAML configuration file:
 var inputPackages []string
@@ -93,13 +94,14 @@ in an renv.lock-compatible file.`,
 			fmt.Println("inputPackages =", inputPackages)
 			fmt.Println("inputRepositories =", inputRepositories)
 			fmt.Println("outputRenvLock =", outputRenvLock)
+			fmt.Println("allowIncompleteRenvLock =", allowIncompleteRenvLock)
 
-			packageDescriptionList, repositoryList, repositoryMap := ParseInput()
+			packageDescriptionList, repositoryList, repositoryMap, allowedMissingDependencyTypes := ParseInput()
 			inputDescriptionFiles := DownloadDescriptionFiles(packageDescriptionList, DownloadTextFile)
 			inputPackages := ParseDescriptionFileList(inputDescriptionFiles)
 			repositoryPackagesFiles := DownloadPackagesFiles(repositoryList, DownloadTextFile)
 			packagesFiles := ParsePackagesFiles(repositoryPackagesFiles)
-			outputPackageList := ConstructOutputPackageList(inputPackages, packagesFiles, repositoryList)
+			outputPackageList := ConstructOutputPackageList(inputPackages, packagesFiles, repositoryList, allowedMissingDependencyTypes)
 			renvLock := GenerateRenvLock(outputPackageList, repositoryMap)
 			writeJSON(outputRenvLock, renvLock)
 		},
@@ -118,6 +120,10 @@ in an renv.lock-compatible file.`,
 		"Token to download non-public files from GitLab.")
 	rootCmd.PersistentFlags().StringVar(&outputRenvLock, "outputRenvLock", "renv.lock",
 		"File name to save the output renv.lock file.")
+	rootCmd.PersistentFlags().StringVar(&allowIncompleteRenvLock, "allowIncompleteRenvLock", "",
+		"Locksmith will fail if any of dependencies of input packages cannot be found in the repositories. "+
+			"However, it will not fail for comma-separated dependency types listed in this argument, e.g.: "+
+			"'Imports,Depends,Suggests,LinkingTo'")
 
 	// Add version command.
 	rootCmd.AddCommand(extension.NewVersionCobraCmd())
@@ -173,6 +179,7 @@ func initializeConfig() {
 		"gitHubToken",
 		"gitLabToken",
 		"outputRenvLock",
+		"allowIncompleteRenvLock",
 	} {
 		// If the flag has not been set in newRootCommand() and it has been set in initConfig().
 		// In other words: if it's not been provided in command line, but has been

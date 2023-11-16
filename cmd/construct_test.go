@@ -381,7 +381,7 @@ func Test_ConstructOutputPackageList(t *testing.T) {
 				"", "", "", "", "", "", "",
 			},
 		},
-		packagesFiles, repositoryList,
+		packagesFiles, repositoryList, []string{},
 	)
 	assert.Equal(t, outputPackageList,
 		[]PackageDescription{
