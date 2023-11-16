@@ -1,0 +1,23 @@
+name: GPT Code Review 🤖
+
+permissions:
+  contents: read
+  pull-requests: write
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+
+jobs:
+  review:
+    name: GPT Code Review 🤖
+    runs-on: ubuntu-latest
+    steps:
+      - name: GPT Code Review 🤖
+        uses: anc95/ChatGPT-CodeReview@main
+        env:
+          GITHUB_TOKEN: "${{ secrets.REPO_GITHUB_TOKEN }}"
+          OPENAI_API_KEY: "${{ secrets.OPENAI_API_KEY }}"
