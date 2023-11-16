@@ -15,7 +15,7 @@ For additional information about `renv.lock`, please refer to the [`renv` docume
 
 Simply download the project for your distribution from the
 [releases](https://github.com/insightsengineering/locksmith/releases) page. `locksmith` is
-distributed as a single binary file and does not require any additional system requirements.
+distributed as a single binary file and does not need any additional system requirements.
 
 Alternatively, you can install the latest version by running:
 
@@ -46,7 +46,7 @@ easily in a configuration file.
 locksmith --inputPackageList https://raw.githubusercontent.com/insightsengineering/formatters/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/rtables/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/scda/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/scda.2022/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/nestcolor/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/tern/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/rlistings/main/DESCRIPTION,https://gitlab.example.com/projectgroup/projectsubgroup/projectname/-/raw/main/DESCRIPTION --inputRepositoryList BioC=https://bioconductor.org/packages/release/bioc,CRAN=https://cran.rstudio.com
 ```
 
-In order to download the packages from GitHub or GitLab repositories, please set the environment
+In order to download the packages from non-public GitHub or GitLab repositories, please set the environment
 variables containing the Personal Access Tokens.
 
 * For GitHub, set the `LOCKSMITH_GITHUBTOKEN` environment variable.
@@ -87,10 +87,20 @@ as opposed to `inputPackageList` and `inputRepositoryList` CLI flags/YAML keys.
 Additionally, `inputPackageList`/`inputRepositoryList` CLI flags take precendence over
 `inputPackages`/`inputRepositories` YAML keys.
 
+## Environment variables
+
+`locksmith` reads environment variables with `LOCKSMITH_` prefix and tries to match them with CLI
+flags. For example, setting the following variables will override the respective values from the
+configuration file: `LOCKSMITH_LOGLEVEL`, `LOCKSMITH_INPUTPACKAGELIST`, `LOCKSMITH_INPUTREPOSITORYLIST` etc.
+
+The order of precedence is:
+
+CLI flag → environment variable → configuration file → default value.
+
 ## Binary dependencies
 
 For `locksmith` in order to generate an `renv.lock` with binary R packages,
-it is necessary to provide URLs to binary repositories in `inputRepositories`/`inputRepositoryList`.
+it is necessary to provide URLs to binary repositories via `inputRepositories`/`inputRepositoryList`.
 
 Examples illustrating the expected format of URLs to repositories with binary packages:
 
@@ -140,16 +150,6 @@ Simply list the types of dependencies which should not cause the `renv.lock` gen
 ```bash
 locksmith --allowIncompleteRenvLock 'Imports,Depends,Suggests,LinkingTo'
 ```
-
-## Environment variables
-
-`locksmith` reads environment variables with `LOCKSMITH_` prefix and tries to match them with CLI
-flags. For example, setting the following variables will override the respective values from the
-configuration file: `LOCKSMITH_LOGLEVEL`, `LOCKSMITH_EXAMPLEPARAMETER` etc.
-
-The order of precedence is:
-
-CLI flag → environment variable → configuration file → default value.
 
 ## Development
 
