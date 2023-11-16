@@ -27,6 +27,7 @@ func ConstructOutputPackageList(packages []PackageDescription, packagesFiles map
 	repositoryList []string, allowedMissingDependencyTypes []string) []PackageDescription {
 	var outputPackageList []PackageDescription
 	var fatalErrors string
+	var nonFatalErrors string
 	// Add all input packages to output list, as the packages should be downloaded from git repositories.
 	for _, p := range packages {
 		outputPackageList = append(outputPackageList, PackageDescription{
@@ -45,7 +46,7 @@ func ConstructOutputPackageList(packages []PackageDescription, packagesFiles map
 					ResolveDependenciesRecursively(
 						&outputPackageList, d.DependencyName, d.VersionOperator,
 						d.VersionValue, d.DependencyType, allowedMissingDependencyTypes,
-						repositoryList, packagesFiles, 1, &fatalErrors,
+						repositoryList, packagesFiles, 1, &fatalErrors, &nonFatalErrors,
 					)
 				}
 			}
@@ -53,6 +54,9 @@ func ConstructOutputPackageList(packages []PackageDescription, packagesFiles map
 	}
 	if fatalErrors != "" {
 		log.Fatal(fatalErrors)
+	}
+	if nonFatalErrors != "" {
+		log.Error(nonFatalErrors)
 	}
 	return outputPackageList
 }
@@ -63,7 +67,8 @@ func ConstructOutputPackageList(packages []PackageDescription, packagesFiles map
 // Repeats the process recursively for all dependencies not yet processed.
 func ResolveDependenciesRecursively(outputList *[]PackageDescription, name string, versionOperator string,
 	versionValue string, dependencyType string, allowedMissingDependencyTypes []string,
-	repositoryList []string, packagesFiles map[string]PackagesFile, recursionLevel int, fatalErrors *string) {
+	repositoryList []string, packagesFiles map[string]PackagesFile, recursionLevel int,
+	fatalErrors *string, nonFatalErrors *string) {
 	var indentation string
 	for i := 0; i < recursionLevel; i++ {
 		indentation += "  "
@@ -105,7 +110,7 @@ func ResolveDependenciesRecursively(outputList *[]PackageDescription, name strin
 							ResolveDependenciesRecursively(
 								outputList, d.DependencyName, d.VersionOperator, d.VersionValue,
 								d.DependencyType, allowedMissingDependencyTypes, repositoryList,
-								packagesFiles, recursionLevel+1, fatalErrors,
+								packagesFiles, recursionLevel+1, fatalErrors, nonFatalErrors,
 							)
 						}
 					}
@@ -122,6 +127,7 @@ func ResolveDependenciesRecursively(outputList *[]PackageDescription, name strin
 	message := "Could not find package " + name + versionConstraint + " in any of the repositories.\n"
 	if stringInSlice(dependencyType, allowedMissingDependencyTypes) {
 		log.Warn(indentation + message)
+		*nonFatalErrors += message
 	} else {
 		log.Error(indentation + message)
 		*fatalErrors += message
