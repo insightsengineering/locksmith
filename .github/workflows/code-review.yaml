@@ -17,10 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: GPT Code Review 🤖
-        uses: anc95/ChatGPT-CodeReview@main
+        uses: microsoft/gpt-review@v0.9.5
         env:
           GITHUB_TOKEN: "${{ secrets.REPO_GITHUB_TOKEN }}"
           OPENAI_API_KEY: "${{ secrets.OPENAI_API_KEY }}"
-          MODEL: gpt-3.5-turbo
-          top_p: 1
-          temperature: 1
