@@ -9,6 +9,8 @@ repositories (e.g. in a package manager, CRAN, BioConductor etc.), `locksmith` w
 the list of all dependencies and their versions required to make the input list of packages work.
 It will then save the result in an `renv.lock`-compatible file.
 
+For additional information about `renv.lock`, please refer to the [`renv` documentation](https://rstudio.github.io/renv/articles/renv.html).
+
 ## Installation
 
 Simply download the project for your distribution from the
