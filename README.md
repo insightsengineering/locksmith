@@ -43,7 +43,7 @@ Please see below for [an example](#configuration-file) how to set package and re
 easily in a configuration file.
 
 ```bash
-locksmith --inputPackageList https://raw.githubusercontent.com/insightsengineering/formatters/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/rtables/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/scda/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/scda.2022/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/nestcolor/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/tern/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/rlistings/main/DESCRIPTION,https://gitlab.example.com/projectgroup/projectsubgroup/projectname/-/raw/main/DESCRIPTION --inputRepositoryList BioC=https://bioconductor.org/packages/release/bioc,CRAN=https://cran.rstudio.com
+locksmith --inputPackageList https://raw.githubusercontent.com/insightsengineering/formatters/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/rtables/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/scda/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/scda.2022/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/nestcolor/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/tern/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/rlistings/main/DESCRIPTION,https://gitlab.example.com/api/v4/projects/123456/repository/files/DESCRIPTION/raw?ref=main,https://gitlab.example.com/api/v4/projects/234567/repository/files/directory%2Fsubdirectory%2FDESCRIPTION/raw?ref=main --inputRepositoryList BioC=https://bioconductor.org/packages/release/bioc,CRAN=https://cran.rstudio.com
 ```
 
 In order to download the packages from non-public GitHub or GitLab repositories, please set the environment
@@ -75,7 +75,8 @@ inputPackages:
   - https://raw.githubusercontent.com/insightsengineering/rtables/main/DESCRIPTION
   - https://raw.githubusercontent.com/insightsengineering/scda/main/DESCRIPTION
   - https://raw.githubusercontent.com/insightsengineering/scda.2022/main/DESCRIPTION
-  - https://gitlab.example.com/projectgroup/projectsubgroup/projectname/-/raw/main/DESCRIPTION
+  - https://gitlab.example.com/api/v4/projects/123456/repository/files/DESCRIPTION/raw?ref=main
+  - https://gitlab.example.com/api/v4/projects/234567/repository/files/directory%2Fsubdirectory%2FDESCRIPTION/raw?ref=main
 inputRepositories:
   - Bioconductor.BioCsoft=https://bioconductor.org/packages/release/bioc
   - CRAN=https://cran.rstudio.com
