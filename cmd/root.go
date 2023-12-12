@@ -106,21 +106,21 @@ in an renv.lock-compatible file.`,
 			writeJSON(outputRenvLock, renvLock)
 		},
 	}
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "",
+	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "",
 		"config file (default is $HOME/.locksmith.yaml)")
-	rootCmd.PersistentFlags().StringVar(&logLevel, "logLevel", "info",
+	rootCmd.PersistentFlags().StringVarP(&logLevel, "logLevel", "l", "info",
 		"Logging level (trace, debug, info, warn, error). ")
-	rootCmd.PersistentFlags().StringVar(&inputPackageList, "inputPackageList", "",
+	rootCmd.PersistentFlags().StringVarP(&inputPackageList, "inputPackageList", "p", "",
 		"Comma-separated list of URLs for raw DESCRIPTION files in git repositories for input packages.")
-	rootCmd.PersistentFlags().StringVar(&inputRepositoryList, "inputRepositoryList", "",
+	rootCmd.PersistentFlags().StringVarP(&inputRepositoryList, "inputRepositoryList", "r", "",
 		"Comma-separated list of package repositories URLs, sorted according to their priorities (descending).")
-	rootCmd.PersistentFlags().StringVar(&gitHubToken, "gitHubToken", "",
+	rootCmd.PersistentFlags().StringVarP(&gitHubToken, "gitHubToken", "t", "",
 		"Token to download non-public files from GitHub.")
-	rootCmd.PersistentFlags().StringVar(&gitLabToken, "gitLabToken", "",
+	rootCmd.PersistentFlags().StringVarP(&gitLabToken, "gitLabToken", "g", "",
 		"Token to download non-public files from GitLab.")
-	rootCmd.PersistentFlags().StringVar(&outputRenvLock, "outputRenvLock", "renv.lock",
+	rootCmd.PersistentFlags().StringVarP(&outputRenvLock, "outputRenvLock", "o", "renv.lock",
 		"File name to save the output renv.lock file.")
-	rootCmd.PersistentFlags().StringVar(&allowIncompleteRenvLock, "allowIncompleteRenvLock", "",
+	rootCmd.PersistentFlags().StringVarP(&allowIncompleteRenvLock, "allowIncompleteRenvLock", "i", "",
 		"Locksmith will fail if any of dependencies of input packages cannot be found in the repositories. "+
 			"However, it will not fail for comma-separated dependency types listed in this argument, e.g.: "+
 			"'Imports,Depends,Suggests,LinkingTo'")
