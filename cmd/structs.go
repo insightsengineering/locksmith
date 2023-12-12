@@ -97,3 +97,8 @@ type Dependency struct {
 	VersionOperator string `json:"operator"`
 	VersionValue    string `json:"value"`
 }
+
+type DependencyVersion struct {
+	VersionOperator string `json:"operator"`
+	VersionValue    string `json:"value"`
+}
