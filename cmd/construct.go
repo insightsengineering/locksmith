@@ -26,8 +26,8 @@ import (
 func ConstructOutputPackageList(packages []PackageDescription, packagesFiles map[string]PackagesFile,
 	repositoryList []string, allowedMissingDependencyTypes []string) []PackageDescription {
 	var outputPackageList []PackageDescription
-	var fatalErrors string
-	var nonFatalErrors string
+	fatalErrors := make(map[string]bool)
+	nonFatalErrors := make(map[string]bool)
 	// Add all input packages to output list, as the packages should be downloaded from git repositories.
 	for _, p := range packages {
 		outputPackageList = append(outputPackageList, PackageDescription{
@@ -46,17 +46,25 @@ func ConstructOutputPackageList(packages []PackageDescription, packagesFiles map
 					ResolveDependenciesRecursively(
 						&outputPackageList, d.DependencyName, d.VersionOperator,
 						d.VersionValue, d.DependencyType, allowedMissingDependencyTypes,
-						repositoryList, packagesFiles, 1, &fatalErrors, &nonFatalErrors,
+						repositoryList, packagesFiles, 1, fatalErrors, nonFatalErrors,
 					)
 				}
 			}
 		}
 	}
-	if fatalErrors != "" {
-		log.Fatal(fatalErrors)
+	var fatalErrorsString string
+	for fe, _ := range fatalErrors {
+		fatalErrorsString += fe
 	}
-	if nonFatalErrors != "" {
-		log.Error(nonFatalErrors)
+	if fatalErrorsString != "" {
+		log.Fatal(fatalErrorsString)
+	}
+	var nonFatalErrorsString string
+	for nfe, _ := range nonFatalErrors {
+		nonFatalErrorsString += nfe
+	}
+	if nonFatalErrorsString != "" {
+		log.Error(nonFatalErrorsString)
 	}
 	return outputPackageList
 }
@@ -68,7 +76,7 @@ func ConstructOutputPackageList(packages []PackageDescription, packagesFiles map
 func ResolveDependenciesRecursively(outputList *[]PackageDescription, name string, versionOperator string,
 	versionValue string, dependencyType string, allowedMissingDependencyTypes []string,
 	repositoryList []string, packagesFiles map[string]PackagesFile, recursionLevel int,
-	fatalErrors *string, nonFatalErrors *string) {
+	fatalErrors map[string]bool, nonFatalErrors map[string]bool) {
 	var indentation string
 	for i := 0; i < recursionLevel; i++ {
 		indentation += "  "
@@ -127,10 +135,10 @@ func ResolveDependenciesRecursively(outputList *[]PackageDescription, name strin
 	message := "Could not find package " + name + versionConstraint + " in any of the repositories.\n"
 	if stringInSlice(dependencyType, allowedMissingDependencyTypes) {
 		log.Warn(indentation + message)
-		*nonFatalErrors += message
+		nonFatalErrors[message] = true
 	} else {
 		log.Error(indentation + message)
-		*fatalErrors += message
+		fatalErrors[message] = true
 	}
 }
 
