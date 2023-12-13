@@ -332,6 +332,12 @@ func Test_ConstructOutputPackageList(t *testing.T) {
 						"",
 						"",
 					},
+					{
+						"LinkingTo",
+						"nonExistentPackage2",
+						">=",
+						"1.0.0",
+					},
 				},
 				"", "", "", "", "", "", "",
 			},
@@ -389,7 +395,8 @@ func Test_ConstructOutputPackageList(t *testing.T) {
 		},
 		packagesFiles, repositoryList,
 		// Let the generation of renv.lock proceed, despite 'nonExistentPackage'
-		// (dependency type LinkingTo) not being found in any repository.
+		// and 'nonExistentPackage2' (dependency type LinkingTo) not being found
+		// in any repository.
 		[]string{"LinkingTo"},
 	)
 	assert.Equal(t, outputPackageList,

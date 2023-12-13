@@ -20,14 +20,16 @@ import (
 	"strings"
 )
 
+const lowestPossiblePackageVersion = "0.0.0.0"
+
 // ConstructOutputPackageList generates a list of all packages and their dependencies
 // which should be included in the output renv.lock file,
 // based on the list of package descriptions, and information contained in the PACKAGES files.
 func ConstructOutputPackageList(packages []PackageDescription, packagesFiles map[string]PackagesFile,
 	repositoryList []string, allowedMissingDependencyTypes []string) []PackageDescription {
 	var outputPackageList []PackageDescription
-	var fatalErrors string
-	var nonFatalErrors string
+	fatalMissingPackageVersions := make(map[string]DependencyVersion)
+	nonFatalMissingPackageVersions := make(map[string]DependencyVersion)
 	// Add all input packages to output list, as the packages should be downloaded from git repositories.
 	for _, p := range packages {
 		outputPackageList = append(outputPackageList, PackageDescription{
@@ -46,17 +48,38 @@ func ConstructOutputPackageList(packages []PackageDescription, packagesFiles map
 					ResolveDependenciesRecursively(
 						&outputPackageList, d.DependencyName, d.VersionOperator,
 						d.VersionValue, d.DependencyType, allowedMissingDependencyTypes,
-						repositoryList, packagesFiles, 1, &fatalErrors, &nonFatalErrors,
+						repositoryList, packagesFiles, 1, fatalMissingPackageVersions,
+						nonFatalMissingPackageVersions,
 					)
 				}
 			}
 		}
 	}
-	if fatalErrors != "" {
-		log.Fatal(fatalErrors)
+	errorsString := "Packages not found in any repository:\n"
+	for packageName, versionConstraint := range nonFatalMissingPackageVersions {
+		var versionConstraintString string
+		if versionConstraint.VersionValue != lowestPossiblePackageVersion {
+			versionConstraintString = (" " +
+				versionConstraint.VersionOperator + " " +
+				versionConstraint.VersionValue)
+		}
+		errorsString += packageName + versionConstraintString + "\n"
 	}
-	if nonFatalErrors != "" {
-		log.Error(nonFatalErrors)
+	if len(errorsString) > len("Packages not found in any repository:\n") {
+		log.Error(errorsString)
+	}
+	errorsString = "Packages not found in any repository:\n"
+	for packageName, versionConstraint := range fatalMissingPackageVersions {
+		var versionConstraintString string
+		if versionConstraint.VersionValue != lowestPossiblePackageVersion {
+			versionConstraintString = (" " +
+				versionConstraint.VersionOperator + " " +
+				versionConstraint.VersionValue)
+		}
+		errorsString += packageName + versionConstraintString + "\n"
+	}
+	if len(errorsString) > len("Packages not found in any repository:\n") {
+		log.Fatal(errorsString)
 	}
 	return outputPackageList
 }
@@ -68,7 +91,8 @@ func ConstructOutputPackageList(packages []PackageDescription, packagesFiles map
 func ResolveDependenciesRecursively(outputList *[]PackageDescription, name string, versionOperator string,
 	versionValue string, dependencyType string, allowedMissingDependencyTypes []string,
 	repositoryList []string, packagesFiles map[string]PackagesFile, recursionLevel int,
-	fatalErrors *string, nonFatalErrors *string) {
+	fatalMissingPackageVersions map[string]DependencyVersion,
+	nonFatalMissingPackageVersions map[string]DependencyVersion) {
 	var indentation string
 	for i := 0; i < recursionLevel; i++ {
 		indentation += "  "
@@ -110,7 +134,8 @@ func ResolveDependenciesRecursively(outputList *[]PackageDescription, name strin
 							ResolveDependenciesRecursively(
 								outputList, d.DependencyName, d.VersionOperator, d.VersionValue,
 								d.DependencyType, allowedMissingDependencyTypes, repositoryList,
-								packagesFiles, recursionLevel+1, fatalErrors, nonFatalErrors,
+								packagesFiles, recursionLevel+1, fatalMissingPackageVersions,
+								nonFatalMissingPackageVersions,
 							)
 						}
 					}
@@ -120,17 +145,48 @@ func ResolveDependenciesRecursively(outputList *[]PackageDescription, name strin
 			}
 		}
 	}
+	ProcessMissingPackage(
+		indentation, name, versionOperator, versionValue, dependencyType,
+		allowedMissingDependencyTypes, fatalMissingPackageVersions,
+		nonFatalMissingPackageVersions,
+	)
+}
+
+// ProcessMissingPackage saves information about missing packages (dependencies) and their versions.
+// This information is later reported to the user, together with optionally exiting the application
+// with failed status, depending on the types of missing dependencies and the configuration
+// provided by --allowIncompleteRenvLock flag.
+func ProcessMissingPackage(indentation string, packageName string, versionOperator string,
+	versionValue string, dependencyType string, allowedMissingDependencyTypes []string,
+	fatalMissingPackageVersions map[string]DependencyVersion,
+	nonFatalMissingPackageVersions map[string]DependencyVersion) {
 	var versionConstraint string
 	if versionOperator != "" && versionValue != "" {
 		versionConstraint = " (version " + versionOperator + " " + versionValue + ")"
+	} else {
+		versionOperator = ">="
+		versionValue = lowestPossiblePackageVersion
 	}
-	message := "Could not find package " + name + versionConstraint + " in any of the repositories.\n"
+	message := "Could not find package " + packageName + versionConstraint + " in any of the repositories.\n"
 	if stringInSlice(dependencyType, allowedMissingDependencyTypes) {
 		log.Warn(indentation + message)
-		*nonFatalErrors += message
+		val, ok := nonFatalMissingPackageVersions[packageName]
+		if !ok || (ok && !CheckIfVersionSufficient(val.VersionValue, versionOperator, versionValue)) {
+			// This is the first time we see this package as a missing dependency, or
+			// some other package already requires this missing dependency in a lower version
+			// and the currently processed package requires it in a higher version,
+			// so the current requirement is more important.
+			nonFatalMissingPackageVersions[packageName] = DependencyVersion{versionOperator, versionValue}
+			log.Trace("Adding package ", packageName, " ", versionOperator, " ", versionValue, " to missing packages list.")
+		}
 	} else {
 		log.Error(indentation + message)
-		*fatalErrors += message
+		val, ok := fatalMissingPackageVersions[packageName]
+		if !ok || (ok && !CheckIfVersionSufficient(val.VersionValue, versionOperator, versionValue)) {
+			// See a comment above for explanation of this condition.
+			fatalMissingPackageVersions[packageName] = DependencyVersion{versionOperator, versionValue}
+			log.Trace("Adding package ", packageName, " ", versionOperator, " ", versionValue, " to missing packages list.")
+		}
 	}
 }
 
