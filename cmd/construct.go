@@ -176,19 +176,15 @@ func ProcessMissingPackage(indentation string, packageName string, versionOperat
 			// some other package already requires this missing dependency in a lower version
 			// and the currently processed package requires it in a higher version,
 			// so the current requirement is more important.
-			nonFatalMissingPackageVersions[packageName] = DependencyVersion{
-				versionOperator, versionValue,
-			}
+			nonFatalMissingPackageVersions[packageName] = DependencyVersion{versionOperator, versionValue}
 			log.Trace("Adding package ", packageName, " ", versionOperator, " ", versionValue, " to missing packages list.")
 		}
 	} else {
 		log.Error(indentation + message)
 		val, ok := fatalMissingPackageVersions[packageName]
 		if !ok || (ok && !CheckIfVersionSufficient(val.VersionValue, versionOperator, versionValue)) {
-			// See a comment above for explanation of this contidion.
-			fatalMissingPackageVersions[packageName] = DependencyVersion{
-				versionOperator, versionValue,
-			}
+			// See a comment above for explanation of this condition.
+			fatalMissingPackageVersions[packageName] = DependencyVersion{versionOperator, versionValue}
 			log.Trace("Adding package ", packageName, " ", versionOperator, " ", versionValue, " to missing packages list.")
 		}
 	}
