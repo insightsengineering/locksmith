@@ -72,7 +72,7 @@ func ProcessPackagesFile(content string) PackagesFile {
 			allPackages.Packages,
 			PackageDescription{
 				packageName, packageMap["Version"], "", "", packageDependencies,
-				"", "", "", "", "", "", "",
+				"", "", "", "", "", "", "", []string{},
 			},
 		)
 	}
@@ -94,7 +94,7 @@ func ProcessDescription(description DescriptionFile, allPackages *[]PackageDescr
 		PackageDescription{
 			packageMap["Package"], packageMap["Version"], description.PackageSource, "", packageDependencies,
 			description.RemoteType, description.RemoteHost, description.RemoteUsername, description.RemoteRepo,
-			description.RemoteSubdir, description.RemoteRef, description.RemoteSha,
+			description.RemoteSubdir, description.RemoteRef, description.RemoteSha, []string{},
 		},
 	)
 }

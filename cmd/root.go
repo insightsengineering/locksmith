@@ -144,11 +144,11 @@ in an renv.lock-compatible file.`,
 		"Locksmith will fail if any of dependencies of input packages cannot be found in the repositories. "+
 			"However, it will not fail for comma-separated dependency types listed in this argument, e.g.: "+
 			"'Imports,Depends,Suggests,LinkingTo'")
-	rootCmd.PersistentFlags().StringVar(&updatePackages, "updatePackages", "",
+	rootCmd.PersistentFlags().StringVar(&updatePackages, "updatePackages", "*",
 		"Expression with wildcards indicating which packages from the inputRenvLock should be updated to the newest version. "+
 			"The expression follows the pattern: \"expression1,expression2,...\" where \"expressionN\" can be: "+
 			"literal package name and/or * symbol(s) meaning any set of characters. Example: "+
-			`'package*,*abc,a*b,someOtherPackage'`)
+			`'package*,*abc,a*b,someOtherPackage'. By default all packages are updated.`)
 
 	// Add version command.
 	rootCmd.AddCommand(extension.NewVersionCobraCmd())
