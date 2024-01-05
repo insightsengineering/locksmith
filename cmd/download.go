@@ -179,10 +179,10 @@ func ProcessDescriptionURL(descriptionURL string,
 		}
 		remoteType = "gitlab"
 		packageSource = "GitLab"
-		shorterURL := strings.TrimPrefix(descriptionURL, "https://")
-		remoteHost = "https://" + strings.Split(shorterURL, "/")[0]
+		shorterURL := strings.TrimPrefix(descriptionURL, https)
+		remoteHost = https + strings.Split(shorterURL, "/")[0]
 		remoteRef = strings.TrimPrefix(re.FindString(descriptionURL), "ref=")
-		projectURL := "https://" + strings.Join(strings.Split(shorterURL, "/")[0:5], "/")
+		projectURL := https + strings.Join(strings.Split(shorterURL, "/")[0:5], "/")
 		descriptionPath := strings.Split(shorterURL, "/")[7]
 		// Check whether package is stored in a subdirectory of the git repository.
 		if strings.Contains(descriptionPath, "%2F") {

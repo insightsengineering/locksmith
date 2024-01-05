@@ -42,7 +42,7 @@ func Test_ProcessPackagesFile(t *testing.T) {
 							"2.15.0",
 						},
 					},
-					"", "", "", "", "", "", "",
+					"", "", "", "", "", "", "", []string{},
 				},
 				{
 					"somePackage2",
@@ -68,7 +68,7 @@ func Test_ProcessPackagesFile(t *testing.T) {
 							"",
 						},
 					},
-					"", "", "", "", "", "", "",
+					"", "", "", "", "", "", "", []string{},
 				},
 				{
 					"somePackage3",
@@ -106,7 +106,7 @@ func Test_ProcessPackagesFile(t *testing.T) {
 							"1.22",
 						},
 					},
-					"", "", "", "", "", "", "",
+					"", "", "", "", "", "", "", []string{},
 				},
 				{
 					"somePackage4",
@@ -150,7 +150,7 @@ func Test_ProcessPackagesFile(t *testing.T) {
 							"7.1.0",
 						},
 					},
-					"", "", "", "", "", "", "",
+					"", "", "", "", "", "", "", []string{},
 				},
 			},
 		},
@@ -278,7 +278,7 @@ func Test_ParseDescriptionFileList(t *testing.T) {
 						"",
 					},
 				},
-				"", "", "", "", "", "", "",
+				"", "", "", "", "", "", "", []string{},
 			},
 			{
 				"my.awesome.package.2",
@@ -395,7 +395,7 @@ func Test_ParseDescriptionFileList(t *testing.T) {
 						"1.0.0",
 					},
 				},
-				"", "", "", "", "", "", "",
+				"", "", "", "", "", "", "", []string{},
 			},
 		},
 	)
