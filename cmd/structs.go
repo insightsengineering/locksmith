@@ -79,7 +79,7 @@ type PackageDescription struct {
 	// of the package repository, in case Source is 'Repository'.
 	Repository string `json:"Repository,omitempty"`
 	// Dependencies contains the list of package dependencies.
-	Dependencies []Dependency `json:"Requirements,omitempty"`
+	Dependencies []Dependency
 	// When processing packages stored in package repositories, the Remote* fields below are empty.
 	// These fields are documented in the DescriptionFile struct.
 	RemoteType     string `json:"RemoteType,omitempty"`
@@ -89,9 +89,9 @@ type PackageDescription struct {
 	RemoteSubdir   string `json:"RemoteSubdir,omitempty"`
 	RemoteRef      string `json:"RemoteRef,omitempty"`
 	RemoteSha      string `json:"RemoteSha,omitempty"`
-	// Requirements field is not used, except to successfully unmarshal renv.lock JSON in which
+	// Requirements field is not used, except to be able to unmarshal renv.lock JSON in which
 	// this field is present.
-	Requirements   []string `json:"Requirements,omitempty"`
+	Requirements []string `json:"Requirements,omitempty"`
 }
 
 type Dependency struct {

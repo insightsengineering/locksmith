@@ -133,7 +133,7 @@ func GetDefaultBranchSha(gitDirectory string, repoURL string,
 	checkError(err)
 	var gitCloneOptions *git.CloneOptions
 	switch {
-	case environmentCredentialsType == gitlab:
+	case environmentCredentialsType == GitLab:
 		gitCloneOptions = &git.CloneOptions{
 			URL: repoURL,
 			Auth: &githttp.BasicAuth{
@@ -142,18 +142,13 @@ func GetDefaultBranchSha(gitDirectory string, repoURL string,
 			},
 			Depth: 1,
 		}
-	case environmentCredentialsType == github:
+	case environmentCredentialsType == GitHub:
 		gitCloneOptions = &git.CloneOptions{
 			URL: repoURL,
 			Auth: &githttp.BasicAuth{
 				Username: "This can be any string.",
 				Password: os.Getenv("LOCKSMITH_GITHUBTOKEN"),
 			},
-			Depth: 1,
-		}
-	default:
-		gitCloneOptions = &git.CloneOptions{
-			URL:   repoURL,
 			Depth: 1,
 		}
 	}
@@ -183,17 +178,9 @@ func UpdateGitPackages(renvLock *RenvLock, updatePackageRegexp string) {
 		if match && (v.Source == GitLab || v.Source == GitHub) {
 			log.Trace("Package ", k, " matches updated packages regexp ",
 				updatePackageRegexp)
-			var credentialsType string
-			if v.Source == GitLab {
-				credentialsType = gitlab
-			} else if v.Source == GitHub {
-				credentialsType = github
-			}
 			// Clone package's default branch.
 			newPackageSha := GetDefaultBranchSha(
-				gitUpdatesDirectory+k,
-				GetGitRepositoryURL(v),
-				credentialsType,
+				gitUpdatesDirectory+k, GetGitRepositoryURL(v), v.Source,
 			)
 			// Read newest package version from DESCRIPTION.
 			var remoteSubdir string
