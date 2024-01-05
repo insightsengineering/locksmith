@@ -20,6 +20,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"runtime"
 
 	"github.com/jamiealquiza/envy"
 	"github.com/sirupsen/logrus"
@@ -32,8 +33,10 @@ var cfgFile string
 var logLevel string
 var gitHubToken string
 var gitLabToken string
+var inputRenvLock string
 var outputRenvLock string
 var allowIncompleteRenvLock string
+var updatePackages string
 
 // In case the lists are provided as arrays in YAML configuration file:
 var inputPackages []string
@@ -43,6 +46,8 @@ var inputRepositories []string
 // via CLI flag or in an environment variable:
 var inputPackageList string
 var inputRepositoryList string
+
+var localTempDirectory string
 
 var log = logrus.New()
 
@@ -93,17 +98,30 @@ in an renv.lock-compatible file.`,
 			fmt.Println("inputRepositoryList =", inputRepositoryList)
 			fmt.Println("inputPackages =", inputPackages)
 			fmt.Println("inputRepositories =", inputRepositories)
+			fmt.Println("inputRenvLock =", inputRenvLock)
 			fmt.Println("outputRenvLock =", outputRenvLock)
 			fmt.Println("allowIncompleteRenvLock =", allowIncompleteRenvLock)
+			fmt.Println("updatePackages =", updatePackages)
 
-			packageDescriptionList, repositoryList, repositoryMap, allowedMissingDependencyTypes := ParseInput()
-			inputDescriptionFiles := DownloadDescriptionFiles(packageDescriptionList, DownloadTextFile)
-			inputPackages := ParseDescriptionFileList(inputDescriptionFiles)
-			repositoryPackagesFiles := DownloadPackagesFiles(repositoryList, DownloadTextFile)
-			packagesFiles := ParsePackagesFiles(repositoryPackagesFiles)
-			outputPackageList := ConstructOutputPackageList(inputPackages, packagesFiles, repositoryList, allowedMissingDependencyTypes)
-			renvLock := GenerateRenvLock(outputPackageList, repositoryMap)
-			writeJSON(outputRenvLock, renvLock)
+			if runtime.GOOS == "windows" {
+				localTempDirectory = os.Getenv("TMP") + `\tmp\locksmith`
+			} else {
+				localTempDirectory = "/tmp/locksmith"
+			}
+
+			if inputRenvLock != "" {
+				renvLock := UpdateRenvLock(inputRenvLock, updatePackages)
+				writeJSON(outputRenvLock, renvLock)
+			} else {
+				packageDescriptionList, repositoryList, repositoryMap, allowedMissingDependencyTypes := ParseInput()
+				inputDescriptionFiles := DownloadDescriptionFiles(packageDescriptionList, DownloadTextFile)
+				inputPackages := ParseDescriptionFileList(inputDescriptionFiles)
+				repositoryPackagesFiles := DownloadPackagesFiles(repositoryList, DownloadTextFile)
+				packagesFiles := ParsePackagesFiles(repositoryPackagesFiles)
+				outputPackageList := ConstructOutputPackageList(inputPackages, packagesFiles, repositoryList, allowedMissingDependencyTypes)
+				renvLock := GenerateRenvLock(outputPackageList, repositoryMap)
+				writeJSON(outputRenvLock, renvLock)
+			}
 		},
 	}
 	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "",
@@ -118,12 +136,19 @@ in an renv.lock-compatible file.`,
 		"Token to download non-public files from GitHub.")
 	rootCmd.PersistentFlags().StringVarP(&gitLabToken, "gitLabToken", "g", "",
 		"Token to download non-public files from GitLab.")
+	rootCmd.PersistentFlags().StringVarP(&inputRenvLock, "inputRenvLock", "n", "input.renv.lock",
+		"Lockfile which should be read and updated to include the newest versions of the packages.")
 	rootCmd.PersistentFlags().StringVarP(&outputRenvLock, "outputRenvLock", "o", "renv.lock",
 		"File name to save the output renv.lock file.")
 	rootCmd.PersistentFlags().StringVarP(&allowIncompleteRenvLock, "allowIncompleteRenvLock", "i", "",
 		"Locksmith will fail if any of dependencies of input packages cannot be found in the repositories. "+
 			"However, it will not fail for comma-separated dependency types listed in this argument, e.g.: "+
 			"'Imports,Depends,Suggests,LinkingTo'")
+	rootCmd.PersistentFlags().StringVar(&updatePackages, "updatePackages", "",
+		"Expression with wildcards indicating which packages from the inputRenvLock should be updated to the newest version. "+
+			"The expression follows the pattern: \"expression1,expression2,...\" where \"expressionN\" can be: "+
+			"literal package name and/or * symbol(s) meaning any set of characters. Example: "+
+			`'package*,*abc,a*b,someOtherPackage'`)
 
 	// Add version command.
 	rootCmd.AddCommand(extension.NewVersionCobraCmd())
@@ -173,13 +198,8 @@ func Execute() {
 
 func initializeConfig() {
 	for _, v := range []string{
-		"logLevel",
-		"inputPackageList",
-		"inputRepositoryList",
-		"gitHubToken",
-		"gitLabToken",
-		"outputRenvLock",
-		"allowIncompleteRenvLock",
+		"logLevel", "inputPackageList", "inputRepositoryList", "gitHubToken", "gitLabToken",
+		"inputRenvLock", "outputRenvLock", "allowIncompleteRenvLock", "updatePackages",
 	} {
 		// If the flag has not been set in newRootCommand() and it has been set in initConfig().
 		// In other words: if it's not been provided in command line, but has been

@@ -88,6 +88,8 @@ as opposed to `inputPackageList` and `inputRepositoryList` CLI flags/YAML keys.
 Additionally, `inputPackageList`/`inputRepositoryList` CLI flags take precendence over
 `inputPackages`/`inputRepositories` YAML keys.
 
+Please note that package repository URLs should be provided without the trailing `/`.
+
 ## Environment variables
 
 `locksmith` reads environment variables with `LOCKSMITH_` prefix and tries to match them with CLI
@@ -100,7 +102,7 @@ CLI flag → environment variable → configuration file → default value.
 
 ## Binary dependencies
 
-For `locksmith` in order to generate an `renv.lock` with binary R packages,
+If `locksmith` should generate an `renv.lock` with binary R packages,
 it is necessary to provide URLs to binary repositories via `inputRepositories`/`inputRepositoryList`.
 
 Examples illustrating the expected format of URLs to repositories with binary packages:
@@ -120,7 +122,7 @@ Examples illustrating the expected format of URLs to repositories with binary pa
 
 where `<r-version>` is e.g. `4.2`, `4.3` etc.
 
-In all cases the URL points to a directory where the `PACKAGES` file is located.
+In all cases the URL points to a directory where the `PACKAGES` file is located, without the trailing `/`.
 
 As a result, the configuration file could look like this:
 
