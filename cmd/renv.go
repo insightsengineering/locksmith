@@ -242,7 +242,7 @@ func UpdateRepositoryPackages(renvLock *RenvLock, updatePackageRegexp string,
 			}
 		}
 		if newPackageVersion == "" {
-			log.Error("Could not find package ", k, " in PACKAGES file for ", v.Repository, " repository.")
+			log.Error(`Could not find package `, k, ` in PACKAGES file for "`, v.Repository, `" repository.`)
 			continue
 		}
 		if entry, ok := renvLock.Packages[k]; ok {
