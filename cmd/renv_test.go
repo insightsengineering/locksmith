@@ -184,3 +184,85 @@ func Test_GetGitRepositoryURL(t *testing.T) {
 	})
 	assert.Equal(t, repoURL3, "https://gitlab.example.com/org3/org4/repo-name-3")
 }
+
+func mockedGetDefaultBranchSha(_ string, repoURL string, _ string) string {
+	switch {
+	case repoURL == "https://github.com/group1/group2/package11":
+		return "eee111555bbbccc"
+	case repoURL == "https://gitlab.example.com/group3/group4/package12":
+		return "888444dddbbbaaa"
+	}
+	return ""
+}
+
+func Test_UpdateGitPackages(t *testing.T) {
+	renvLock := RenvLock{
+		RenvLockContents{
+			[]RenvLockRepository{
+				{"Repo1", "https://repo1.example.com/repo1"},
+			},
+		},
+		map[string]PackageDescription{
+			"package11": {
+				"package11",
+				"1.0.2",
+				"GitHub",
+				"",
+				[]Dependency{},
+				"github",
+				"api.github.com",
+				"group1/group2",
+				"package11",
+				"subdirectory1",
+				"main",
+				"aaabbb444333",
+				[]string{},
+			},
+			"package12": {
+				"package12",
+				"2.5.4.3",
+				"GitLab",
+				"",
+				[]Dependency{},
+				"gitlab",
+				"https://gitlab.example.com",
+				"group3/group4",
+				"package12",
+				"subdirectory2",
+				"v2.5.4.3",
+				"eee888222aaa",
+				[]string{},
+			},
+			"package3": {
+				"package3",
+				"3.2.7.8",
+				"Repository",
+				"Repo1",
+				[]Dependency{},
+				"", "", "", "", "", "", "", []string{},
+			},
+			"package4": {
+				"package4",
+				"3.7.0",
+				"GitLab",
+				"",
+				[]Dependency{},
+				"gitlab",
+				"https://gitlab.example.com",
+				"group6/group7",
+				"package4",
+				"",
+				"v3.7.0",
+				"ccceee444999",
+				[]string{},
+			},
+		},
+	}
+	UpdateGitPackages(&renvLock, "package1*", mockedGetDefaultBranchSha, "testdata/git_updates/")
+	assert.Equal(t, renvLock.Packages["package11"].Version, "1.0.4")
+	assert.Equal(t, renvLock.Packages["package12"].Version, "2.6.1.1")
+	assert.Equal(t, renvLock.Packages["package4"].Version, "3.7.0")
+	assert.Equal(t, renvLock.Packages["package11"].RemoteSha, "eee111555bbbccc")
+	assert.Equal(t, renvLock.Packages["package12"].RemoteSha, "888444dddbbbaaa")
+	assert.Equal(t, renvLock.Packages["package4"].RemoteSha, "ccceee444999")
+}

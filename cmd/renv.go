@@ -165,12 +165,9 @@ func GetDefaultBranchSha(gitDirectory string, repoURL string,
 // UpdateGitPackages iterates through the packages in renv.lock and updates the entries
 // corresponding to packages stored in git repositories. Package version and latest commit SHA
 // are updated in the renvLock struct. Only packages matching the updatePackageRegexp are updated.
-func UpdateGitPackages(renvLock *RenvLock, updatePackageRegexp string) {
-	gitUpdatesDirectory := localTempDirectory + "/git_updates/"
-	err := os.RemoveAll(gitUpdatesDirectory)
-	checkError(err)
-	err = os.MkdirAll(gitUpdatesDirectory, os.ModePerm)
-	checkError(err)
+func UpdateGitPackages(renvLock *RenvLock, updatePackageRegexp string,
+	getDefaultBranchShaFunction func(string, string, string) string,
+	gitUpdatesDirectory string) {
 	for k, v := range renvLock.Packages {
 		match, err := regexp.MatchString(updatePackageRegexp, k)
 		checkError(err)
@@ -183,7 +180,7 @@ func UpdateGitPackages(renvLock *RenvLock, updatePackageRegexp string) {
 		}
 		log.Trace("Package ", k, " matches updated packages regexp ",
 			updatePackageRegexp)
-		newPackageSha := GetDefaultBranchSha(
+		newPackageSha := getDefaultBranchShaFunction(
 			gitUpdatesDirectory+k, GetGitRepositoryURL(v), v.Source,
 		)
 		// Read newest package version from DESCRIPTION.
@@ -300,7 +297,12 @@ func UpdateRenvLock(inputFileName, updatePackages string) RenvLock {
 	checkError(err)
 
 	updatePackageRegex := GetPackageRegex(updatePackages)
-	UpdateGitPackages(&renvLock, updatePackageRegex)
+	gitUpdatesDirectory := localTempDirectory + "/git_updates/"
+	err = os.RemoveAll(gitUpdatesDirectory)
+	checkError(err)
+	err = os.MkdirAll(gitUpdatesDirectory, os.ModePerm)
+	checkError(err)
+	UpdateGitPackages(&renvLock, updatePackageRegex, GetDefaultBranchSha, gitUpdatesDirectory)
 	repositoryPackagesFiles := GetPackagesFiles(renvLock)
 	UpdateRepositoryPackages(&renvLock, updatePackageRegex, repositoryPackagesFiles)
 	return renvLock
