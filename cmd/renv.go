@@ -224,10 +224,12 @@ func UpdateRepositoryPackages(renvLock *RenvLock, updatePackageRegexp string,
 		}
 		log.Trace("Package ", k, " matches updated packages regexp ",
 			updatePackageRegexp)
+		var repositoryPackagesFile PackagesFile
 		repositoryPackagesFile, ok := packagesFiles[v.Repository]
 		if !ok {
-			log.Error("Could not retrieve PACKAGES file for ", v.Repository, " repository.")
-			continue
+			log.Error("Could not retrieve PACKAGES file for ", v.Repository, " repository.\n",
+				"Attempting to use CRAN's PACKAGES file as a fallback.")
+			repositoryPackagesFile = packagesFiles["CRAN"]
 		}
 		var newPackageVersion string
 		for _, singlePackage := range repositoryPackagesFile.Packages {
@@ -263,6 +265,19 @@ func GetPackagesFiles(renvLock RenvLock) map[string]PackagesFile {
 		packagesFileContent := GetPackagesFileContent(repositoryURL, DownloadTextFile)
 		packagesFile := ProcessPackagesFile(packagesFileContent)
 		repositoryPackagesFiles[repositoryName] = packagesFile
+	}
+
+	// Check if the PACKAGES file from a repository named CRAN has been downloaded.
+	_, ok := repositoryPackagesFiles["CRAN"]
+	if !ok {
+		// If not, save CRAN's PACKAGES file to be used as a fallback, for packages which
+		// (according to renv.lock) should be downloaded from a repository not defined in
+		// the renv.lock header.
+		_, _, cranPackagesContent := DownloadTextFile(
+			"https://cloud.r-project.org/src/contrib/PACKAGES", make(map[string]string),
+		)
+		cranPackagesFile := ProcessPackagesFile(cranPackagesContent)
+		repositoryPackagesFiles["CRAN"] = cranPackagesFile
 	}
 	return repositoryPackagesFiles
 }

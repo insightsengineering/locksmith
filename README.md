@@ -154,6 +154,10 @@ Simply list the types of dependencies which should not cause the `renv.lock` gen
 locksmith --allowIncompleteRenvLock 'Imports,Depends,Suggests,LinkingTo'
 ```
 
+## Updating existing `renv.lock`
+
+TODO
+
 ## Development
 
 This project is built with the [Go programming language](https://go.dev/).
