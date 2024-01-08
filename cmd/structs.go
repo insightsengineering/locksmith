@@ -79,7 +79,7 @@ type PackageDescription struct {
 	// of the package repository, in case Source is 'Repository'.
 	Repository string `json:"Repository,omitempty"`
 	// Dependencies contains the list of package dependencies.
-	Dependencies []Dependency
+	Dependencies []Dependency `json:"Dependencies,omitempty"`
 	// When processing packages stored in package repositories, the Remote* fields below are empty.
 	// These fields are documented in the DescriptionFile struct.
 	RemoteType     string `json:"RemoteType,omitempty"`
