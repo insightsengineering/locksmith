@@ -152,3 +152,35 @@ func Test_GenerateRenvLock(t *testing.T) {
 		},
 	})
 }
+
+func Test_GetPackageRegex(t *testing.T) {
+	packageRegex := GetPackageRegex("package*,*some.Package,test1,my*awesome*package")
+	assert.Equal(t, packageRegex, `^package.*$|^.*some\.Package$|^test1$|^my.*awesome.*package$`)
+}
+
+func Test_GetPackageVersionFromDescription(t *testing.T) {
+	version1 := GetPackageVersionFromDescription("testdata/DESCRIPTION1")
+	assert.Equal(t, version1, "0.14.0.9012")
+	version2 := GetPackageVersionFromDescription("testdata/DESCRIPTION2")
+	assert.Equal(t, version2, "0.9.1.9013")
+	version3 := GetPackageVersionFromDescription("testdata/NON_EXISTENT_DESCRIPTION")
+	assert.Equal(t, version3, "")
+}
+
+func Test_GetGitRepositoryURL(t *testing.T) {
+	repoURL1 := GetGitRepositoryURL(PackageDescription{
+		"", "", "GitHub", "", []Dependency{}, "",
+		"api.github.com", "github-org-1", "repo-name-1", "", "", "", []string{},
+	})
+	assert.Equal(t, repoURL1, "https://github.com/github-org-1/repo-name-1")
+	repoURL2 := GetGitRepositoryURL(PackageDescription{
+		"", "", "GitLab", "", []Dependency{}, "",
+		"https://gitlab.example.com", "org1/org2", "repo-name-2", "", "", "", []string{},
+	})
+	assert.Equal(t, repoURL2, "https://gitlab.example.com/org1/org2/repo-name-2")
+	repoURL3 := GetGitRepositoryURL(PackageDescription{
+		"", "", "GitLab", "", []Dependency{}, "",
+		"gitlab.example.com", "org3/org4", "repo-name-3", "", "", "", []string{},
+	})
+	assert.Equal(t, repoURL3, "https://gitlab.example.com/org3/org4/repo-name-3")
+}
