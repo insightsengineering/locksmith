@@ -194,15 +194,18 @@ func UpdateGitPackages(renvLock *RenvLock, updatePackageRegexp string) {
 		newPackageVersion := GetPackageVersionFromDescription(
 			gitUpdatesDirectory + k + remoteSubdir + "/DESCRIPTION")
 		if entry, ok := renvLock.Packages[k]; ok && newPackageSha != "" && newPackageVersion != "" {
-			// Update the renv structure with new version only if the current
-			// default branch SHA and current package version could be retrieved.
-			log.Info("Updating package ", k, " version: ",
-				entry.Version, " → ", newPackageVersion,
-				", SHA: ", entry.RemoteSha, " → ", newPackageSha,
-			)
-			entry.Version = newPackageVersion
-			entry.RemoteSha = newPackageSha
-			renvLock.Packages[k] = entry
+			if newPackageVersion != entry.Version && newPackageSha != entry.RemoteSha {
+				// Update the renv structure with new version only if the current
+				// default branch SHA and current package version could be retrieved
+				// and they are different than old ones.
+				log.Info("Updating package ", k, " version: ",
+					entry.Version, " → ", newPackageVersion,
+					", SHA: ", entry.RemoteSha, " → ", newPackageSha,
+				)
+				entry.Version = newPackageVersion
+				entry.RemoteSha = newPackageSha
+				renvLock.Packages[k] = entry
+			}
 		}
 	}
 }
