@@ -228,7 +228,7 @@ func UpdateRepositoryPackages(renvLock *RenvLock, updatePackageRegexp string,
 		repositoryPackagesFile, ok := packagesFiles[v.Repository]
 		if !ok {
 			log.Error(`Could not retrieve PACKAGES for "`, v.Repository, `" repository `,
-				`(referenced by `, k , `). Attempting to use CRAN's PACKAGES as a fallback.`)
+				`(referenced by `, k, `). Attempting to use CRAN's PACKAGES as a fallback.`)
 			repositoryPackagesFile = packagesFiles["CRAN"]
 		}
 		var newPackageVersion string
