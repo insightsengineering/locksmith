@@ -228,11 +228,13 @@ func UpdateRepositoryPackages(renvLock *RenvLock, updatePackageRegexp string,
 		log.Trace("Package ", k, " matches updated packages regexp ",
 			updatePackageRegexp)
 		var repositoryPackagesFile PackagesFile
-		repositoryPackagesFile, ok := packagesFiles[v.Repository]
+		repositoryName := v.Repository
+		repositoryPackagesFile, ok := packagesFiles[repositoryName]
 		if !ok {
-			log.Error(`Could not retrieve PACKAGES for "`, v.Repository, `" repository `,
+			log.Error(`Could not retrieve PACKAGES for "`, repositoryName, `" repository `,
 				`(referenced by `, k, `). Attempting to use CRAN's PACKAGES as a fallback.`)
 			repositoryPackagesFile = packagesFiles["CRAN"]
+			repositoryName = "CRAN"
 		}
 		var newPackageVersion string
 		for _, singlePackage := range repositoryPackagesFile.Packages {
@@ -242,7 +244,7 @@ func UpdateRepositoryPackages(renvLock *RenvLock, updatePackageRegexp string,
 			}
 		}
 		if newPackageVersion == "" {
-			log.Error(`Could not find package `, k, ` in PACKAGES file for "`, v.Repository, `" repository.`)
+			log.Error(`Could not find package `, k, ` in PACKAGES file for "`, repositoryName, `" repository.`)
 			continue
 		}
 		if entry, ok := renvLock.Packages[k]; ok {
