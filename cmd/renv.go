@@ -30,8 +30,6 @@ import (
 
 const GitHub = "GitHub"
 const GitLab = "GitLab"
-const github = "github"
-const gitlab = "gitlab"
 const https = "https://"
 
 // GenerateRenvLock generates renv.lock file structure which can be then saved as a JSON file.
@@ -100,7 +98,8 @@ func GetPackageVersionFromDescription(descriptionFilePath string) string {
 	descriptionContents := make(map[string]string)
 	err = yaml.Unmarshal([]byte(cleanedDescription), &descriptionContents)
 	checkError(err)
-	return descriptionContents["Version"]
+	version, _ := descriptionContents["Version"]
+	return version
 }
 
 // GetGitRepositoryURL reads the PackageDescription struct corresponding to a single package
@@ -175,43 +174,103 @@ func UpdateGitPackages(renvLock *RenvLock, updatePackageRegexp string) {
 	for k, v := range renvLock.Packages {
 		match, err := regexp.MatchString(updatePackageRegexp, k)
 		checkError(err)
-		if match && (v.Source == GitLab || v.Source == GitHub) {
-			log.Trace("Package ", k, " matches updated packages regexp ",
-				updatePackageRegexp)
-			// Clone package's default branch.
-			newPackageSha := GetDefaultBranchSha(
-				gitUpdatesDirectory+k, GetGitRepositoryURL(v), v.Source,
-			)
-			// Read newest package version from DESCRIPTION.
-			var remoteSubdir string
-			if v.RemoteSubdir != "" {
-				remoteSubdir = "/" + v.RemoteSubdir
-			}
-			newPackageVersion := GetPackageVersionFromDescription(
-				gitUpdatesDirectory + k + remoteSubdir + "/DESCRIPTION")
-			// Update renv structure with new package version and SHA.
-			if entry, ok := renvLock.Packages[k]; ok {
-				log.Info("Updating package ", k, " version: ",
-					entry.Version, " -> ", newPackageVersion,
-					", SHA: ", entry.RemoteSha, " -> ", newPackageSha,
-				)
-				if newPackageSha != "" {
-					// Only update the version if the current default branch SHA
-					// could be retrieved.
-					entry.Version = newPackageVersion
-					entry.RemoteSha = newPackageSha
-				}
-				renvLock.Packages[k] = entry
-			}
-		} else {
+		if !match || (v.Source != GitLab && v.Source != GitHub) {
 			log.Trace(
 				"Package ", k, " doesn't match updated packages regexp ",
 				updatePackageRegexp, " or is not a git repository.",
 			)
+			continue
+		}
+		log.Trace("Package ", k, " matches updated packages regexp ",
+			updatePackageRegexp)
+		newPackageSha := GetDefaultBranchSha(
+			gitUpdatesDirectory+k, GetGitRepositoryURL(v), v.Source,
+		)
+		// Read newest package version from DESCRIPTION.
+		var remoteSubdir string
+		if v.RemoteSubdir != "" {
+			remoteSubdir = "/" + v.RemoteSubdir
+		}
+		newPackageVersion := GetPackageVersionFromDescription(
+			gitUpdatesDirectory + k + remoteSubdir + "/DESCRIPTION")
+		if entry, ok := renvLock.Packages[k]; ok && newPackageSha != "" && newPackageVersion != "" {
+			// Update the renv structure with new version only if the current
+			// default branch SHA and current package version could be retrieved.
+			log.Info("Updating package ", k, " version: ",
+				entry.Version, " → ", newPackageVersion,
+				", SHA: ", entry.RemoteSha, " → ", newPackageSha,
+			)
+			entry.Version = newPackageVersion
+			entry.RemoteSha = newPackageSha
+			renvLock.Packages[k] = entry
 		}
 	}
 }
 
+// UpdateRepositoryPackages iterates through the packages in renv.lock and updates the entries
+// corresponding to packages downloaded from CRAN-like repositories. Package version is updated
+// in the renvLock struct. Only packages matching the updatePackageRegexp are updated.
+func UpdateRepositoryPackages(renvLock *RenvLock, updatePackageRegexp string,
+	packagesFiles map[string]PackagesFile) {
+	for k, v := range renvLock.Packages {
+		match, err := regexp.MatchString(updatePackageRegexp, k)
+		checkError(err)
+		if !match || v.Source == GitLab || v.Source == GitHub {
+			log.Trace(
+				"Package ", k, " doesn't match updated packages regexp ",
+				updatePackageRegexp, " or is not a git repository.",
+			)
+			continue
+		}
+		log.Trace("Package ", k, " matches updated packages regexp ",
+			updatePackageRegexp)
+		repositoryPackagesFile, ok := packagesFiles[v.Repository]
+		if !ok {
+			log.Error("Could not retrieve PACKAGES file for ", v.Repository, " repository.")
+			continue
+		}
+		var newPackageVersion string
+		for _, singlePackage := range repositoryPackagesFile.Packages {
+			if singlePackage.Package == k {
+				newPackageVersion = singlePackage.Version
+				continue
+			}
+		}
+		if newPackageVersion == "" {
+			log.Error("Could not find package ", k, " in PACKAGES file for ", v.Repository, " repository.")
+			continue
+		}
+		if entry, ok := renvLock.Packages[k]; ok {
+			if newPackageVersion != entry.Version {
+				log.Info("Updating package ", k, " version: ",
+					entry.Version, " → ", newPackageVersion,
+				)
+				entry.Version = newPackageVersion
+				renvLock.Packages[k] = entry
+			}
+		}
+	}
+}
+
+// GetPackagesFiles downloads PACKAGES files from repositories defined in the renv.lock header.
+// It returns a map from the repository name (as defined in the renv.lock header) to the PackagesFile
+// struct representing repository's PACKAGES file.
+func GetPackagesFiles(renvLock RenvLock) map[string]PackagesFile {
+	repositoryPackagesFiles := make(map[string]PackagesFile)
+	for _, repository := range renvLock.R.Repositories {
+		repositoryName := repository.Name
+		repositoryURL := repository.URL
+		packagesFileContent := GetPackagesFileContent(repositoryURL, DownloadTextFile)
+		packagesFile := ProcessPackagesFile(packagesFileContent)
+		repositoryPackagesFiles[repositoryName] = packagesFile
+	}
+	return repositoryPackagesFiles
+}
+
+// UpdateRenvLock reads the renv.lock from inputFileName. It then retrieves the information
+// about the newest package versions from respective repositories (CRAN-like or git repositories)
+// from which the packages should be downloaded according to the renv.lock.
+// It returns the RenvLock struct represeting the renv.lock with updated package versions.
 func UpdateRenvLock(inputFileName, updatePackages string) RenvLock {
 	var renvLock RenvLock
 	byteValue, err := os.ReadFile(inputFileName)
@@ -222,5 +281,7 @@ func UpdateRenvLock(inputFileName, updatePackages string) RenvLock {
 
 	updatePackageRegex := GetPackageRegex(updatePackages)
 	UpdateGitPackages(&renvLock, updatePackageRegex)
+	repositoryPackagesFiles := GetPackagesFiles(renvLock)
+	UpdateRepositoryPackages(&renvLock, updatePackageRegex, repositoryPackagesFiles)
 	return renvLock
 }

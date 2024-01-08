@@ -230,6 +230,27 @@ func DownloadDescriptionFiles(packageDescriptionList []string,
 	return inputDescriptionFiles
 }
 
+// GetPackagesFileContent downloads the PACKAGES file from the repositoryURL using the downloadFileFunction
+// and returns the contents, or empty string in case of error.
+func GetPackagesFileContent(repositoryURL string,
+	downloadFileFunction func(string, map[string]string) (int, int64, string)) string {
+	var packagesFileURL string
+	if strings.Contains(repositoryURL, "/bin/windows/") || strings.Contains(repositoryURL, "/bin/macosx") {
+		// If we're dealing with a repository with binary Windows or macOS packages,
+		// we're expecting it to be in a specific format documented in the README.
+		packagesFileURL = repositoryURL + "/PACKAGES"
+	} else {
+		packagesFileURL = repositoryURL + "/src/contrib/PACKAGES"
+	}
+	log.Debug("Downloading ", packagesFileURL)
+	statusCode, _, packagesFileContent := downloadFileFunction(packagesFileURL, map[string]string{})
+	if statusCode == 200 {
+		return packagesFileContent
+	}
+	log.Warn("An error occurred while downloading ", packagesFileURL)
+	return ""
+}
+
 // DownloadPackagesFiles downloads PACKAGES files from repository URLs specified in the repositoryList.
 // Returns a map from repository URL to the string with the contents of PACKAGES file
 // for that repository.
@@ -237,21 +258,7 @@ func DownloadPackagesFiles(repositoryList []string,
 	downloadFileFunction func(string, map[string]string) (int, int64, string)) map[string]string {
 	inputPackagesFiles := make(map[string]string)
 	for _, repository := range repositoryList {
-		var packagesFileURL string
-		if strings.Contains(repository, "/bin/windows/") || strings.Contains(repository, "/bin/macosx") {
-			// If we're dealing with a repository with binary Windows or macOS packages,
-			// we're expecting it to be in a specific format documented in the README.
-			packagesFileURL = repository + "/PACKAGES"
-		} else {
-			packagesFileURL = repository + "/src/contrib/PACKAGES"
-		}
-		log.Debug("Downloading ", packagesFileURL)
-		statusCode, _, packagesFileContent := downloadFileFunction(packagesFileURL, map[string]string{})
-		if statusCode == 200 {
-			inputPackagesFiles[repository] = packagesFileContent
-		} else {
-			log.Warn("An error occurred while downloading ", packagesFileURL)
-		}
+		inputPackagesFiles[repository] = GetPackagesFileContent(repository, downloadFileFunction)
 	}
 	return inputPackagesFiles
 }
