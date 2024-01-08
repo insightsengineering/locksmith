@@ -98,7 +98,7 @@ func GetPackageVersionFromDescription(descriptionFilePath string) string {
 	descriptionContents := make(map[string]string)
 	err = yaml.Unmarshal([]byte(cleanedDescription), &descriptionContents)
 	checkError(err)
-	version, _ := descriptionContents["Version"]
+	version := descriptionContents["Version"]
 	return version
 }
 
