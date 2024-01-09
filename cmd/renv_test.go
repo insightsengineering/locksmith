@@ -185,14 +185,14 @@ func Test_GetGitRepositoryURL(t *testing.T) {
 	assert.Equal(t, repoURL3, "https://gitlab.example.com/org3/org4/repo-name-3")
 }
 
-func mockedGetDefaultBranchSha(_ string, repoURL string, _ string) string {
+func mockedGetDefaultBranchSha(_ string, repoURL string, _ string) (string, string) {
 	switch {
 	case repoURL == "https://github.com/group1/group2/package11":
-		return "eee111555bbbccc"
+		return "eee111555bbbccc", "main"
 	case repoURL == "https://gitlab.example.com/group3/group4/package12":
-		return "888444dddbbbaaa"
+		return "888444dddbbbaaa", "main"
 	}
-	return ""
+	return "", ""
 }
 
 func Test_UpdateGitPackages(t *testing.T) {
@@ -258,11 +258,155 @@ func Test_UpdateGitPackages(t *testing.T) {
 			},
 		},
 	}
-	UpdateGitPackages(&renvLock, "package1*", mockedGetDefaultBranchSha, "testdata/git_updates/")
+	UpdateGitPackages(&renvLock, "^package1.*$", mockedGetDefaultBranchSha, "testdata/git_updates/")
 	assert.Equal(t, renvLock.Packages["package11"].Version, "1.0.4")
 	assert.Equal(t, renvLock.Packages["package12"].Version, "2.6.1.1")
 	assert.Equal(t, renvLock.Packages["package4"].Version, "3.7.0")
 	assert.Equal(t, renvLock.Packages["package11"].RemoteSha, "eee111555bbbccc")
 	assert.Equal(t, renvLock.Packages["package12"].RemoteSha, "888444dddbbbaaa")
 	assert.Equal(t, renvLock.Packages["package4"].RemoteSha, "ccceee444999")
+	assert.Equal(t, renvLock.Packages["package11"].RemoteRef, "main")
+	assert.Equal(t, renvLock.Packages["package12"].RemoteRef, "main")
+	assert.Equal(t, renvLock.Packages["package4"].RemoteRef, "v3.7.0")
+}
+
+func Test_UpdateRepositoryPackages(t *testing.T) {
+	renvLock := RenvLock{
+		RenvLockContents{
+			[]RenvLockRepository{
+				{"Repo1", "https://repo1.example.com/ExampleRepo1"},
+				{"Repo2", "https://repo2.example.com/ExampleRepo2"},
+				{"Repo3", "https://repo3.example.com/ExampleRepo3"},
+			},
+		},
+		map[string]PackageDescription{
+			"package13": {
+				"package13",
+				"1.1.0",
+				"Repository",
+				"Repo1",
+				[]Dependency{},
+				"", "", "", "", "", "", "", []string{},
+			},
+			"package14": {
+				"package14",
+				"3.7.0",
+				"GitLab",
+				"",
+				[]Dependency{},
+				"gitlab",
+				"https://gitlab.example.com",
+				"group6/group7",
+				"package4",
+				"",
+				"v3.7.0",
+				"ccceee444999",
+				[]string{},
+			},
+			"package15": {
+				"package15",
+				"2.4.7",
+				"Repository",
+				"Repo2",
+				[]Dependency{},
+				"", "", "", "", "", "", "", []string{},
+			},
+			"package16": {
+				"package16",
+				"0.0.5",
+				"Repository",
+				"Repo3",
+				[]Dependency{},
+				"", "", "", "", "", "", "", []string{},
+			},
+			"package17": {
+				"package17",
+				"1.1.1",
+				"Repository",
+				"Repo1",
+				[]Dependency{},
+				"", "", "", "", "", "", "", []string{},
+			},
+			"package18": {
+				"package18",
+				"2.3.2",
+				"Repository",
+				"Repo2",
+				[]Dependency{},
+				"", "", "", "", "", "", "", []string{},
+			},
+			"package19": {
+				"package19",
+				"4.1.1",
+				"Repository",
+				"NonExistentRepository",
+				[]Dependency{},
+				"", "", "", "", "", "", "", []string{},
+			},
+			"package21": {
+				"package21",
+				"3.8.1",
+				"Repository",
+				"Repo1",
+				[]Dependency{},
+				"", "", "", "", "", "", "", []string{},
+			},
+		},
+	}
+	packagesFiles := make(map[string]PackagesFile)
+	packagesFiles["Repo1"] = PackagesFile{
+		[]PackageDescription{
+			{
+				"package13",
+				"2.2.0",
+				"", "", []Dependency{},
+				"", "", "", "", "", "", "", []string{},
+			},
+			{
+				"package21",
+				"3.9.3",
+				"", "", []Dependency{},
+				"", "", "", "", "", "", "", []string{},
+			},
+		},
+	}
+	packagesFiles["Repo2"] = PackagesFile{
+		[]PackageDescription{
+			{
+				"package15",
+				"3.2.1",
+				"", "", []Dependency{},
+				"", "", "", "", "", "", "", []string{},
+			},
+		},
+	}
+	packagesFiles["Repo3"] = PackagesFile{
+		[]PackageDescription{
+			{
+				"package16",
+				"1.2.3",
+				"", "", []Dependency{},
+				"", "", "", "", "", "", "", []string{},
+			},
+		},
+	}
+	packagesFiles["CRAN"] = PackagesFile{
+		[]PackageDescription{
+			{
+				"package19",
+				"5.2.3",
+				"", "", []Dependency{},
+				"", "", "", "", "", "", "", []string{},
+			},
+		},
+	}
+	UpdateRepositoryPackages(&renvLock, "^package1.*$", packagesFiles)
+	assert.Equal(t, renvLock.Packages["package13"].Version, "2.2.0")
+	assert.Equal(t, renvLock.Packages["package14"].Version, "3.7.0")
+	assert.Equal(t, renvLock.Packages["package15"].Version, "3.2.1")
+	assert.Equal(t, renvLock.Packages["package16"].Version, "1.2.3")
+	assert.Equal(t, renvLock.Packages["package17"].Version, "1.1.1")
+	assert.Equal(t, renvLock.Packages["package18"].Version, "2.3.2")
+	assert.Equal(t, renvLock.Packages["package19"].Version, "5.2.3")
+	assert.Equal(t, renvLock.Packages["package21"].Version, "3.8.1")
 }
