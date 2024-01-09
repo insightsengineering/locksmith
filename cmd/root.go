@@ -136,7 +136,7 @@ in an renv.lock-compatible file.`,
 		"Token to download non-public files from GitHub.")
 	rootCmd.PersistentFlags().StringVarP(&gitLabToken, "gitLabToken", "g", "",
 		"Token to download non-public files from GitLab.")
-	rootCmd.PersistentFlags().StringVarP(&inputRenvLock, "inputRenvLock", "n", "input.renv.lock",
+	rootCmd.PersistentFlags().StringVarP(&inputRenvLock, "inputRenvLock", "n", "",
 		"Lockfile which should be read and updated to include the newest versions of the packages.")
 	rootCmd.PersistentFlags().StringVarP(&outputRenvLock, "outputRenvLock", "o", "renv.lock",
 		"File name to save the output renv.lock file.")
