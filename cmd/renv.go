@@ -157,7 +157,7 @@ func GetDefaultBranchSha(gitDirectory string, repoURL string,
 	// Get SHA of repository HEAD.
 	ref, err := repository.Head()
 	checkError(err)
-	return ref.Hash().String(), ref.Name().String()
+	return ref.Hash().String(), strings.TrimPrefix(ref.Name().String(), "refs/heads/")
 }
 
 // UpdateGitPackages iterates through the packages in renv.lock and updates the entries
