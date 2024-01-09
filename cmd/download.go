@@ -218,13 +218,11 @@ func DownloadDescriptionFiles(packageDescriptionList []string,
 				},
 			)
 		} else {
-			log.Warn(
-				"An error occurred while downloading ", packageDescriptionURL,
+			log.Warn("An error occurred while downloading ", packageDescriptionURL,
 				"\nIt may have happened because the git repository is not public ",
 				"and you didn't set the Personal Access Token.",
 				"\nPlease make sure you provided an access token (in LOCKSMITH_GITHUBTOKEN ",
-				"or LOCKSMITH_GITLABTOKEN environment variable).",
-			)
+				"or LOCKSMITH_GITLABTOKEN environment variable).")
 		}
 	}
 	return inputDescriptionFiles
