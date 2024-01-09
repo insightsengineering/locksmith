@@ -179,10 +179,10 @@ func ProcessDescriptionURL(descriptionURL string,
 		}
 		remoteType = "gitlab"
 		packageSource = "GitLab"
-		shorterURL := strings.TrimPrefix(descriptionURL, "https://")
-		remoteHost = "https://" + strings.Split(shorterURL, "/")[0]
+		shorterURL := strings.TrimPrefix(descriptionURL, https)
+		remoteHost = https + strings.Split(shorterURL, "/")[0]
 		remoteRef = strings.TrimPrefix(re.FindString(descriptionURL), "ref=")
-		projectURL := "https://" + strings.Join(strings.Split(shorterURL, "/")[0:5], "/")
+		projectURL := https + strings.Join(strings.Split(shorterURL, "/")[0:5], "/")
 		descriptionPath := strings.Split(shorterURL, "/")[7]
 		// Check whether package is stored in a subdirectory of the git repository.
 		if strings.Contains(descriptionPath, "%2F") {
@@ -218,16 +218,35 @@ func DownloadDescriptionFiles(packageDescriptionList []string,
 				},
 			)
 		} else {
-			log.Warn(
-				"An error occurred while downloading ", packageDescriptionURL,
+			log.Warn("An error occurred while downloading ", packageDescriptionURL,
 				"\nIt may have happened because the git repository is not public ",
 				"and you didn't set the Personal Access Token.",
 				"\nPlease make sure you provided an access token (in LOCKSMITH_GITHUBTOKEN ",
-				"or LOCKSMITH_GITLABTOKEN environment variable).",
-			)
+				"or LOCKSMITH_GITLABTOKEN environment variable).")
 		}
 	}
 	return inputDescriptionFiles
+}
+
+// GetPackagesFileContent downloads the PACKAGES file from the repositoryURL using the downloadFileFunction
+// and returns the contents, or empty string in case of error.
+func GetPackagesFileContent(repositoryURL string,
+	downloadFileFunction func(string, map[string]string) (int, int64, string)) string {
+	var packagesFileURL string
+	if strings.Contains(repositoryURL, "/bin/windows/") || strings.Contains(repositoryURL, "/bin/macosx") {
+		// If we're dealing with a repository with binary Windows or macOS packages,
+		// we're expecting it to be in a specific format documented in the README.
+		packagesFileURL = repositoryURL + "/PACKAGES"
+	} else {
+		packagesFileURL = repositoryURL + "/src/contrib/PACKAGES"
+	}
+	log.Debug("Downloading ", packagesFileURL)
+	statusCode, _, packagesFileContent := downloadFileFunction(packagesFileURL, map[string]string{})
+	if statusCode == 200 {
+		return packagesFileContent
+	}
+	log.Warn("An error occurred while downloading ", packagesFileURL)
+	return ""
 }
 
 // DownloadPackagesFiles downloads PACKAGES files from repository URLs specified in the repositoryList.
@@ -237,21 +256,7 @@ func DownloadPackagesFiles(repositoryList []string,
 	downloadFileFunction func(string, map[string]string) (int, int64, string)) map[string]string {
 	inputPackagesFiles := make(map[string]string)
 	for _, repository := range repositoryList {
-		var packagesFileURL string
-		if strings.Contains(repository, "/bin/windows/") || strings.Contains(repository, "/bin/macosx") {
-			// If we're dealing with a repository with binary Windows or macOS packages,
-			// we're expecting it to be in a specific format documented in the README.
-			packagesFileURL = repository + "/PACKAGES"
-		} else {
-			packagesFileURL = repository + "/src/contrib/PACKAGES"
-		}
-		log.Debug("Downloading ", packagesFileURL)
-		statusCode, _, packagesFileContent := downloadFileFunction(packagesFileURL, map[string]string{})
-		if statusCode == 200 {
-			inputPackagesFiles[repository] = packagesFileContent
-		} else {
-			log.Warn("An error occurred while downloading ", packagesFileURL)
-		}
+		inputPackagesFiles[repository] = GetPackagesFileContent(repository, downloadFileFunction)
 	}
 	return inputPackagesFiles
 }

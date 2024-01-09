@@ -32,12 +32,6 @@ following command to view its capabilities:
 locksmith --help
 ```
 
-Example usage with multiple flags:
-
-```bash
-locksmith --logLevel debug --exampleParameter 'exampleValue'
-```
-
 Real-life example with multiple input packages and repositories.
 Please see below for [an example](#configuration-file) how to set package and repository lists more
 easily in a configuration file.
@@ -46,7 +40,7 @@ easily in a configuration file.
 locksmith --inputPackageList https://raw.githubusercontent.com/insightsengineering/formatters/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/rtables/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/scda/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/scda.2022/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/nestcolor/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/tern/main/DESCRIPTION,https://raw.githubusercontent.com/insightsengineering/rlistings/main/DESCRIPTION,https://gitlab.example.com/api/v4/projects/123456/repository/files/DESCRIPTION/raw?ref=main,https://gitlab.example.com/api/v4/projects/234567/repository/files/directory%2Fsubdirectory%2FDESCRIPTION/raw?ref=main --inputRepositoryList BioC=https://bioconductor.org/packages/release/bioc,CRAN=https://cran.rstudio.com
 ```
 
-In order to download the packages from non-public GitHub or GitLab repositories, please set the environment
+In order to download the input `DESCRIPTION` files from GitHub or GitLab repositories, please set the environment
 variables containing the Personal Access Tokens.
 
 * For GitHub, set the `LOCKSMITH_GITHUBTOKEN` environment variable.
@@ -88,6 +82,8 @@ as opposed to `inputPackageList` and `inputRepositoryList` CLI flags/YAML keys.
 Additionally, `inputPackageList`/`inputRepositoryList` CLI flags take precendence over
 `inputPackages`/`inputRepositories` YAML keys.
 
+Please note that package repository URLs should be provided without the trailing `/`.
+
 ## Environment variables
 
 `locksmith` reads environment variables with `LOCKSMITH_` prefix and tries to match them with CLI
@@ -98,9 +94,11 @@ The order of precedence is:
 
 CLI flag → environment variable → configuration file → default value.
 
+To check the available names of environment variables, please run `locksmith --help`.
+
 ## Binary dependencies
 
-For `locksmith` in order to generate an `renv.lock` with binary R packages,
+If `locksmith` should generate an `renv.lock` with binary R packages,
 it is necessary to provide URLs to binary repositories via `inputRepositories`/`inputRepositoryList`.
 
 Examples illustrating the expected format of URLs to repositories with binary packages:
@@ -120,7 +118,7 @@ Examples illustrating the expected format of URLs to repositories with binary pa
 
 where `<r-version>` is e.g. `4.2`, `4.3` etc.
 
-In all cases the URL points to a directory where the `PACKAGES` file is located.
+In all cases the URL points to a directory where the `PACKAGES` file is located, without the trailing `/`.
 
 As a result, the configuration file could look like this:
 
@@ -151,6 +149,26 @@ Simply list the types of dependencies which should not cause the `renv.lock` gen
 ```bash
 locksmith --allowIncompleteRenvLock 'Imports,Depends,Suggests,LinkingTo'
 ```
+
+## Updating existing `renv.lock`
+
+`locksmith` has the capability to update an existing lockfile with the newest available package versions.
+
+To ensure that the `input.renv.lock` has all the packages in the newest versions from the respective repositories (git, CRAN-like or BioConductor-like), and to save such updated file to `output.renv.lock`, you can run:
+
+```bash
+locksmith --inputRenvLock input.renv.lock --outputRenvLock output.renv.lock
+```
+
+For git packages, a reference to the latest commit on the default branch will be saved.
+
+For packages which, according to the input lockfile, should be downloaded from CRAN-like or BioConductor-like repositories, a reference to the latest available package version in the respective repository will be saved.
+
+The packages can be updated selectively by using the `--updatePackages` flag.
+
+Please note that `renv` might have saved the information in the input lockfile that the package should be downloaded from `CRAN`, `RSPM` or BioConductor repository, but at the same time the definition of that repository in the `renv.lock` header (in the `Repositories` section) might be missing. For such packages `locksmith` will try to check what is the newest available package version at [CRAN](https://cloud.r-project.org).
+
+Please also note that `locksmith` will not verify whether the dependencies of some packages have changed - this means that the set of package names present in the lockfile will stay the same.
 
 ## Development
 

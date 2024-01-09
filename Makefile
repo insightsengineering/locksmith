@@ -25,7 +25,7 @@ help: ## Show this help menu
 
 devdeps: ## Install development dependencies
 	@printf "Executing target: [$@] 🎯\n"
-	@which -a golangci-lint > /dev/null || curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(GOPATH) v1.55.0
+	@which -a golangci-lint > /dev/null || curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(GOPATH) v1.55.2
 	@which -a typex > /dev/null || go install github.com/dtgorski/typex@latest
 	@which -a goreleaser > /dev/null || go install github.com/goreleaser/goreleaser@latest
 	@which -a gocover-cobertura > /dev/null || go install github.com/boumenot/gocover-cobertura@latest
@@ -60,7 +60,7 @@ format: ## Format source code
 
 lint: devdeps spell ## Lint source code
 	@printf "Executing target: [$@] 🎯\n"
-	@golangci-lint run --fast -c .golangci.yml
+	@golangci-lint run -c .golangci.yml
 
 test: clean tidy devdeps spell ## Run unit tests and generate reports
 	@printf "Executing target: [$@] 🎯\n"

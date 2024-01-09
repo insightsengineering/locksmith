@@ -155,6 +155,12 @@ func mockedDownloadTextFile(url string, _ map[string]string) (int, int64, string
 		return 200, 0, "PACKAGES contents 2"
 	case url == "https://repo3.example.com/repo3/src/contrib/PACKAGES":
 		return 200, 0, "PACKAGES contents 3"
+	case url == "https://cloud.r-project.org/bin/windows/contrib/4.3/PACKAGES":
+		return 200, 0, "PACKAGES content bin/windows"
+	case url == "https://cloud.r-project.org/src/contrib/PACKAGES":
+		return 200, 0, "PACKAGES content src/contrib"
+	case url == "https://example.com/src/contrib/PACKAGES":
+		return 404, 0, "Not found"
 	}
 	return 200, 0, ""
 }
@@ -297,4 +303,13 @@ func Test_DownloadPackagesFiles(t *testing.T) {
 		"https://repo2.example.com/repo2": "PACKAGES contents 2",
 		"https://repo3.example.com/repo3": "PACKAGES contents 3",
 	})
+}
+
+func Test_GetPackagesFileContent(t *testing.T) {
+	packagesContentBin := GetPackagesFileContent("https://cloud.r-project.org/bin/windows/contrib/4.3", mockedDownloadTextFile)
+	packagesContentSrc := GetPackagesFileContent("https://cloud.r-project.org", mockedDownloadTextFile)
+	packagesContent := GetPackagesFileContent("https://example.com", mockedDownloadTextFile)
+	assert.Equal(t, packagesContentBin, "PACKAGES content bin/windows")
+	assert.Equal(t, packagesContentSrc, "PACKAGES content src/contrib")
+	assert.Equal(t, packagesContent, "")
 }
