@@ -166,7 +166,7 @@ For packages which, according to the input lockfile, should be downloaded from C
 
 The packages can be updated selectively by using the `--updatePackages` flag.
 
-Please note that `renv` might have saved the information in the input lockfile that the package should be downloaded from `CRAN`, `RSPM` or BioConductor repository, but at the same time the definition of that repository in the `renv.lock` header (in the `Repositories` section) might be missing. For such packages `locksmith` will try to check what is the newest available package version at https://cloud.r-project.org.
+Please note that `renv` might have saved the information in the input lockfile that the package should be downloaded from `CRAN`, `RSPM` or BioConductor repository, but at the same time the definition of that repository in the `renv.lock` header (in the `Repositories` section) might be missing. For such packages `locksmith` will try to check what is the newest available package version at [CRAN](https://cloud.r-project.org).
 
 Please also note that `locksmith` will not verify whether the dependencies of some packages have changed - this means that the set of package names present in the lockfile will stay the same.
 
