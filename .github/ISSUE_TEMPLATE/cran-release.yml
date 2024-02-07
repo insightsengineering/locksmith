@@ -71,6 +71,9 @@ body:
         - [ ] Monitor integration tests, if integration fails, create priority issues on the board.
         - [ ] Execute UAT tests (Optional).
 
+
+
+
         #### CRAN submission
         - [ ] Tag the update(s) as a release candidate vX.Y.Z-rc<iteration-number> (e.g. v0.5.3-rc1) on the release candidate branch (release-candidate-vX.Y.Z).
           ```r
