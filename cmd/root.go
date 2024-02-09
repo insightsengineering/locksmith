@@ -77,6 +77,7 @@ func setLogLevel() {
 
 var rootCmd *cobra.Command
 
+//nolint:revive
 func newRootCommand() {
 	rootCmd = &cobra.Command{
 		Use:   "locksmith",
