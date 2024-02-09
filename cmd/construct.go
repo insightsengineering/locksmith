@@ -20,7 +20,7 @@ import (
 	"strings"
 )
 
-const lowestPossiblePackageVersion = "0.0.0.0"
+const lowestPossiblePackageVersion = "0.0.0.0.0"
 
 // ConstructOutputPackageList generates a list of all packages and their dependencies
 // which should be included in the output renv.lock file,
@@ -286,8 +286,8 @@ func CheckIfVersionSufficient(availableVersionValue string, versionOperator stri
 	requiredVersion := stringsToInts(requiredVersionStrings)
 
 	available := "="
-	// Compare up to 4 dot- or dash-separated version components.
-	for i := 0; i < 4; i++ {
+	// Compare up to 5 dot- or dash-separated version components.
+	for i := 0; i < 5; i++ {
 		breakLoop := false
 		switch {
 		case availableVersion[i] > requiredVersion[i]:

@@ -206,6 +206,9 @@ func UpdateGitPackages(renvLock *RenvLock, updatePackageRegexp string,
 	}
 }
 
+// GetLatestPackageVersionFromAnyRepository searches for the latest version of soughtPackageName
+// in packagesFiles. It returns the name of the repository (as defined in renv.lock header)
+// where the latest version of that package has been found.
 func GetLatestPackageVersionFromAnyRepository(soughtPackageName string, packagesFiles map[string]PackagesFile) string {
 	latestPackageVersion := lowestPossiblePackageVersion
 	latestPackageVersionRepository := ""
@@ -266,10 +269,9 @@ func UpdateRepositoryPackages(renvLock *RenvLock, updatePackageRegexp string,
 			if newPackageVersion != entry.Version {
 				if notFoundRepositoryName != "" {
 					log.Warn(
-						"Repository ", notFoundRepositoryName, " referenced by package ", k,
-						"has not been defined in the lockfile. Therefore, the package will be updated to ",
-						"the version found in ", repositoryName, " which contains the latest version of this ",
-						"package among the repositories defined in the lockfile.",
+						"Repository ", notFoundRepositoryName, " referenced by package ", k, " has not ",
+						"been defined in the lockfile. Package will be updated to the latest version ",
+						"found in ", repositoryName, ".",
 					)
 				}
 				log.Info("Updating package ", k, " version: ",
