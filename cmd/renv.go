@@ -270,8 +270,8 @@ func UpdateRepositoryPackages(renvLock *RenvLock, updatePackageRegexp string,
 				if notFoundRepositoryName != "" {
 					log.Warn(
 						"Repository ", notFoundRepositoryName, " referenced by package ", k, " has not ",
-						"been defined in the lockfile. Package will be updated to the latest version ",
-						"found in ", repositoryName, ".",
+						"been defined in the lockfile and ", k, " will be updated to the latest version ",
+						`found in "`, repositoryName, `" repository.`,
 					)
 				}
 				log.Info("Updating package ", k, " version: ",
