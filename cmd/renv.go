@@ -241,20 +241,15 @@ func UpdateRepositoryPackages(renvLock *RenvLock, updatePackageRegexp string,
 		log.Trace("Package ", k, " matches updated packages regexp ",
 			updatePackageRegexp)
 		var repositoryPackagesFile PackagesFile
+		var notFoundRepositoryName string
 		repositoryName := v.Repository
 		repositoryPackagesFile, ok := packagesFiles[repositoryName]
 		if !ok {
 			// Package coming from a repository not defined in the lockfile.
 			// Check which of the defined repositories has the latest version of that package.
-			notFoundRepositoryName := repositoryName
-			repositoryName := GetLatestPackageVersionFromAnyRepository(k, packagesFiles)
+			notFoundRepositoryName = repositoryName
+			repositoryName = GetLatestPackageVersionFromAnyRepository(k, packagesFiles)
 			repositoryPackagesFile = packagesFiles[repositoryName]
-			log.Warn(
-				"Repository ", notFoundRepositoryName, " referenced by package ", k,
-				"has not been defined in the lockfile. Therefore, the package will be updated to ",
-				"the version found in ", repositoryName, " which contains the latest version of this ",
-				"package among the repositories defined in the lockfile.",
-			)
 		}
 		var newPackageVersion string
 		for _, singlePackage := range repositoryPackagesFile.Packages {
@@ -269,6 +264,14 @@ func UpdateRepositoryPackages(renvLock *RenvLock, updatePackageRegexp string,
 		}
 		if entry, ok := renvLock.Packages[k]; ok {
 			if newPackageVersion != entry.Version {
+				if notFoundRepositoryName != "" {
+					log.Warn(
+						"Repository ", notFoundRepositoryName, " referenced by package ", k,
+						"has not been defined in the lockfile. Therefore, the package will be updated to ",
+						"the version found in ", repositoryName, " which contains the latest version of this ",
+						"package among the repositories defined in the lockfile.",
+					)
+				}
 				log.Info("Updating package ", k, " version: ",
 					entry.Version, " → ", newPackageVersion)
 				entry.Version = newPackageVersion

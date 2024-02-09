@@ -79,7 +79,7 @@ var rootCmd *cobra.Command
 
 func newRootCommand() {
 	rootCmd = &cobra.Command{
-		Use: "locksmith",
+		Use:   "locksmith",
 		Short: "renv.lock generator",
 		Long: `locksmith is a utility to generate renv.lock file containing all dependencies
 of given set of R packages. Given the input list of git repositories containing the R packages,
@@ -154,7 +154,7 @@ in an renv.lock-compatible file.`,
 	rootCmd.AddCommand(extension.NewVersionCobraCmd())
 
 	cfg := envy.CobraConfig{
-		Prefix: "LOCKSMITH",
+		Prefix:     "LOCKSMITH",
 		Persistent: true,
 	}
 	envy.ParseCobra(rootCmd, cfg)
