@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE coverage SYSTEM "http://cobertura.sourceforge.net/xml/coverage-04.dtd">
-<coverage line-rate="0.6744681" branch-rate="0" version="" timestamp="1707487760145" lines-covered="634" lines-valid="940" branches-covered="0" branches-valid="0" complexity="0">
+<coverage line-rate="0.6744681" branch-rate="0" version="" timestamp="1707489987150" lines-covered="634" lines-valid="940" branches-covered="0" branches-valid="0" complexity="0">
   <sources>
     <source>/home/runner/work/locksmith/locksmith</source>
   </sources>
@@ -202,9 +202,9 @@
             </method>
             <method name="splitVersion" signature="" line-rate="1" branch-rate="0" complexity="0">
               <lines>
-                <line number="255" hits="678"></line>
-                <line number="256" hits="678"></line>
-                <line number="257" hits="678"></line>
+                <line number="255" hits="682"></line>
+                <line number="256" hits="682"></line>
+                <line number="257" hits="682"></line>
               </lines>
             </method>
             <method name="CheckIfVersionSufficient" signature="" line-rate="0.9268293" branch-rate="0" complexity="0">
@@ -219,14 +219,14 @@
                 <line number="271" hits="81"></line>
                 <line number="272" hits="81"></line>
                 <line number="273" hits="81"></line>
-                <line number="274" hits="31"></line>
-                <line number="275" hits="31"></line>
-                <line number="276" hits="35"></line>
-                <line number="277" hits="35"></line>
-                <line number="279" hits="23"></line>
-                <line number="280" hits="23"></line>
-                <line number="281" hits="27"></line>
-                <line number="282" hits="27"></line>
+                <line number="274" hits="30"></line>
+                <line number="275" hits="30"></line>
+                <line number="276" hits="34"></line>
+                <line number="277" hits="34"></line>
+                <line number="279" hits="25"></line>
+                <line number="280" hits="25"></line>
+                <line number="281" hits="29"></line>
+                <line number="282" hits="29"></line>
                 <line number="285" hits="81"></line>
                 <line number="286" hits="81"></line>
                 <line number="287" hits="81"></line>
@@ -235,12 +235,12 @@
                 <line number="290" hits="81"></line>
                 <line number="291" hits="185"></line>
                 <line number="292" hits="185"></line>
-                <line number="293" hits="40"></line>
-                <line number="294" hits="40"></line>
-                <line number="295" hits="40"></line>
-                <line number="296" hits="33"></line>
-                <line number="297" hits="33"></line>
-                <line number="298" hits="33"></line>
+                <line number="293" hits="38"></line>
+                <line number="294" hits="38"></line>
+                <line number="295" hits="38"></line>
+                <line number="296" hits="35"></line>
+                <line number="297" hits="35"></line>
+                <line number="298" hits="35"></line>
                 <line number="299" hits="8"></line>
                 <line number="300" hits="8"></line>
                 <line number="301" hits="8"></line>
@@ -425,9 +425,9 @@
             <line number="247" hits="1"></line>
             <line number="248" hits="1"></line>
             <line number="252" hits="15"></line>
-            <line number="255" hits="678"></line>
-            <line number="256" hits="678"></line>
-            <line number="257" hits="678"></line>
+            <line number="255" hits="682"></line>
+            <line number="256" hits="682"></line>
+            <line number="257" hits="682"></line>
             <line number="262" hits="91"></line>
             <line number="263" hits="91"></line>
             <line number="264" hits="10"></line>
@@ -438,14 +438,14 @@
             <line number="271" hits="81"></line>
             <line number="272" hits="81"></line>
             <line number="273" hits="81"></line>
-            <line number="274" hits="31"></line>
-            <line number="275" hits="31"></line>
-            <line number="276" hits="35"></line>
-            <line number="277" hits="35"></line>
-            <line number="279" hits="23"></line>
-            <line number="280" hits="23"></line>
-            <line number="281" hits="27"></line>
-            <line number="282" hits="27"></line>
+            <line number="274" hits="30"></line>
+            <line number="275" hits="30"></line>
+            <line number="276" hits="34"></line>
+            <line number="277" hits="34"></line>
+            <line number="279" hits="25"></line>
+            <line number="280" hits="25"></line>
+            <line number="281" hits="29"></line>
+            <line number="282" hits="29"></line>
             <line number="285" hits="81"></line>
             <line number="286" hits="81"></line>
             <line number="287" hits="81"></line>
@@ -454,12 +454,12 @@
             <line number="290" hits="81"></line>
             <line number="291" hits="185"></line>
             <line number="292" hits="185"></line>
-            <line number="293" hits="40"></line>
-            <line number="294" hits="40"></line>
-            <line number="295" hits="40"></line>
-            <line number="296" hits="33"></line>
-            <line number="297" hits="33"></line>
-            <line number="298" hits="33"></line>
+            <line number="293" hits="38"></line>
+            <line number="294" hits="38"></line>
+            <line number="295" hits="38"></line>
+            <line number="296" hits="35"></line>
+            <line number="297" hits="35"></line>
+            <line number="298" hits="35"></line>
             <line number="299" hits="8"></line>
             <line number="300" hits="8"></line>
             <line number="301" hits="8"></line>
@@ -1285,10 +1285,10 @@
                 <line number="216" hits="3"></line>
                 <line number="217" hits="3"></line>
                 <line number="218" hits="3"></line>
-                <line number="219" hits="3"></line>
-                <line number="220" hits="3"></line>
-                <line number="221" hits="3"></line>
-                <line number="222" hits="3"></line>
+                <line number="219" hits="1"></line>
+                <line number="220" hits="1"></line>
+                <line number="221" hits="1"></line>
+                <line number="222" hits="1"></line>
                 <line number="223" hits="3"></line>
                 <line number="227" hits="1"></line>
                 <line number="228" hits="1"></line>
@@ -1515,10 +1515,10 @@
             <line number="216" hits="3"></line>
             <line number="217" hits="3"></line>
             <line number="218" hits="3"></line>
-            <line number="219" hits="3"></line>
-            <line number="220" hits="3"></line>
-            <line number="221" hits="3"></line>
-            <line number="222" hits="3"></line>
+            <line number="219" hits="1"></line>
+            <line number="220" hits="1"></line>
+            <line number="221" hits="1"></line>
+            <line number="222" hits="1"></line>
             <line number="223" hits="3"></line>
             <line number="227" hits="1"></line>
             <line number="228" hits="1"></line>
@@ -1921,7 +1921,7 @@
           <methods>
             <method name="checkError" signature="" line-rate="1" branch-rate="0" complexity="0">
               <lines>
-                <line number="26" hits="534"></line>
+                <line number="26" hits="537"></line>
                 <line number="27" hits="1"></line>
                 <line number="28" hits="1"></line>
                 <line number="29" hits="1"></line>
@@ -1997,10 +1997,10 @@
                 <line number="107" hits="162"></line>
                 <line number="108" hits="162"></line>
                 <line number="109" hits="162"></line>
-                <line number="110" hits="482"></line>
-                <line number="111" hits="482"></line>
-                <line number="112" hits="482"></line>
-                <line number="113" hits="482"></line>
+                <line number="110" hits="485"></line>
+                <line number="111" hits="485"></line>
+                <line number="112" hits="485"></line>
+                <line number="113" hits="485"></line>
                 <line number="114" hits="162"></line>
               </lines>
             </method>
@@ -2017,7 +2017,7 @@
             </method>
           </methods>
           <lines>
-            <line number="26" hits="534"></line>
+            <line number="26" hits="537"></line>
             <line number="27" hits="1"></line>
             <line number="28" hits="1"></line>
             <line number="29" hits="1"></line>
@@ -2081,10 +2081,10 @@
             <line number="107" hits="162"></line>
             <line number="108" hits="162"></line>
             <line number="109" hits="162"></line>
-            <line number="110" hits="482"></line>
-            <line number="111" hits="482"></line>
-            <line number="112" hits="482"></line>
-            <line number="113" hits="482"></line>
+            <line number="110" hits="485"></line>
+            <line number="111" hits="485"></line>
+            <line number="112" hits="485"></line>
+            <line number="113" hits="485"></line>
             <line number="114" hits="162"></line>
             <line number="117" hits="0"></line>
             <line number="118" hits="0"></line>
