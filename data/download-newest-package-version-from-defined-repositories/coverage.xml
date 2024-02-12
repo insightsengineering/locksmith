@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE coverage SYSTEM "http://cobertura.sourceforge.net/xml/coverage-04.dtd">
-<coverage line-rate="0.6744681" branch-rate="0" version="" timestamp="1707746565505" lines-covered="634" lines-valid="940" branches-covered="0" branches-valid="0" complexity="0">
+<coverage line-rate="0.67481405" branch-rate="0" version="" timestamp="1707747485938" lines-covered="635" lines-valid="941" branches-covered="0" branches-valid="0" complexity="0">
   <sources>
     <source>/home/runner/work/locksmith/locksmith</source>
   </sources>
   <packages>
-    <package name="github.com/insightsengineering/locksmith/cmd" line-rate="0.6744681" branch-rate="0" complexity="0">
+    <package name="github.com/insightsengineering/locksmith/cmd" line-rate="0.67481405" branch-rate="0" complexity="0">
       <classes>
-        <class name="-" filename="cmd/construct.go" line-rate="0.88372093" branch-rate="0" complexity="0">
+        <class name="-" filename="cmd/construct.go" line-rate="0.8842593" branch-rate="0" complexity="0">
           <methods>
             <method name="ConstructOutputPackageList" signature="" line-rate="0.78431374" branch-rate="0" complexity="0">
               <lines>
@@ -207,7 +207,7 @@
                 <line number="257" hits="678"></line>
               </lines>
             </method>
-            <method name="CheckIfVersionSufficient" signature="" line-rate="0.9268293" branch-rate="0" complexity="0">
+            <method name="CheckIfVersionSufficient" signature="" line-rate="0.9285714" branch-rate="0" complexity="0">
               <lines>
                 <line number="262" hits="91"></line>
                 <line number="263" hits="91"></line>
@@ -233,23 +233,24 @@
                 <line number="288" hits="81"></line>
                 <line number="289" hits="81"></line>
                 <line number="290" hits="81"></line>
-                <line number="291" hits="185"></line>
+                <line number="291" hits="81"></line>
                 <line number="292" hits="185"></line>
-                <line number="293" hits="40"></line>
+                <line number="293" hits="185"></line>
                 <line number="294" hits="40"></line>
                 <line number="295" hits="40"></line>
-                <line number="296" hits="33"></line>
+                <line number="296" hits="40"></line>
                 <line number="297" hits="33"></line>
                 <line number="298" hits="33"></line>
-                <line number="299" hits="8"></line>
+                <line number="299" hits="33"></line>
                 <line number="300" hits="8"></line>
                 <line number="301" hits="8"></line>
-                <line number="303" hits="81"></line>
+                <line number="302" hits="8"></line>
                 <line number="304" hits="81"></line>
-                <line number="308" hits="0"></line>
+                <line number="305" hits="81"></line>
                 <line number="309" hits="0"></line>
                 <line number="310" hits="0"></line>
-                <line number="311" hits="81"></line>
+                <line number="311" hits="0"></line>
+                <line number="312" hits="81"></line>
               </lines>
             </method>
           </methods>
@@ -452,23 +453,24 @@
             <line number="288" hits="81"></line>
             <line number="289" hits="81"></line>
             <line number="290" hits="81"></line>
-            <line number="291" hits="185"></line>
+            <line number="291" hits="81"></line>
             <line number="292" hits="185"></line>
-            <line number="293" hits="40"></line>
+            <line number="293" hits="185"></line>
             <line number="294" hits="40"></line>
             <line number="295" hits="40"></line>
-            <line number="296" hits="33"></line>
+            <line number="296" hits="40"></line>
             <line number="297" hits="33"></line>
             <line number="298" hits="33"></line>
-            <line number="299" hits="8"></line>
+            <line number="299" hits="33"></line>
             <line number="300" hits="8"></line>
             <line number="301" hits="8"></line>
-            <line number="303" hits="81"></line>
+            <line number="302" hits="8"></line>
             <line number="304" hits="81"></line>
-            <line number="308" hits="0"></line>
+            <line number="305" hits="81"></line>
             <line number="309" hits="0"></line>
             <line number="310" hits="0"></line>
-            <line number="311" hits="81"></line>
+            <line number="311" hits="0"></line>
+            <line number="312" hits="81"></line>
           </lines>
         </class>
         <class name="-" filename="cmd/download.go" line-rate="0.7643678" branch-rate="0" complexity="0">
