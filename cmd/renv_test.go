@@ -368,6 +368,12 @@ func Test_UpdateRepositoryPackages(t *testing.T) {
 				"", "", []Dependency{},
 				"", "", "", "", "", "", "", []string{},
 			},
+			{
+				"package19",
+				"5.2.1",
+				"", "", []Dependency{},
+				"", "", "", "", "", "", "", []string{},
+			},
 		},
 	}
 	packagesFiles["Repo2"] = PackagesFile{
@@ -375,6 +381,12 @@ func Test_UpdateRepositoryPackages(t *testing.T) {
 			{
 				"package15",
 				"3.2.1",
+				"", "", []Dependency{},
+				"", "", "", "", "", "", "", []string{},
+			},
+			{
+				"package19",
+				"5.2.2",
 				"", "", []Dependency{},
 				"", "", "", "", "", "", "", []string{},
 			},
@@ -388,13 +400,9 @@ func Test_UpdateRepositoryPackages(t *testing.T) {
 				"", "", []Dependency{},
 				"", "", "", "", "", "", "", []string{},
 			},
-		},
-	}
-	packagesFiles["CRAN"] = PackagesFile{
-		[]PackageDescription{
 			{
 				"package19",
-				"5.2.3",
+				"5.2.2.4",
 				"", "", []Dependency{},
 				"", "", "", "", "", "", "", []string{},
 			},
@@ -407,6 +415,6 @@ func Test_UpdateRepositoryPackages(t *testing.T) {
 	assert.Equal(t, renvLock.Packages["package16"].Version, "1.2.3")
 	assert.Equal(t, renvLock.Packages["package17"].Version, "1.1.1")
 	assert.Equal(t, renvLock.Packages["package18"].Version, "2.3.2")
-	assert.Equal(t, renvLock.Packages["package19"].Version, "5.2.3")
+	assert.Equal(t, renvLock.Packages["package19"].Version, "5.2.2.4")
 	assert.Equal(t, renvLock.Packages["package21"].Version, "3.8.1")
 }

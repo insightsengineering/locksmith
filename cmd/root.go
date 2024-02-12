@@ -58,7 +58,7 @@ func setLogLevel() {
 	log.SetFormatter(customFormatter)
 	log.SetReportCaller(false)
 	customFormatter.FullTimestamp = false
-	fmt.Println("logLevel =", logLevel)
+	fmt.Println(`logLevel = "` + logLevel + `"`)
 	switch logLevel {
 	case "trace":
 		log.SetLevel(logrus.TraceLevel)
@@ -77,6 +77,7 @@ func setLogLevel() {
 
 var rootCmd *cobra.Command
 
+//nolint:revive
 func newRootCommand() {
 	rootCmd = &cobra.Command{
 		Use:   "locksmith",
@@ -93,15 +94,15 @@ in an renv.lock-compatible file.`,
 		Run: func(cmd *cobra.Command, args []string) {
 			setLogLevel()
 
-			fmt.Println("config =", cfgFile)
-			fmt.Println("inputPackageList =", inputPackageList)
-			fmt.Println("inputRepositoryList =", inputRepositoryList)
+			fmt.Println(`config = "` + cfgFile + `"`)
+			fmt.Println(`inputPackageList = "` + inputPackageList + `"`)
+			fmt.Println(`inputRepositoryList = "` + inputRepositoryList + `"`)
 			fmt.Println("inputPackages =", inputPackages)
 			fmt.Println("inputRepositories =", inputRepositories)
-			fmt.Println("inputRenvLock =", inputRenvLock)
-			fmt.Println("outputRenvLock =", outputRenvLock)
-			fmt.Println("allowIncompleteRenvLock =", allowIncompleteRenvLock)
-			fmt.Println("updatePackages =", updatePackages)
+			fmt.Println(`inputRenvLock = "` + inputRenvLock + `"`)
+			fmt.Println(`outputRenvLock = "` + outputRenvLock + `"`)
+			fmt.Println(`allowIncompleteRenvLock = "` + allowIncompleteRenvLock + `"`)
+			fmt.Println(`updatePackages = "` + updatePackages + `"`)
 
 			if runtime.GOOS == "windows" {
 				localTempDirectory = os.Getenv("TMP") + `\tmp\locksmith`
@@ -138,7 +139,7 @@ in an renv.lock-compatible file.`,
 		"Token to download non-public files from GitLab.")
 	rootCmd.PersistentFlags().StringVarP(&inputRenvLock, "inputRenvLock", "n", "",
 		"Lockfile which should be read and updated to include the newest versions of the packages.")
-	rootCmd.PersistentFlags().StringVarP(&outputRenvLock, "outputRenvLock", "o", "renv.lock",
+	rootCmd.PersistentFlags().StringVarP(&outputRenvLock, "outputRenvLock", "k", "renv.lock",
 		"File name to save the output renv.lock file.")
 	rootCmd.PersistentFlags().StringVarP(&allowIncompleteRenvLock, "allowIncompleteRenvLock", "i", "",
 		"Locksmith will fail if any of dependencies of input packages cannot be found in the repositories. "+
@@ -173,7 +174,7 @@ func initConfig() {
 		home, err := os.UserHomeDir()
 		cobra.CheckErr(err)
 
-		// Search config in home directory with name ".locksmith" (without extension).
+		// Search for config in home directory.
 		viper.AddConfigPath(home)
 		viper.SetConfigType("yaml")
 		viper.SetConfigName(".locksmith")

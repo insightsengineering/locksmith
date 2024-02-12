@@ -206,6 +206,28 @@ func UpdateGitPackages(renvLock *RenvLock, updatePackageRegexp string,
 	}
 }
 
+// GetLatestPackageVersionFromAnyRepository searches for the latest version of soughtPackageName
+// in packagesFiles. It returns the name of the repository (as defined in renv.lock header)
+// where the latest version of that package has been found.
+func GetLatestPackageVersionFromAnyRepository(soughtPackageName string, packagesFiles map[string]PackagesFile) string {
+	latestPackageVersion := lowestPossiblePackageVersion
+	latestPackageVersionRepository := ""
+	for repositoryName, p := range packagesFiles {
+		for _, packageDescription := range p.Packages {
+			if packageDescription.Package == soughtPackageName {
+				log.Trace(soughtPackageName, " version ", packageDescription.Version, " found in ", repositoryName, " repository.")
+				if CheckIfVersionSufficient(packageDescription.Version, ">", latestPackageVersion) {
+					latestPackageVersion = packageDescription.Version
+					latestPackageVersionRepository = repositoryName
+				}
+				break
+			}
+		}
+	}
+	log.Trace("Latest version ", latestPackageVersion, " for package ", soughtPackageName, " found in ", latestPackageVersionRepository, " repository.")
+	return latestPackageVersionRepository
+}
+
 // UpdateRepositoryPackages iterates through the packages in renv.lock and updates the entries
 // corresponding to packages downloaded from CRAN-like repositories. Package version is updated
 // in the renvLock struct. Only packages matching the updatePackageRegexp are updated.
@@ -222,19 +244,21 @@ func UpdateRepositoryPackages(renvLock *RenvLock, updatePackageRegexp string,
 		log.Trace("Package ", k, " matches updated packages regexp ",
 			updatePackageRegexp)
 		var repositoryPackagesFile PackagesFile
+		var notFoundRepositoryName string
 		repositoryName := v.Repository
 		repositoryPackagesFile, ok := packagesFiles[repositoryName]
 		if !ok {
-			log.Error(`Could not retrieve PACKAGES for "`, repositoryName, `" repository `,
-				`(referenced by `, k, `). Attempting to use CRAN's PACKAGES as a fallback.`)
-			repositoryPackagesFile = packagesFiles["CRAN"]
-			repositoryName = "CRAN"
+			// Package coming from a repository not defined in the lockfile.
+			// Check which of the defined repositories has the latest version of that package.
+			notFoundRepositoryName = repositoryName
+			repositoryName = GetLatestPackageVersionFromAnyRepository(k, packagesFiles)
+			repositoryPackagesFile = packagesFiles[repositoryName]
 		}
 		var newPackageVersion string
 		for _, singlePackage := range repositoryPackagesFile.Packages {
 			if singlePackage.Package == k {
 				newPackageVersion = singlePackage.Version
-				continue
+				break
 			}
 		}
 		if newPackageVersion == "" {
@@ -243,6 +267,13 @@ func UpdateRepositoryPackages(renvLock *RenvLock, updatePackageRegexp string,
 		}
 		if entry, ok := renvLock.Packages[k]; ok {
 			if newPackageVersion != entry.Version {
+				if notFoundRepositoryName != "" {
+					log.Warn(
+						"Repository ", notFoundRepositoryName, " referenced by package ", k, " has not ",
+						"been defined in the lockfile and ", k, " will be updated to the latest version ",
+						`found in "`, repositoryName, `" repository.`,
+					)
+				}
 				log.Info("Updating package ", k, " version: ",
 					entry.Version, " → ", newPackageVersion)
 				entry.Version = newPackageVersion
@@ -261,19 +292,6 @@ func GetPackagesFiles(renvLock RenvLock) map[string]PackagesFile {
 		packagesFileContent := GetPackagesFileContent(repository.URL, DownloadTextFile)
 		packagesFile := ProcessPackagesFile(packagesFileContent)
 		repositoryPackagesFiles[repository.Name] = packagesFile
-	}
-
-	// Check if the PACKAGES file from a repository named CRAN has been downloaded.
-	_, ok := repositoryPackagesFiles["CRAN"]
-	if !ok {
-		// If not, save CRAN's PACKAGES file to be used as a fallback, for packages which
-		// (according to renv.lock) should be downloaded from a repository not defined in
-		// the renv.lock header.
-		_, _, cranPackagesContent := DownloadTextFile(
-			"https://cloud.r-project.org/src/contrib/PACKAGES", make(map[string]string),
-		)
-		cranPackagesFile := ProcessPackagesFile(cranPackagesContent)
-		repositoryPackagesFiles["CRAN"] = cranPackagesFile
 	}
 	return repositoryPackagesFiles
 }
