@@ -70,7 +70,7 @@ inputPackages:
   - https://raw.githubusercontent.com/insightsengineering/scda/main/DESCRIPTION
   - https://raw.githubusercontent.com/insightsengineering/scda.2022/main/DESCRIPTION
   - https://gitlab.example.com/api/v4/projects/123456/repository/files/DESCRIPTION/raw?ref=main
-  # Forward slashes in 'directory/subdirectory/DESCRIPTION' path are replaced by %2F
+  # Forward slashes in 'directory/subdirectory/DESCRIPTION' path are replaced by '%2F' due to URL encoding
   - https://gitlab.example.com/api/v4/projects/234567/repository/files/directory%2Fsubdirectory%2FDESCRIPTION/raw?ref=main
 inputRepositories:
   - Bioconductor.BioCsoft=https://bioconductor.org/packages/release/bioc
