@@ -287,6 +287,7 @@ func CheckIfVersionSufficient(availableVersionValue string, versionOperator stri
 
 	available := "="
 	// Compare up to 5 dot- or dash-separated version components.
+	// Examples of packages with 5 version components: RcppEigen, RcppArmadillo.
 	for i := 0; i < 5; i++ {
 		breakLoop := false
 		switch {
