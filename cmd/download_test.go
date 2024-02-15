@@ -17,152 +17,153 @@ limitations under the License.
 package cmd
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func mockedDownloadTextFile(url string, _ map[string]string) (int, int64, string) { // nolint: gocyclo
+func mockedDownloadTextFile(url string, _ map[string]string) (int64, string, error) { // nolint: gocyclo
 	switch {
 	case url == "https://gitlab.example.com/api/v4/projects/37706/repository/tags/v1.3.1":
-		return 200, 0, `{
+		return 0, `{
 			"someotherdata": "someotherdata",
 			"commit": {
 				"someotherdata": "someotherdata",
 				"id": "aaabbbcccddd111"
 			}
-		}`
+		}`, nil
 	case url == "https://gitlab.example.com/api/v4/projects/37706":
-		return 200, 0, `{
+		return 0, `{
 			"someotherdata": "someotherdata",
 			"path_with_namespace": "group1/group2/project1"
-		}`
+		}`, nil
 	case url == "https://gitlab.example.com/api/v4/projects/38706/repository/tags/v1.4.2":
-		return 200, 0, `{
+		return 0, `{
 			"someotherdata": "someotherdata",
 			"commit": {
 				"someotherdata": "someotherdata",
 				"id": "aaa222ccc444111"
 			}
-		}`
+		}`, nil
 	case url == "https://gitlab.example.com/api/v4/projects/38706":
-		return 200, 0, `{
+		return 0, `{
 			"someotherdata": "someotherdata",
 			"path_with_namespace": "group3/group4/group5/project4"
-		}`
+		}`, nil
 	case url == "https://gitlab.example.com/api/v4/projects/30176/repository/tags/v0.2.0":
-		return 200, 0, `{
+		return 0, `{
 			"someotherdata": "someotherdata",
 			"commit": {
 				"someotherdata": "someotherdata",
 				"id": "fff222ccc444eee"
 			}
-		}`
+		}`, nil
 	case url == "https://gitlab.example.com/api/v4/projects/30176":
-		return 200, 0, `{
+		return 0, `{
 			"someotherdata": "someotherdata",
 			"path_with_namespace": "group6/project7"
-		}`
+		}`, nil
 	case url == "https://gitlab.example.com/api/v4/projects/39307/repository/branches/main":
-		return 200, 0, `{
+		return 0, `{
 			"someotherdata": "someotherdata",
 			"commit": {
 				"someotherdata": "someotherdata",
 				"id": "fff555ddd888eee"
 			}
-		}`
+		}`, nil
 	case url == "https://gitlab.example.com/api/v4/projects/39307":
-		return 200, 0, `{
+		return 0, `{
 			"someotherdata": "someotherdata",
 			"path_with_namespace": "group7/project8"
-		}`
+		}`, nil
 	case url == "https://gitlab.example.com/api/v4/projects/39211/repository/branches/main":
-		return 200, 0, `{
+		return 0, `{
 			"someotherdata": "someotherdata",
 			"commit": {
 				"someotherdata": "someotherdata",
 				"id": "fffeee999888aaa"
 			}
-		}`
+		}`, nil
 	case url == "https://gitlab.example.com/api/v4/projects/39211":
-		return 200, 0, `{
+		return 0, `{
 			"someotherdata": "someotherdata",
 			"path_with_namespace": "group9/subgroup10/subgroup11/project9"
-		}`
+		}`, nil
 	case url == "https://api.github.com/repos/insightsengineering/formatters/git/ref/tags/v0.5.4":
-		return 200, 0, `{
+		return 0, `{
 			"someotherdata": "someotherdata",
 			"object": {
 				"someotherdata": "someotherdata",
 				"sha": "444eee222111eee"
 			}
-		}`
+		}`, nil
 	case url == "https://api.github.com/repos/insightsengineering/rtables/git/ref/tags/v0.6.5":
-		return 200, 0, `{
+		return 0, `{
 			"someotherdata": "someotherdata",
 			"object": {
 				"someotherdata": "someotherdata",
 				"sha": "555ddd222111ddd"
 			}
-		}`
+		}`, nil
 	case url == "https://api.github.com/repos/insightsengineering/nestcolor/git/ref/heads/main":
-		return 200, 0, `{
+		return 0, `{
 			"someotherdata": "someotherdata",
 			"object": {
 				"someotherdata": "someotherdata",
 				"sha": "555333aaabbbddd"
 			}
-		}`
+		}`, nil
 	case url == "https://api.github.com/repos/insightsengineering/tern/git/ref/heads/main":
-		return 200, 0, `{
+		return 0, `{
 			"someotherdata": "someotherdata",
 			"object": {
 				"someotherdata": "someotherdata",
 				"sha": "555333aaaeeefff"
 			}
-		}`
+		}`, nil
 	case url == "https://api.github.com/repos/insightsengineering/rlistings/git/ref/tags/v0.2.6":
-		return 200, 0, `{
+		return 0, `{
 			"someotherdata": "someotherdata",
 			"object": {
 				"someotherdata": "someotherdata",
 				"sha": "111444999eee222"
 			}
-		}`
+		}`, nil
 	case url == "https://gitlab.example.com/api/v4/projects/37706/repository/files/subdirectory%2FDESCRIPTION/raw?ref=v1.3.1":
-		return 200, 0, "DESCRIPTION contents 1"
+		return 0, "DESCRIPTION contents 1", nil
 	case url == "https://gitlab.example.com/api/v4/projects/38706/repository/files/subdirectory1%2Fsubdirectory2%2FDESCRIPTION/raw?ref=v1.4.2":
-		return 200, 0, "DESCRIPTION contents 2"
+		return 0, "DESCRIPTION contents 2", nil
 	case url == "https://gitlab.example.com/api/v4/projects/30176/repository/files/DESCRIPTION/raw?ref=v0.2.0":
-		return 200, 0, "DESCRIPTION contents 3"
+		return 0, "DESCRIPTION contents 3", nil
 	case url == "https://gitlab.example.com/api/v4/projects/39307/repository/files/DESCRIPTION/raw?ref=main":
-		return 200, 0, "DESCRIPTION contents 4"
+		return 0, "DESCRIPTION contents 4", nil
 	case url == "https://gitlab.example.com/api/v4/projects/39211/repository/files/subdirectory1%2FDESCRIPTION/raw?ref=main":
-		return 200, 0, "DESCRIPTION contents 5"
+		return 0, "DESCRIPTION contents 5", nil
 	case url == "https://raw.githubusercontent.com/insightsengineering/formatters/v0.5.4/subdirectory/DESCRIPTION":
-		return 200, 0, "DESCRIPTION contents 6"
+		return 0, "DESCRIPTION contents 6", nil
 	case url == "https://raw.githubusercontent.com/insightsengineering/rtables/v0.6.5/subdirectory1/subdirectory2/DESCRIPTION":
-		return 200, 0, "DESCRIPTION contents 7"
+		return 0, "DESCRIPTION contents 7", nil
 	case url == "https://raw.githubusercontent.com/insightsengineering/nestcolor/main/subdirectory/DESCRIPTION":
-		return 200, 0, "DESCRIPTION contents 8"
+		return 0, "DESCRIPTION contents 8", nil
 	case url == "https://raw.githubusercontent.com/insightsengineering/tern/main/DESCRIPTION":
-		return 200, 0, "DESCRIPTION contents 9"
+		return 0, "DESCRIPTION contents 9", nil
 	case url == "https://raw.githubusercontent.com/insightsengineering/rlistings/v0.2.6/DESCRIPTION":
-		return 200, 0, "DESCRIPTION contents 10"
+		return 0, "DESCRIPTION contents 10", nil
 	case url == "https://repo1.example.com/repo1/src/contrib/PACKAGES":
-		return 200, 0, "PACKAGES contents 1"
+		return 0, "PACKAGES contents 1", nil
 	case url == "https://repo2.example.com/repo2/src/contrib/PACKAGES":
-		return 200, 0, "PACKAGES contents 2"
+		return 0, "PACKAGES contents 2", nil
 	case url == "https://repo3.example.com/repo3/src/contrib/PACKAGES":
-		return 200, 0, "PACKAGES contents 3"
+		return 0, "PACKAGES contents 3", nil
 	case url == "https://cloud.r-project.org/bin/windows/contrib/4.3/PACKAGES":
-		return 200, 0, "PACKAGES content bin/windows"
+		return 0, "PACKAGES content bin/windows", nil
 	case url == "https://cloud.r-project.org/src/contrib/PACKAGES":
-		return 200, 0, "PACKAGES content src/contrib"
+		return 0, "PACKAGES content src/contrib", nil
 	case url == "https://example.com/src/contrib/PACKAGES":
-		return 404, 0, "Not found"
+		return 0, "", errors.New("Not found")
 	}
-	return 200, 0, ""
+	return 0, "", nil
 }
 
 func Test_DownloadDescriptionFiles(t *testing.T) {
