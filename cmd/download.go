@@ -67,6 +67,8 @@ func DownloadTextFile(url string, parameters map[string]string) (int64, string, 
 			body, err2 := io.ReadAll(resp.Body)
 			if err2 == nil {
 				return resp.ContentLength, string(body), nil
+			} else {
+				return 0, "", err2
 			}
 		}
 	}
