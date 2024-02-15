@@ -19,6 +19,8 @@ package cmd
 import (
 	"crypto/tls"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"regexp"
@@ -67,10 +69,10 @@ func DownloadTextFile(url string, parameters map[string]string) (int64, string, 
 			body, err2 := io.ReadAll(resp.Body)
 			if err2 == nil {
 				return resp.ContentLength, string(body), nil
-			} else {
-				return 0, "", err2
 			}
+			return 0, "", err2
 		}
+		return 0, "", errors.New("Received status code " + fmt.Sprint(resp.StatusCode))
 	}
 	return 0, "", err
 }
