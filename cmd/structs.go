@@ -66,7 +66,7 @@ type RenvLockContents struct {
 	Repositories []RenvLockRepository `json:"Repositories"`
 }
 
-// PackageDescrition represents an R package.
+// PackageDescription represents an R package.
 type PackageDescription struct {
 	// Package stores the package name.
 	Package string `json:"Package"`
@@ -92,6 +92,7 @@ type PackageDescription struct {
 	// Requirements field is not used, except to be able to unmarshal renv.lock JSON in which
 	// this field is present.
 	Requirements []string `json:"Requirements,omitempty"`
+	Hash         string   `json:"Hash,omitempty"`
 }
 
 type Dependency struct {

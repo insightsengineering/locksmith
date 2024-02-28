@@ -126,7 +126,7 @@ func Test_ConstructOutputPackageList(t *testing.T) {
 						"",
 					},
 				},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 			{
 				"package4",
@@ -146,14 +146,14 @@ func Test_ConstructOutputPackageList(t *testing.T) {
 						"",
 					},
 				},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 			{
 				"package11",
 				"0.7.8",
 				"", "",
 				[]Dependency{},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 			{
 				"package14",
@@ -173,28 +173,28 @@ func Test_ConstructOutputPackageList(t *testing.T) {
 						"2.2",
 					},
 				},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 			{
 				"package16",
 				"2.4.5",
 				"", "",
 				[]Dependency{},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 			{
 				"package6",
 				"3.0.1",
 				"", "",
 				[]Dependency{},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 			{
 				"package10",
 				"3.0.2",
 				"", "",
 				[]Dependency{},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 		},
 	}
@@ -224,21 +224,21 @@ func Test_ConstructOutputPackageList(t *testing.T) {
 						"",
 					},
 				},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 			{
 				"package5",
 				"3.2.0",
 				"", "",
 				[]Dependency{},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 			{
 				"package7",
 				"1.6.2",
 				"", "",
 				[]Dependency{},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 			{
 				"package9",
@@ -252,28 +252,28 @@ func Test_ConstructOutputPackageList(t *testing.T) {
 						"3.6",
 					},
 				},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 			{
 				"package11",
 				"5.4.7",
 				"", "",
 				[]Dependency{},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 			{
 				"package12",
 				"1.2.3",
 				"", "",
 				[]Dependency{},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 			{
 				"package15",
 				"3.3.4.5",
 				"", "",
 				[]Dependency{},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 		},
 	}
@@ -284,7 +284,7 @@ func Test_ConstructOutputPackageList(t *testing.T) {
 				"1.9.2",
 				"", "",
 				[]Dependency{},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 		},
 	}
@@ -339,7 +339,7 @@ func Test_ConstructOutputPackageList(t *testing.T) {
 						"1.0.0",
 					},
 				},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 			{
 				"package2",
@@ -390,7 +390,7 @@ func Test_ConstructOutputPackageList(t *testing.T) {
 						"",
 					},
 				},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 		},
 		packagesFiles, repositoryList,
@@ -407,7 +407,7 @@ func Test_ConstructOutputPackageList(t *testing.T) {
 				"GitHub",
 				"",
 				[]Dependency{},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 			{
 				"package2",
@@ -415,7 +415,7 @@ func Test_ConstructOutputPackageList(t *testing.T) {
 				"GitHub",
 				"",
 				[]Dependency{},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 			{
 				"package3",
@@ -423,7 +423,7 @@ func Test_ConstructOutputPackageList(t *testing.T) {
 				"Repository",
 				"https://repo1.example.com/ExampleRepo1",
 				[]Dependency{},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 			{
 				// package11 removed from here
@@ -432,7 +432,7 @@ func Test_ConstructOutputPackageList(t *testing.T) {
 				// However afterwards, package4 requested package11 >= 4.5
 				// so it had to be retrieved from repo2.
 				// The reference to repo1 was overwritten here.
-				"", "", "", "", []Dependency{}, "", "", "", "", "", "", "", []string{},
+				"", "", "", "", []Dependency{}, "", "", "", "", "", "", "", []string{}, "",
 			},
 			{
 				"package12",
@@ -440,7 +440,7 @@ func Test_ConstructOutputPackageList(t *testing.T) {
 				"Repository",
 				"https://repo2.example.com/ExampleRepo2",
 				[]Dependency{},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 			{
 				"package4",
@@ -448,7 +448,7 @@ func Test_ConstructOutputPackageList(t *testing.T) {
 				"Repository",
 				"https://repo2.example.com/ExampleRepo2",
 				[]Dependency{},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 			{
 				"package11",
@@ -456,7 +456,7 @@ func Test_ConstructOutputPackageList(t *testing.T) {
 				"Repository",
 				"https://repo2.example.com/ExampleRepo2",
 				[]Dependency{},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 			{
 				"package14",
@@ -464,7 +464,7 @@ func Test_ConstructOutputPackageList(t *testing.T) {
 				"Repository",
 				"https://repo1.example.com/ExampleRepo1",
 				[]Dependency{},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 			{
 				"package15",
@@ -472,7 +472,7 @@ func Test_ConstructOutputPackageList(t *testing.T) {
 				"Repository",
 				"https://repo2.example.com/ExampleRepo2",
 				[]Dependency{},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 			{
 				"package16",
@@ -480,7 +480,7 @@ func Test_ConstructOutputPackageList(t *testing.T) {
 				"Repository",
 				"https://repo1.example.com/ExampleRepo1",
 				[]Dependency{},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 			{
 				"package5",
@@ -488,7 +488,7 @@ func Test_ConstructOutputPackageList(t *testing.T) {
 				"Repository",
 				"https://repo2.example.com/ExampleRepo2",
 				[]Dependency{},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 			{
 				"package6",
@@ -496,7 +496,7 @@ func Test_ConstructOutputPackageList(t *testing.T) {
 				"Repository",
 				"https://repo1.example.com/ExampleRepo1",
 				[]Dependency{},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 			{
 				"package7",
@@ -504,7 +504,7 @@ func Test_ConstructOutputPackageList(t *testing.T) {
 				"Repository",
 				"https://repo2.example.com/ExampleRepo2",
 				[]Dependency{},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 			{
 				"package8",
@@ -512,7 +512,7 @@ func Test_ConstructOutputPackageList(t *testing.T) {
 				"Repository",
 				"https://repo3.example.com/ExampleRepo3",
 				[]Dependency{},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 			{
 				"package9",
@@ -520,7 +520,7 @@ func Test_ConstructOutputPackageList(t *testing.T) {
 				"Repository",
 				"https://repo2.example.com/ExampleRepo2",
 				[]Dependency{},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 			{
 				"package10",
@@ -528,7 +528,7 @@ func Test_ConstructOutputPackageList(t *testing.T) {
 				"Repository",
 				"https://repo1.example.com/ExampleRepo1",
 				[]Dependency{},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 		},
 	)
