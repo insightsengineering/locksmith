@@ -92,7 +92,7 @@ type PackageDescription struct {
 	// Requirements field is not used, except to be able to unmarshal renv.lock JSON in which
 	// this field is present.
 	Requirements []string `json:"Requirements,omitempty"`
-	Hash         string   `json:"Hash",omitempty`
+	Hash         string   `json:"Hash,omitempty"`
 }
 
 type Dependency struct {
