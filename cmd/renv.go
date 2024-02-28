@@ -277,6 +277,7 @@ func UpdateRepositoryPackages(renvLock *RenvLock, updatePackageRegexp string,
 				log.Info("Updating package ", k, " version: ",
 					entry.Version, " → ", newPackageVersion)
 				entry.Version = newPackageVersion
+				entry.Hash = ""
 				renvLock.Packages[k] = entry
 			}
 		}

@@ -37,7 +37,7 @@ func Test_GenerateRenvLock(t *testing.T) {
 			"subdirectory1",
 			"main",
 			"aaabbb444333",
-			[]string{},
+			[]string{}, "",
 		},
 		{
 			"package2",
@@ -52,10 +52,10 @@ func Test_GenerateRenvLock(t *testing.T) {
 			"subdirectory2",
 			"v2.5.4.3",
 			"eee888222aaa",
-			[]string{},
+			[]string{}, "",
 		},
 		{
-			"", "", "", "", []Dependency{}, "", "", "", "", "", "", "", []string{},
+			"", "", "", "", []Dependency{}, "", "", "", "", "", "", "", []string{}, "",
 		},
 		{
 			"package3",
@@ -63,7 +63,7 @@ func Test_GenerateRenvLock(t *testing.T) {
 			"Repository",
 			"https://repo1.example.com/repo1",
 			[]Dependency{},
-			"", "", "", "", "", "", "", []string{},
+			"", "", "", "", "", "", "", []string{}, "",
 		},
 		{
 			"package4",
@@ -71,7 +71,7 @@ func Test_GenerateRenvLock(t *testing.T) {
 			"Repository",
 			"https://repo2.example.com/repo2",
 			[]Dependency{},
-			"", "", "", "", "", "", "", []string{},
+			"", "", "", "", "", "", "", []string{}, "",
 		},
 		{
 			"package5",
@@ -79,7 +79,7 @@ func Test_GenerateRenvLock(t *testing.T) {
 			"Repository",
 			"https://repo3.example.com/repo3",
 			[]Dependency{},
-			"", "", "", "", "", "", "", []string{},
+			"", "", "", "", "", "", "", []string{}, "",
 		},
 	}, map[string]string{
 		"Repo1": "https://repo1.example.com/repo1",
@@ -108,7 +108,7 @@ func Test_GenerateRenvLock(t *testing.T) {
 				"subdirectory1",
 				"main",
 				"aaabbb444333",
-				[]string{},
+				[]string{}, "",
 			},
 			"package2": {
 				"package2",
@@ -123,7 +123,7 @@ func Test_GenerateRenvLock(t *testing.T) {
 				"subdirectory2",
 				"v2.5.4.3",
 				"eee888222aaa",
-				[]string{},
+				[]string{}, "",
 			},
 			"package3": {
 				"package3",
@@ -131,7 +131,7 @@ func Test_GenerateRenvLock(t *testing.T) {
 				"Repository",
 				"Repo1",
 				[]Dependency{},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 			"package4": {
 				"package4",
@@ -139,7 +139,7 @@ func Test_GenerateRenvLock(t *testing.T) {
 				"Repository",
 				"Repo2",
 				[]Dependency{},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 			"package5": {
 				"package5",
@@ -147,7 +147,7 @@ func Test_GenerateRenvLock(t *testing.T) {
 				"Repository",
 				"Repo3",
 				[]Dependency{},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 		},
 	})
@@ -170,17 +170,17 @@ func Test_GetPackageVersionFromDescription(t *testing.T) {
 func Test_GetGitRepositoryURL(t *testing.T) {
 	repoURL1 := GetGitRepositoryURL(PackageDescription{
 		"", "", "GitHub", "", []Dependency{}, "",
-		"api.github.com", "github-org-1", "repo-name-1", "", "", "", []string{},
+		"api.github.com", "github-org-1", "repo-name-1", "", "", "", []string{}, "",
 	})
 	assert.Equal(t, repoURL1, "https://github.com/github-org-1/repo-name-1")
 	repoURL2 := GetGitRepositoryURL(PackageDescription{
 		"", "", "GitLab", "", []Dependency{}, "",
-		"https://gitlab.example.com", "org1/org2", "repo-name-2", "", "", "", []string{},
+		"https://gitlab.example.com", "org1/org2", "repo-name-2", "", "", "", []string{}, "",
 	})
 	assert.Equal(t, repoURL2, "https://gitlab.example.com/org1/org2/repo-name-2")
 	repoURL3 := GetGitRepositoryURL(PackageDescription{
 		"", "", "GitLab", "", []Dependency{}, "",
-		"gitlab.example.com", "org3/org4", "repo-name-3", "", "", "", []string{},
+		"gitlab.example.com", "org3/org4", "repo-name-3", "", "", "", []string{}, "",
 	})
 	assert.Equal(t, repoURL3, "https://gitlab.example.com/org3/org4/repo-name-3")
 }
@@ -216,7 +216,7 @@ func Test_UpdateGitPackages(t *testing.T) {
 				"subdirectory1",
 				"main",
 				"aaabbb444333",
-				[]string{},
+				[]string{}, "",
 			},
 			"package12": {
 				"package12",
@@ -231,7 +231,7 @@ func Test_UpdateGitPackages(t *testing.T) {
 				"subdirectory2",
 				"v2.5.4.3",
 				"eee888222aaa",
-				[]string{},
+				[]string{}, "",
 			},
 			"package3": {
 				"package3",
@@ -239,7 +239,7 @@ func Test_UpdateGitPackages(t *testing.T) {
 				"Repository",
 				"Repo1",
 				[]Dependency{},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 			"package4": {
 				"package4",
@@ -254,7 +254,7 @@ func Test_UpdateGitPackages(t *testing.T) {
 				"",
 				"v3.7.0",
 				"ccceee444999",
-				[]string{},
+				[]string{}, "",
 			},
 		},
 	}
@@ -286,7 +286,7 @@ func Test_UpdateRepositoryPackages(t *testing.T) {
 				"Repository",
 				"Repo1",
 				[]Dependency{},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 			"package14": {
 				"package14",
@@ -301,7 +301,7 @@ func Test_UpdateRepositoryPackages(t *testing.T) {
 				"",
 				"v3.7.0",
 				"ccceee444999",
-				[]string{},
+				[]string{}, "",
 			},
 			"package15": {
 				"package15",
@@ -309,7 +309,7 @@ func Test_UpdateRepositoryPackages(t *testing.T) {
 				"Repository",
 				"Repo2",
 				[]Dependency{},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 			"package16": {
 				"package16",
@@ -317,7 +317,7 @@ func Test_UpdateRepositoryPackages(t *testing.T) {
 				"Repository",
 				"Repo3",
 				[]Dependency{},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 			"package17": {
 				"package17",
@@ -325,7 +325,7 @@ func Test_UpdateRepositoryPackages(t *testing.T) {
 				"Repository",
 				"Repo1",
 				[]Dependency{},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 			"package18": {
 				"package18",
@@ -333,7 +333,7 @@ func Test_UpdateRepositoryPackages(t *testing.T) {
 				"Repository",
 				"Repo2",
 				[]Dependency{},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 			"package19": {
 				"package19",
@@ -341,7 +341,7 @@ func Test_UpdateRepositoryPackages(t *testing.T) {
 				"Repository",
 				"NonExistentRepository",
 				[]Dependency{},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 			"package21": {
 				"package21",
@@ -349,7 +349,7 @@ func Test_UpdateRepositoryPackages(t *testing.T) {
 				"Repository",
 				"Repo1",
 				[]Dependency{},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 		},
 	}
@@ -360,19 +360,19 @@ func Test_UpdateRepositoryPackages(t *testing.T) {
 				"package13",
 				"2.2.0",
 				"", "", []Dependency{},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 			{
 				"package21",
 				"3.9.3",
 				"", "", []Dependency{},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 			{
 				"package19",
 				"5.2.1",
 				"", "", []Dependency{},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 		},
 	}
@@ -382,13 +382,13 @@ func Test_UpdateRepositoryPackages(t *testing.T) {
 				"package15",
 				"3.2.1",
 				"", "", []Dependency{},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 			{
 				"package19",
 				"5.2.2",
 				"", "", []Dependency{},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 		},
 	}
@@ -398,13 +398,13 @@ func Test_UpdateRepositoryPackages(t *testing.T) {
 				"package16",
 				"1.2.3",
 				"", "", []Dependency{},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 			{
 				"package19",
 				"5.2.2.4",
 				"", "", []Dependency{},
-				"", "", "", "", "", "", "", []string{},
+				"", "", "", "", "", "", "", []string{}, "",
 			},
 		},
 	}

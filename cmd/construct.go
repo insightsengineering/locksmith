@@ -35,7 +35,7 @@ func ConstructOutputPackageList(packages []PackageDescription, packagesFiles map
 		outputPackageList = append(outputPackageList, PackageDescription{
 			p.Package, p.Version, p.Source, "", []Dependency{},
 			p.RemoteType, p.RemoteHost, p.RemoteUsername, p.RemoteRepo, p.RemoteSubdir,
-			p.RemoteRef, p.RemoteSha, []string{},
+			p.RemoteRef, p.RemoteSha, []string{}, "",
 		})
 	}
 	for _, p := range packages {
@@ -120,7 +120,7 @@ func ResolveDependenciesRecursively(outputList *[]PackageDescription, name strin
 				// during the processing of output package list into renv.lock file.
 				*outputList = append(*outputList, PackageDescription{
 					p.Package, p.Version, "Repository", r, []Dependency{},
-					"", "", "", "", "", "", "", []string{},
+					"", "", "", "", "", "", "", []string{}, "",
 				})
 				for _, d := range p.Dependencies {
 					if d.DependencyType == "Depends" || d.DependencyType == "Imports" ||
