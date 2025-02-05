@@ -34,7 +34,7 @@ jobs:
       - name: Setup Go 🐹
         uses: actions/setup-go@v5
         with:
-          go-version: 1.21.3
+          go-version: 1.23.6
           cache: true
           cache-dependency-path: go.sum
 
@@ -46,7 +46,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run GoReleaser 🚀
-        uses: goreleaser/goreleaser-action@v5
+        uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
           version: latest
