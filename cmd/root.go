@@ -120,6 +120,7 @@ in an renv.lock-compatible file.`,
 				repositoryPackagesFiles := DownloadPackagesFiles(repositoryList, DownloadTextFile)
 				packagesFiles := ParsePackagesFiles(repositoryPackagesFiles)
 				outputPackageList := ConstructOutputPackageList(inputPackages, packagesFiles, repositoryList, allowedMissingDependencyTypes)
+				GenerateHTMLReport(outputPackageList, inputPackages, packagesFiles)
 				renvLock := GenerateRenvLock(outputPackageList, repositoryMap)
 				writeJSON(outputRenvLock, renvLock)
 			}
