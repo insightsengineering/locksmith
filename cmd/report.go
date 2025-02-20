@@ -106,13 +106,13 @@ func GenerateHTMLReport(outputPackageList []PackageDescription,
 			if pkg.Package == p.Package {
 				for _, d := range pkg.Dependencies {
 					switch d.DependencyType {
-					case "Depends":
+					case depends:
 						depends += d.DependencyName + ", "
-					case "Imports":
+					case imports:
 						imports += d.DependencyName + ", "
-					case "LinkingTo":
+					case linkingTo:
 						linkingTo += d.DependencyName + ", "
-					case "Suggests":
+					case suggests:
 						suggests += d.DependencyName + ", "
 					}
 				}

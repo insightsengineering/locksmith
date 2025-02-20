@@ -21,6 +21,10 @@ import (
 )
 
 const lowestPossiblePackageVersion = "0.0.0.0.0"
+const depends = "Depends"
+const imports = "Imports"
+const suggests = "Suggests"
+const linkingTo = "LinkingTo"
 
 // ConstructOutputPackageList generates a list of all packages and their dependencies
 // which should be included in the output renv.lock file,
@@ -40,8 +44,8 @@ func ConstructOutputPackageList(packages []PackageDescription, packagesFiles map
 	}
 	for _, p := range packages {
 		for _, d := range p.Dependencies {
-			if d.DependencyType == "Depends" || d.DependencyType == "Imports" ||
-				d.DependencyType == "Suggests" || d.DependencyType == "LinkingTo" {
+			if d.DependencyType == depends || d.DependencyType == imports ||
+				d.DependencyType == suggests || d.DependencyType == linkingTo {
 				if !CheckIfSkipDependency("", p.Package, d.DependencyName,
 					d.VersionOperator, d.VersionValue, &outputPackageList, p.Package) {
 					log.Info(p.Package, " → ", d.DependencyName, " (", d.DependencyType, ")")
@@ -125,8 +129,8 @@ func ResolveDependenciesRecursively(outputList *[]PackageDescription, name strin
 					"", "", "", "", "", "", "", []string{}, "",
 				})
 				for _, d := range p.Dependencies {
-					if d.DependencyType == "Depends" || d.DependencyType == "Imports" ||
-						d.DependencyType == "LinkingTo" {
+					if d.DependencyType == depends || d.DependencyType == imports ||
+						d.DependencyType == linkingTo {
 						if !CheckIfSkipDependency(indentation, p.Package, d.DependencyName,
 							d.VersionOperator, d.VersionValue, outputList, dependencyChain) {
 							log.Info(
