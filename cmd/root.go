@@ -18,9 +18,11 @@ limitations under the License.
 package cmd
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"runtime"
+	"strings"
 
 	"github.com/jamiealquiza/envy"
 	"github.com/sirupsen/logrus"
@@ -37,6 +39,7 @@ var inputRenvLock string
 var outputRenvLock string
 var allowIncompleteRenvLock string
 var updatePackages string
+var reportFileName string
 
 // In case the lists are provided as arrays in YAML configuration file:
 var inputPackages []string
@@ -49,7 +52,42 @@ var inputRepositoryList string
 
 var localTempDirectory string
 
+// Messages with level warning are saved to warnBuffer.
+// Messages with level error or higher are saved to errorBuffer.
+// This is required for the HTML report.
+var warnBuffer, errorBuffer bytes.Buffer
+
 var log = logrus.New()
+
+type WarningCaptureHook struct {
+	WarnEntries *bytes.Buffer
+}
+
+func (hook *WarningCaptureHook) Levels() []logrus.Level {
+	return []logrus.Level{logrus.WarnLevel}
+}
+
+func (hook *WarningCaptureHook) Fire(entry *logrus.Entry) error {
+	if entry.Level == logrus.WarnLevel {
+		hook.WarnEntries.WriteString(strings.TrimSpace(entry.Message) + "\n")
+	}
+	return nil
+}
+
+type ErrorCaptureHook struct {
+	ErrorEntries *bytes.Buffer
+}
+
+func (hook *ErrorCaptureHook) Levels() []logrus.Level {
+	return []logrus.Level{logrus.ErrorLevel, logrus.FatalLevel, logrus.PanicLevel}
+}
+
+func (hook *ErrorCaptureHook) Fire(entry *logrus.Entry) error {
+	if entry.Level >= logrus.ErrorLevel {
+		hook.ErrorEntries.WriteString(strings.TrimSpace(entry.Message) + "\n")
+	}
+	return nil
+}
 
 func setLogLevel() {
 	customFormatter := new(logrus.TextFormatter)
@@ -58,6 +96,19 @@ func setLogLevel() {
 	log.SetFormatter(customFormatter)
 	log.SetReportCaller(false)
 	customFormatter.FullTimestamp = false
+
+	// Log messages with level exactly equal to warning to warnBuffer.
+	warnCaptureHook := &WarningCaptureHook{
+		WarnEntries: &warnBuffer,
+	}
+	// Log messages with level equal to or higher than error to errorBuffer.
+	errorCaptureHook := &ErrorCaptureHook{
+		ErrorEntries: &errorBuffer,
+	}
+	// Add the custom hooks.
+	log.AddHook(warnCaptureHook)
+	log.AddHook(errorCaptureHook)
+
 	fmt.Println(`logLevel = "` + logLevel + `"`)
 	switch logLevel {
 	case "trace":
@@ -103,6 +154,7 @@ in an renv.lock-compatible file.`,
 			fmt.Println(`outputRenvLock = "` + outputRenvLock + `"`)
 			fmt.Println(`allowIncompleteRenvLock = "` + allowIncompleteRenvLock + `"`)
 			fmt.Println(`updatePackages = "` + updatePackages + `"`)
+			fmt.Println(`reportFileName = "` + reportFileName + `"`)
 
 			if runtime.GOOS == "windows" {
 				localTempDirectory = os.Getenv("TMP") + `\tmp\locksmith`
@@ -121,6 +173,7 @@ in an renv.lock-compatible file.`,
 				packagesFiles := ParsePackagesFiles(repositoryPackagesFiles)
 				outputPackageList := ConstructOutputPackageList(inputPackages, packagesFiles, repositoryList, allowedMissingDependencyTypes)
 				renvLock := GenerateRenvLock(outputPackageList, repositoryMap)
+				GenerateHTMLReport(outputPackageList, inputPackages, packagesFiles, renvLock, repositoryMap)
 				writeJSON(outputRenvLock, renvLock)
 			}
 		},
@@ -150,6 +203,8 @@ in an renv.lock-compatible file.`,
 			"The expression follows the pattern: \"expression1,expression2,...\" where \"expressionN\" can be: "+
 			"literal package name and/or * symbol(s) meaning any set of characters. Example: "+
 			`'package*,*abc,a*b,someOtherPackage'. By default all packages are updated.`)
+	rootCmd.PersistentFlags().StringVarP(&reportFileName, "reportFileName", "f", "locksmithReport.html",
+		"File name to save the output report.")
 
 	// Add version command.
 	rootCmd.AddCommand(extension.NewVersionCobraCmd())
@@ -201,6 +256,7 @@ func initializeConfig() {
 	for _, v := range []string{
 		"logLevel", "inputPackageList", "inputRepositoryList", "gitHubToken", "gitLabToken",
 		"inputRenvLock", "outputRenvLock", "allowIncompleteRenvLock", "updatePackages",
+		"reportFileName",
 	} {
 		// If the flag has not been set in newRootCommand() and it has been set in initConfig().
 		// In other words: if it's not been provided in command line, but has been
