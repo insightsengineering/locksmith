@@ -43,13 +43,13 @@ func ConstructOutputPackageList(packages []PackageDescription, packagesFiles map
 			if d.DependencyType == "Depends" || d.DependencyType == "Imports" ||
 				d.DependencyType == "Suggests" || d.DependencyType == "LinkingTo" {
 				if !CheckIfSkipDependency("", p.Package, d.DependencyName,
-					d.VersionOperator, d.VersionValue, &outputPackageList) {
+					d.VersionOperator, d.VersionValue, &outputPackageList, p.Package) {
 					log.Info(p.Package, " → ", d.DependencyName, " (", d.DependencyType, ")")
 					ResolveDependenciesRecursively(
 						&outputPackageList, d.DependencyName, d.VersionOperator,
 						d.VersionValue, d.DependencyType, allowedMissingDependencyTypes,
 						repositoryList, packagesFiles, 1, fatalMissingPackageVersions,
-						nonFatalMissingPackageVersions,
+						nonFatalMissingPackageVersions, p.Package,
 					)
 				}
 			}
@@ -92,17 +92,19 @@ func ResolveDependenciesRecursively(outputList *[]PackageDescription, name strin
 	versionValue string, dependencyType string, allowedMissingDependencyTypes []string,
 	repositoryList []string, packagesFiles map[string]PackagesFile, recursionLevel int,
 	fatalMissingPackageVersions map[string]DependencyVersion,
-	nonFatalMissingPackageVersions map[string]DependencyVersion) {
+	nonFatalMissingPackageVersions map[string]DependencyVersion,
+	dependencyChain string) {
 	var indentation string
 	for i := 0; i < recursionLevel; i++ {
 		indentation += "  "
 	}
+	dependencyChain += " → " + name
 	for _, r := range repositoryList {
 		// Check if the package is present in the PACKAGES file for the repository.
 		for _, p := range packagesFiles[r].Packages {
 			if p.Package == name {
 				if r != repositoryList[0] {
-					log.Warn(indentation, name, " not found in top repository.")
+					log.Warn(indentation, name, " not found in top repository. [", dependencyChain, "]")
 				}
 				// Check if package in the repository is available in sufficient version.
 				if !CheckIfVersionSufficient(p.Version, versionOperator, versionValue) {
@@ -110,7 +112,7 @@ func ResolveDependenciesRecursively(outputList *[]PackageDescription, name strin
 						indentation, p.Package, " in repository ", r,
 						" is available in version ", p.Version,
 						" which is insufficient according to requirement ",
-						versionOperator, " ", versionValue,
+						versionOperator, " ", versionValue, ". [", dependencyChain, "]",
 					)
 					// Try to retrieve the package from the next repository.
 					continue
@@ -126,7 +128,7 @@ func ResolveDependenciesRecursively(outputList *[]PackageDescription, name strin
 					if d.DependencyType == "Depends" || d.DependencyType == "Imports" ||
 						d.DependencyType == "LinkingTo" {
 						if !CheckIfSkipDependency(indentation, p.Package, d.DependencyName,
-							d.VersionOperator, d.VersionValue, outputList) {
+							d.VersionOperator, d.VersionValue, outputList, dependencyChain) {
 							log.Info(
 								indentation, p.Package, " → ", d.DependencyName,
 								" (", d.DependencyType, ")",
@@ -135,7 +137,7 @@ func ResolveDependenciesRecursively(outputList *[]PackageDescription, name strin
 								outputList, d.DependencyName, d.VersionOperator, d.VersionValue,
 								d.DependencyType, allowedMissingDependencyTypes, repositoryList,
 								packagesFiles, recursionLevel+1, fatalMissingPackageVersions,
-								nonFatalMissingPackageVersions,
+								nonFatalMissingPackageVersions, dependencyChain,
 							)
 						}
 					}
@@ -148,7 +150,7 @@ func ResolveDependenciesRecursively(outputList *[]PackageDescription, name strin
 	ProcessMissingPackage(
 		indentation, name, versionOperator, versionValue, dependencyType,
 		allowedMissingDependencyTypes, fatalMissingPackageVersions,
-		nonFatalMissingPackageVersions,
+		nonFatalMissingPackageVersions, dependencyChain,
 	)
 }
 
@@ -159,7 +161,8 @@ func ResolveDependenciesRecursively(outputList *[]PackageDescription, name strin
 func ProcessMissingPackage(indentation string, packageName string, versionOperator string,
 	versionValue string, dependencyType string, allowedMissingDependencyTypes []string,
 	fatalMissingPackageVersions map[string]DependencyVersion,
-	nonFatalMissingPackageVersions map[string]DependencyVersion) {
+	nonFatalMissingPackageVersions map[string]DependencyVersion,
+	dependencyChain string) {
 	var versionConstraint string
 	if versionOperator != "" && versionValue != "" {
 		versionConstraint = " (version " + versionOperator + " " + versionValue + ")"
@@ -167,9 +170,9 @@ func ProcessMissingPackage(indentation string, packageName string, versionOperat
 		versionOperator = ">="
 		versionValue = lowestPossiblePackageVersion
 	}
-	message := "Could not find package " + packageName + versionConstraint + " in any of the repositories.\n"
+	message := "Could not find package " + packageName + versionConstraint + " in any of the repositories."
 	if stringInSlice(dependencyType, allowedMissingDependencyTypes) {
-		log.Warn(indentation + message)
+		log.Warn(indentation + message + " [" + dependencyChain + "]\n")
 		val, ok := nonFatalMissingPackageVersions[packageName]
 		if !ok || (ok && !CheckIfVersionSufficient(val.VersionValue, versionOperator, versionValue)) {
 			// This is the first time we see this package as a missing dependency, or
@@ -180,7 +183,7 @@ func ProcessMissingPackage(indentation string, packageName string, versionOperat
 			log.Trace("Adding package ", packageName, " ", versionOperator, " ", versionValue, " to missing packages list.")
 		}
 	} else {
-		log.Error(indentation + message)
+		log.Error(indentation + message + " [" + dependencyChain + "]\n")
 		val, ok := fatalMissingPackageVersions[packageName]
 		if !ok || (ok && !CheckIfVersionSufficient(val.VersionValue, versionOperator, versionValue)) {
 			// See a comment above for explanation of this condition.
@@ -206,7 +209,8 @@ func CheckIfBasePackage(name string) bool {
 // Dependency should be skipped if it is a base R package, or has already been added to output
 // package list (later used to generate the renv.lock).
 func CheckIfSkipDependency(indentation string, packageName string, dependencyName string,
-	versionOperator string, versionValue string, outputList *[]PackageDescription) bool {
+	versionOperator string, versionValue string, outputList *[]PackageDescription,
+	dependencyChain string) bool {
 	if CheckIfBasePackage(dependencyName) {
 		log.Trace(indentation, "Skipping package ", dependencyName, " as it is a base R package.")
 		return true
@@ -236,6 +240,7 @@ func CheckIfSkipDependency(indentation string, packageName string, dependencyNam
 				"Output list already contains ", dependencyName, " but the version ",
 				(*outputList)[i].Version, " is insufficient as ", packageName,
 				" requires ", dependencyName, " ", versionOperator, " ", versionValue,
+				". [", dependencyChain, "]",
 			)
 			// Overwrite the information about the previous version of the dependency on the output list.
 			// The new version of the dependency will be subsequently added by deeper recursion levels,

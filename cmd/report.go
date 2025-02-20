@@ -17,15 +17,27 @@ limitations under the License.
 // Package cmd implements the core functionality of locksmith - the renv.lock generator.
 package cmd
 
+import (
+	_ "embed"
+	"encoding/json"
+	"html/template"
+	"os"
+	"strings"
+)
+
 type HTMLReport struct {
-	Config           []HTMLReportConfigurationItem
-	Errors           string
+	Config []HTMLReportConfigItem
+	// Errors will be written to the report only if locksmith
+	// is running with logLevel = error or lower.
+	Errors string
+	// Errors will be written to the report only if locksmith
+	// is running with logLevel = warning or lower.
 	Warnings         string
 	Dependencies     []HTMLReportDependency
 	RenvLockContents string
 }
 
-type HTMLReportConfigurationItem struct {
+type HTMLReportConfigItem struct {
 	Key   string
 	Value string
 }
@@ -40,20 +52,46 @@ type HTMLReportDependency struct {
 	Suggests   string
 }
 
+//go:embed template.html
+var htmlTemplate string
+
 func GenerateHTMLReport(outputPackageList []PackageDescription,
-	inputPackages []PackageDescription, packagesFiles map[string]PackagesFile) {
+	inputPackageDescriptions []PackageDescription, packagesFiles map[string]PackagesFile,
+	renvLockContents RenvLock) {
 
 	var htmlReport HTMLReport
-	log.Info(outputPackageList)
-	log.Info(inputPackages)
+
+	htmlReport.Config = append(htmlReport.Config,
+		HTMLReportConfigItem{"cfgFile", cfgFile},
+		HTMLReportConfigItem{"logLevel", logLevel},
+		HTMLReportConfigItem{"inputRenvLock", inputRenvLock},
+		HTMLReportConfigItem{"outputRenvLock", outputRenvLock},
+		HTMLReportConfigItem{"allowIncompleteRenvLock", allowIncompleteRenvLock},
+		HTMLReportConfigItem{"updatePackages", updatePackages},
+		HTMLReportConfigItem{"reportFileName", reportFileName},
+		HTMLReportConfigItem{"inputPackageList", inputPackageList},
+		HTMLReportConfigItem{"inputRepositoryList", inputRepositoryList},
+		HTMLReportConfigItem{"inputPackages", strings.Join(inputPackages, ", ")},
+		HTMLReportConfigItem{"inputRepositories", strings.Join(inputRepositories, ", ")},
+	)
+
+	renvLockString, err := json.MarshalIndent(renvLockContents, "", "  ")
+	checkError(err)
+	htmlReport.RenvLockContents = string(renvLockString)
+
+	htmlReport.Errors = errorBuffer.String()
+	htmlReport.Warnings = warnBuffer.String()
+
+	// Find different types of dependencies for the packages added to the output renv.lock.
 	for _, p := range outputPackageList {
-		log.Info(p.Package, " ", p.Version)
 		var depends, imports, linkingTo, suggests, repository string
 		// This represents the struct where we should look for the package details
 		// including its dependencies.
 		var expectedPackageLocation []PackageDescription
+
 		if p.Source == "Repository" {
 			// Get package dependencies from the PACKAGES file.
+			// Set the repository to repository URL.
 			repository = p.Repository
 			expectedPackageLocation = packagesFiles[p.Repository].Packages
 
@@ -61,15 +99,12 @@ func GenerateHTMLReport(outputPackageList []PackageDescription,
 			// Get package dependencies from DESCRIPTION files of input packages.
 			// Set the repository to GitLab or GitHub.
 			repository = p.Source
-			expectedPackageLocation = inputPackages
+			expectedPackageLocation = inputPackageDescriptions
 		}
+
 		for _, pkg := range expectedPackageLocation {
 			if pkg.Package == p.Package {
 				for _, d := range pkg.Dependencies {
-					log.Info(
-						pkg.Package, " → ", d.DependencyName,
-						" (", d.DependencyType, ")",
-					)
 					switch d.DependencyType {
 					case "Depends":
 						depends += d.DependencyName + ", "
@@ -85,7 +120,20 @@ func GenerateHTMLReport(outputPackageList []PackageDescription,
 			}
 		}
 		htmlReport.Dependencies = append(htmlReport.Dependencies, HTMLReportDependency{
-			p.Package, p.Version, repository, depends, imports, linkingTo, suggests,
+			p.Package, p.Version, repository,
+			strings.TrimSuffix(depends, ", "),
+			strings.TrimSuffix(imports, ", "),
+			strings.TrimSuffix(linkingTo, ", "),
+			strings.TrimSuffix(suggests, ", "),
 		})
 	}
+	t, err := template.New("locksmithReport").Parse(htmlTemplate)
+	checkError(err)
+
+	reportFile, err := os.Create(reportFileName)
+	checkError(err)
+	defer reportFile.Close()
+
+	err = t.Execute(reportFile, htmlReport)
+	checkError(err)
 }
