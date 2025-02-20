@@ -95,17 +95,10 @@
           </tr>
         </thead>
         <tbody>
-            {{range .Dependencies}}
-          <tr>
-            <td>{{.Name}}</td>
-            <td>{{.Version}}</td>
-            <td>{{.Repository}}</td>
-            <td>{{.Depends}}</td>
-            <td>{{.Imports}}</td>
-            <td>{{.LinkingTo}}</td>
-            <td>{{.Suggests}}</td>
-          </tr>
-            {{end}}
+            {{range .Dependencies}}<tr>
+            <td>{{.Name}}</td><td>{{.Version}}</td><td>{{.Repository}}</td>
+            <td>{{.Depends}}</td><td>{{.Imports}}</td><td>{{.LinkingTo}}</td>
+            <td>{{.Suggests}}</td></tr>{{end}}
         </tbody>
       </table>
     </div>

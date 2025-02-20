@@ -69,8 +69,8 @@ func GenerateHTMLReport(outputPackageList []PackageDescription,
 		HTMLReportConfigItem{"allowIncompleteRenvLock", allowIncompleteRenvLock},
 		HTMLReportConfigItem{"updatePackages", updatePackages},
 		HTMLReportConfigItem{"reportFileName", reportFileName},
-		HTMLReportConfigItem{"inputPackageList", inputPackageList},
-		HTMLReportConfigItem{"inputRepositoryList", inputRepositoryList},
+		HTMLReportConfigItem{"inputPackageList", strings.Join(strings.Split(inputPackageList, ","), ", ")},
+		HTMLReportConfigItem{"inputRepositoryList", strings.Join(strings.Split(inputRepositoryList, ","), ", ")},
 		HTMLReportConfigItem{"inputPackages", strings.Join(inputPackages, ", ")},
 		HTMLReportConfigItem{"inputRepositories", strings.Join(inputRepositories, ", ")},
 	)
@@ -84,7 +84,7 @@ func GenerateHTMLReport(outputPackageList []PackageDescription,
 
 	// Find different types of dependencies for the packages added to the output renv.lock.
 	for _, p := range outputPackageList {
-		var depends, imports, linkingTo, suggests, repository string
+		var dependsList, importsList, linkingToList, suggestsList, repository string
 		// This represents the struct where we should look for the package details
 		// including its dependencies.
 		var expectedPackageLocation []PackageDescription
@@ -107,13 +107,13 @@ func GenerateHTMLReport(outputPackageList []PackageDescription,
 				for _, d := range pkg.Dependencies {
 					switch d.DependencyType {
 					case depends:
-						depends += d.DependencyName + ", "
+						dependsList += d.DependencyName + ", "
 					case imports:
-						imports += d.DependencyName + ", "
+						importsList += d.DependencyName + ", "
 					case linkingTo:
-						linkingTo += d.DependencyName + ", "
+						linkingToList += d.DependencyName + ", "
 					case suggests:
-						suggests += d.DependencyName + ", "
+						suggestsList += d.DependencyName + ", "
 					}
 				}
 				break
@@ -121,10 +121,10 @@ func GenerateHTMLReport(outputPackageList []PackageDescription,
 		}
 		htmlReport.Dependencies = append(htmlReport.Dependencies, HTMLReportDependency{
 			p.Package, p.Version, repository,
-			strings.TrimSuffix(depends, ", "),
-			strings.TrimSuffix(imports, ", "),
-			strings.TrimSuffix(linkingTo, ", "),
-			strings.TrimSuffix(suggests, ", "),
+			strings.TrimSuffix(dependsList, ", "),
+			strings.TrimSuffix(importsList, ", "),
+			strings.TrimSuffix(linkingToList, ", "),
+			strings.TrimSuffix(suggestsList, ", "),
 		})
 	}
 	t, err := template.New("locksmithReport").Parse(htmlTemplate)
