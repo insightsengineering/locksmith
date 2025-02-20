@@ -26,6 +26,11 @@
     .fixed-width {
       font-family: 'Courier New', Courier, monospace;
     }
+    .table-wrap {
+      word-wrap: break-word;
+      white-space: normal;
+      word-break: break-all;
+    }
   </style>
 </head>
 <body>
@@ -57,7 +62,7 @@
   <div class="container mt-4" id="content">
     <div id="configuration">
       <h2>Configuration</h2>
-      <table id="configTable" class="display fixed-width">
+      <table id="configTable" class="display fixed-width table-wrap">
         <thead>
           <tr>
             <th>Name</th>
