@@ -173,7 +173,7 @@ in an renv.lock-compatible file.`,
 				packagesFiles := ParsePackagesFiles(repositoryPackagesFiles)
 				outputPackageList := ConstructOutputPackageList(inputPackages, packagesFiles, repositoryList, allowedMissingDependencyTypes)
 				renvLock := GenerateRenvLock(outputPackageList, repositoryMap)
-				GenerateHTMLReport(outputPackageList, inputPackages, packagesFiles, renvLock)
+				GenerateHTMLReport(outputPackageList, inputPackages, packagesFiles, renvLock, repositoryMap)
 				writeJSON(outputRenvLock, renvLock)
 			}
 		},

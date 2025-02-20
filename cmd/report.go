@@ -57,7 +57,7 @@ var htmlTemplate string
 
 func GenerateHTMLReport(outputPackageList []PackageDescription,
 	inputPackageDescriptions []PackageDescription, packagesFiles map[string]PackagesFile,
-	renvLockContents RenvLock) {
+	renvLockContents RenvLock, repositoryMap map[string]string) {
 
 	var htmlReport HTMLReport
 
@@ -69,8 +69,8 @@ func GenerateHTMLReport(outputPackageList []PackageDescription,
 		HTMLReportConfigItem{"allowIncompleteRenvLock", allowIncompleteRenvLock},
 		HTMLReportConfigItem{"updatePackages", updatePackages},
 		HTMLReportConfigItem{"reportFileName", reportFileName},
-		HTMLReportConfigItem{"inputPackageList", strings.Join(strings.Split(inputPackageList, ","), ", ")},
-		HTMLReportConfigItem{"inputRepositoryList", strings.Join(strings.Split(inputRepositoryList, ","), ", ")},
+		HTMLReportConfigItem{"inputPackageList", strings.ReplaceAll(inputPackageList, ",", ", ")},
+		HTMLReportConfigItem{"inputRepositoryList", strings.ReplaceAll(inputRepositoryList, ",", ", ")},
 		HTMLReportConfigItem{"inputPackages", strings.Join(inputPackages, ", ")},
 		HTMLReportConfigItem{"inputRepositories", strings.Join(inputRepositories, ", ")},
 	)
@@ -91,8 +91,8 @@ func GenerateHTMLReport(outputPackageList []PackageDescription,
 
 		if p.Source == "Repository" {
 			// Get package dependencies from the PACKAGES file.
-			// Set the repository to repository URL.
-			repository = p.Repository
+			// Set the repository to repository alias.
+			repository = GetRepositoryKeyByValue(p.Repository, repositoryMap)
 			expectedPackageLocation = packagesFiles[p.Repository].Packages
 
 		} else {

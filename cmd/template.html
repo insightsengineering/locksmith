@@ -61,14 +61,14 @@
   <div class="container mt-4" id="content">
     <div id="configuration">
       <h2>Configuration</h2>
-      <table id="configTable" class="display fixed-width table-wrap">
+      <table id="configTable" class="display table-wrap">
         <thead>
           <tr>
             <th>Name</th>
             <th>Value</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody class="fixed-width">
         {{range .Config}}
           <tr>
             <td>{{.Key}}</td>
@@ -94,10 +94,10 @@
           </tr>
         </thead>
         <tbody>
-            {{range .Dependencies}}<tr>
-            <td>{{.Name}}</td><td>{{.Version}}</td><td>{{.Repository}}</td>
-            <td>{{.Depends}}</td><td>{{.Imports}}</td><td>{{.LinkingTo}}</td>
-            <td>{{.Suggests}}</td></tr>{{end}}
+        {{range .Dependencies}}<tr>
+        <td>{{.Name}}</td><td class="fixed-width">{{.Version}}</td><td>{{.Repository}}</td>
+        <td>{{.Depends}}</td><td>{{.Imports}}</td><td>{{.LinkingTo}}</td>
+        <td>{{.Suggests}}</td></tr>{{end}}
         </tbody>
       </table>
     </div>
