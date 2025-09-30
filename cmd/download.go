@@ -134,7 +134,8 @@ func GetGitHubSha(remoteUsername string, remoteRepo string, remoteRef string, to
 		log.Trace("remoteRef = ", remoteRef, " doesn't match tag name regexp.")
 		urlPath = "heads"
 	}
-	tagOrBranchURL := "https://api.github.com/repos/" + remoteUsername + "/" + remoteRepo + "/git/ref/" + urlPath + "/" + remoteRef
+	tagOrBranchURL := "https://api.github.com/repos/" + remoteUsername + "/" + remoteRepo +
+		"/git/ref/" + urlPath + "/" + remoteRef
 	_, tagDataResponse, err := downloadFileFunction(tagOrBranchURL, token)
 	if err == nil {
 		var tagOrBranchData GitHubTagOrBranchResponse
