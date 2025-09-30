@@ -215,7 +215,10 @@ func GetLatestPackageVersionFromAnyRepository(soughtPackageName string, packages
 	for repositoryName, p := range packagesFiles {
 		for _, packageDescription := range p.Packages {
 			if packageDescription.Package == soughtPackageName {
-				log.Trace(soughtPackageName, " version ", packageDescription.Version, " found in ", repositoryName, " repository.")
+				log.Trace(
+					soughtPackageName, " version ", packageDescription.Version, " found in ",
+					repositoryName, " repository.",
+				)
 				if CheckIfVersionSufficient(packageDescription.Version, ">", latestPackageVersion) {
 					latestPackageVersion = packageDescription.Version
 					latestPackageVersionRepository = repositoryName
@@ -224,7 +227,10 @@ func GetLatestPackageVersionFromAnyRepository(soughtPackageName string, packages
 			}
 		}
 	}
-	log.Trace("Latest version ", latestPackageVersion, " for package ", soughtPackageName, " found in ", latestPackageVersionRepository, " repository.")
+	log.Trace(
+		"Latest version ", latestPackageVersion, " for package ", soughtPackageName, " found in ",
+		latestPackageVersionRepository, " repository.",
+	)
 	return latestPackageVersionRepository
 }
 

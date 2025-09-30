@@ -171,7 +171,9 @@ in an renv.lock-compatible file.`,
 				inputPackages := ParseDescriptionFileList(inputDescriptionFiles)
 				repositoryPackagesFiles := DownloadPackagesFiles(repositoryList, DownloadTextFile)
 				packagesFiles := ParsePackagesFiles(repositoryPackagesFiles)
-				outputPackageList := ConstructOutputPackageList(inputPackages, packagesFiles, repositoryList, allowedMissingDependencyTypes)
+				outputPackageList := ConstructOutputPackageList(
+					inputPackages, packagesFiles, repositoryList, allowedMissingDependencyTypes,
+				)
 				renvLock := GenerateRenvLock(outputPackageList, repositoryMap)
 				GenerateHTMLReport(outputPackageList, inputPackages, packagesFiles, renvLock, repositoryMap)
 				writeJSON(outputRenvLock, renvLock)
